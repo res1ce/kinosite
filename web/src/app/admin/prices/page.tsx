@@ -24,7 +24,7 @@ export default async function AdminPricesPage() {
   const items = await prisma.priceItem.findMany({ orderBy: { amount: "asc" } });
   return (
     <main className="grid gap-8">
-      <h1 className="text-xl font-semibold">Прайс-лист</h1>
+      <h1 className="text-xl font-semibold">Услуги</h1>
       <form action={createItem} className="grid gap-3 border rounded p-4">
         <div className="grid md:grid-cols-2 gap-3">
           <label className="grid gap-1">
@@ -32,8 +32,8 @@ export default async function AdminPricesPage() {
             <input className="border rounded px-3 py-2" name="name" required />
           </label>
           <label className="grid gap-1">
-            <span className="text-sm">Сумма (в {`RUB`})</span>
-            <input className="border rounded px-3 py-2" name="amount" type="number" step="1" required />
+            <span className="text-sm">(Опционально) Сумма</span>
+            <input className="border rounded px-3 py-2" name="amount" type="number" step="1" />
           </label>
         </div>
         <label className="grid gap-1">

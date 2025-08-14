@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import ImagesUploader from "@/components/ImagesUploader";
 
 async function createEvent(formData: FormData) {
   "use server";
@@ -8,11 +9,21 @@ async function createEvent(formData: FormData) {
   const shortDescription = String(formData.get("shortDescription") || "").trim();
   const content = String(formData.get("content") || "").trim();
   const coverImageUrl = String(formData.get("coverImageUrl") || "").trim() || null;
+  const galleryUrls = String(formData.get("galleryUrls") || "").trim();
   const date = new Date(String(formData.get("date") || new Date().toISOString()));
   const location = String(formData.get("location") || "").trim() || null;
   if (!title || !slug) return;
   await prisma.event.create({
-    data: { title, slug, shortDescription, content, coverImageUrl, date, location: location || undefined },
+    data: {
+      title,
+      slug,
+      shortDescription,
+      content,
+      coverImageUrl,
+      galleryUrls: galleryUrls ? JSON.parse(galleryUrls) : undefined,
+      date,
+      location: location || undefined,
+    },
   });
   revalidatePath("/events");
   revalidatePath(`/events/${slug}`);
@@ -31,7 +42,7 @@ export default async function AdminEventsPage() {
   const events = await prisma.event.findMany({ orderBy: { createdAt: "desc" } });
   return (
     <main className="grid gap-8">
-      <h1 className="text-xl font-semibold">Мероприятия</h1>
+      <h1 className="text-xl font-semibold">Новости</h1>
       <form action={createEvent} className="grid gap-3 border rounded p-4">
         <div className="grid gap-1">
           <label className="text-sm">Заголовок</label>
@@ -53,6 +64,7 @@ export default async function AdminEventsPage() {
           <label className="text-sm">Обложка (URL)</label>
           <input className="border rounded px-3 py-2" name="coverImageUrl" />
         </div>
+        <ImagesUploader />
         <div className="grid md:grid-cols-2 gap-3">
           <div className="grid gap-1">
             <label className="text-sm">Дата</label>
@@ -84,5 +96,7 @@ export default async function AdminEventsPage() {
     </main>
   );
 }
+
+// uploader вынесен в отдельный клиентский компонент
 
 

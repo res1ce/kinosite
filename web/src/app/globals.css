@@ -3,26 +3,36 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --brand-primary: #7c3aed; /* violet-600 */
+  --brand-secondary: #10b981; /* emerald-500 */
+  --brand-accent: #f59e0b; /* amber-500 */
+  --surface: #ffffff;
+  --border: rgba(0,0,0,.08);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-manrope);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+    --brand-primary: #8b5cf6; /* lighter for dark */
+    --brand-secondary: #34d399;
+    --brand-accent: #fbbf24;
+    --surface: #111213;
+    --border: rgba(255,255,255,.14);
   }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji", "Segoe UI Emoji";
 }
 
 /* Версия для слабовидящих */
@@ -40,4 +50,144 @@ body {
 .a11y {
   --background: #ffffff !important;
   --foreground: #000000 !important;
+  --brand-primary: #000000 !important;
+  --brand-secondary: #000000 !important;
+  --brand-accent: #000000 !important;
 }
+
+/* Современный градиент и анимации */
+.gradient-animated {
+  background: radial-gradient(1200px 600px at 10% -10%, rgba(59,130,246,.25), transparent),
+              radial-gradient(1200px 600px at 90% 10%, rgba(147,51,234,.25), transparent),
+              linear-gradient(120deg, #0b0b0b 0%, #0f172a 30%, #111827 60%, #0b0b0b 100%);
+  background-size: 200% 200%;
+  animation: gradientShift 12s ease infinite;
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.card-hover {
+  transition: transform .25s ease, box-shadow .25s ease;
+}
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(0,0,0,.15);
+}
+
+/* Hover tilt */
+.hover-tilt { transition: transform .2s ease, box-shadow .2s ease; }
+.hover-tilt:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(0,0,0,.12); }
+
+/* Section soft gradient */
+.section-soft {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(120deg,
+    rgba(124,58,237,.08),
+    rgba(16,185,129,.06),
+    rgba(59,130,246,.06)
+  );
+  background-size: 200% 200%;
+  animation: gradientShift 18s ease infinite;
+}
+html[data-theme="dark"] .section-soft {
+  background: linear-gradient(120deg,
+    rgba(139,92,246,.14),
+    rgba(52,211,153,.10),
+    rgba(59,130,246,.12)
+  );
+}
+
+/* Нейтральная секция без анимации */
+.section-subtle { background: linear-gradient(180deg, rgba(0,0,0,.015), transparent 40%); }
+html[data-theme="dark"] .section-subtle { background: linear-gradient(180deg, rgba(255,255,255,.02), transparent 40%); }
+
+/* Базовая карточка без стекла */
+.card-solid {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0,0,0,.04);
+  transition: box-shadow .2s ease, transform .2s ease, border-color .2s ease;
+}
+.card-solid:hover { box-shadow: 0 8px 30px rgba(0,0,0,.10); transform: translateY(-2px); }
+
+/* Стеклянный эффект */
+.glass {
+  background: rgba(255,255,255,.7);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(0,0,0,.06);
+  box-shadow: 0 8px 30px rgba(0,0,0,.08);
+  background-clip: padding-box;
+}
+.glass-strong {
+  background: rgba(255,255,255,.8);
+  border: 1px solid rgba(0,0,0,.08);
+  box-shadow: 0 10px 36px rgba(0,0,0,.12);
+}
+html[data-theme="dark"] .glass {
+  background: rgba(20,20,20,.7);
+  border-color: rgba(255,255,255,.12);
+  box-shadow: 0 8px 30px rgba(0,0,0,.5);
+}
+html[data-theme="dark"] .glass-strong {
+  background: rgba(20,20,20,.8);
+  border-color: rgba(255,255,255,.18);
+}
+
+/* Чипы */
+.chip { display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 999px; font-size: 12px; line-height: 1; }
+.chip-neutral { background: rgba(0,0,0,.06); color: #111; }
+.chip-accent { background: var(--brand-primary); color: #fff; }
+html[data-theme="dark"] .chip-neutral { background: rgba(255,255,255,.08); color: #eaeaea; }
+
+/* Фоновые паттерны */
+.bg-grid {
+  background-image: linear-gradient(rgba(0,0,0,.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,.05) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+html[data-theme="dark"] .bg-grid {
+  background-image: linear-gradient(rgba(255,255,255,.06) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.06) 1px, transparent 1px);
+}
+
+/* Тёмная тема с переключателем */
+html[data-theme="dark"] {
+  --background: #0b0b0b;
+  --foreground: #e7e7e7;
+  --brand-primary: #8b5cf6;
+  --brand-secondary: #34d399;
+  --brand-accent: #fbbf24;
+}
+
+/* Кнопки */
+.btn-primary {
+  background: var(--brand-primary);
+  color: white;
+}
+.btn-primary:hover { filter: brightness(1.1); }
+.btn-outline {
+  color: var(--brand-primary);
+  border: 1px solid var(--brand-primary);
+  background: transparent;
+}
+.btn-outline:hover { background: rgba(124,58,237,.08); }
+.btn-soft {
+  color: var(--brand-primary);
+  background: rgba(124,58,237,.12);
+}
+.btn-soft:hover { background: rgba(124,58,237,.18); }
+.btn-ghost {
+  color: white;
+  border: 1px solid rgba(255,255,255,.3);
+  background: transparent;
+}
+.btn-ghost:hover { background: rgba(255,255,255,.08); }
+
+/* Анимация появления */
+.reveal { opacity: 0; transform: translateY(16px); transition: opacity .6s ease, transform .6s ease; will-change: opacity, transform; }
+.reveal.is-visible { opacity: 1; transform: none; }

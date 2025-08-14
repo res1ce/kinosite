@@ -1,22 +1,16 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter, Manrope } from "next/font/google";
 import "./globals.css";
-import AccessibilityToggle from "@/components/AccessibilityToggle";
+import ThemeToggle from "@/components/ThemeToggle";
+import RevealOnScroll from "@/components/RevealOnScroll";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+const inter = Inter({ variable: "--font-inter", subsets: ["latin", "cyrillic"] });
+const manrope = Manrope({ variable: "--font-manrope", subsets: ["latin", "cyrillic"] });
 
 export const metadata: Metadata = {
   title: {
-    default: "Кинокомпания",
-    template: "%s — Кинокомпания",
+    default: "Забайкалькая кинокомиссия",
+    template: "%s — Кинокомиссия",
   },
   description: "Организация киномероприятий, партнёрские показы, социальные проекты.",
   metadataBase: new URL("http://localhost:3000"),
@@ -31,10 +25,13 @@ export default function RootLayout({
   return (
     <html lang="ru">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${inter.variable} ${manrope.variable} antialiased`}
       >
         {children}
-        <AccessibilityToggle />
+        <RevealOnScroll />
+        <div className="fixed bottom-4 right-4 flex gap-2 items-center translate-y-[-56px]">
+          <ThemeToggle />
+        </div>
       </body>
     </html>
   );
