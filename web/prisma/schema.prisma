@@ -1,0 +1,71 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String?
+  role         Role     @default(EDITOR)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+enum Role {
+  ADMIN
+  EDITOR
+}
+
+model Event {
+  id               String   @id @default(cuid())
+  title            String
+  slug             String   @unique
+  shortDescription String
+  content          String
+  coverImageUrl    String?
+  galleryUrls      Json?
+  date             DateTime
+  location         String?
+  isPublished      Boolean  @default(true)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model Cinema {
+  id        String   @id @default(cuid())
+  name      String
+  website   String?
+  latitude  Float
+  longitude Float
+  address   String?
+  isPartner Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PriceItem {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  amount      Int
+  currency    String   @default("RUB")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Page {
+  id          String   @id @default(cuid())
+  slug        String   @unique // about, anti-corruption, prosecutor
+  title       String
+  content     String
+  isPublished Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
