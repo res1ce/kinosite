@@ -35,26 +35,6 @@ body {
   font-family: var(--font-sans), system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji", "Segoe UI Emoji";
 }
 
-/* Версия для слабовидящих */
-.a11y body {
-  font-size: 18px;
-}
-.a11y :focus-visible {
-  outline: 2px dashed #000;
-  outline-offset: 2px;
-}
-.a11y a {
-  text-decoration: underline;
-}
-.a11y .a11y-contrast,
-.a11y {
-  --background: #ffffff !important;
-  --foreground: #000000 !important;
-  --brand-primary: #000000 !important;
-  --brand-secondary: #000000 !important;
-  --brand-accent: #000000 !important;
-}
-
 /* Современный градиент и анимации */
 .gradient-animated {
   background: radial-gradient(1200px 600px at 10% -10%, rgba(59,130,246,.25), transparent),

@@ -37,16 +37,18 @@ model Event {
   updatedAt        DateTime @updatedAt
 }
 
-model Cinema {
-  id        String   @id @default(cuid())
-  name      String
-  website   String?
-  latitude  Float
-  longitude Float
-  address   String?
-  isPartner Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model Location {
+  id           String   @id @default(cuid())
+  name         String
+  latitude     Float
+  longitude    Float
+  address      String?
+  description  String?
+  coverImageUrl String?
+  galleryUrls  Json?
+  isPartner    Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 
 model PriceItem {

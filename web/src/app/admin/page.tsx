@@ -4,10 +4,11 @@ export default function AdminHomePage() {
   return (
     <div className="grid gap-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Card title="Новости" href="/admin/events" description="Добавление и редактирование" />
-        <Card title="Локации" href="/admin/cinemas" description="Каталог локаций" />
-        <Card title="Услуги" href="/admin/prices" description="Список услуг (без цен)" />
-        <Card title="Страницы" href="/admin/pages" description="О нас, Документы" />
+        <Card title="Новости" href="/admin/events" description="Добавление и редактирование новостей" />
+        <Card title="Локации" href="/admin/locations" description="Добавление и редактирование каталога локаций" />
+        <Card title="Услуги" href="/admin/prices" description="Добавление и редактирование списка услуг" />
+        <Card title="О нас" href="/admin/pages" description="Добавление и редактирование информации на странице о нас" />
+        <Card title="Документы" href="/admin/pages" description="Добавление и редактирование информации в документах" />
       </div>
     </div>
   );
