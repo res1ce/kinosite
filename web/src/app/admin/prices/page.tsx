@@ -8,7 +8,7 @@ async function createItem(formData: FormData) {
   const amount = Number(formData.get("amount"));
   const currency = (String(formData.get("currency") || "RUB").trim() || "RUB").toUpperCase();
   if (!name || Number.isNaN(amount)) return;
-  await prisma.priceItem.create({ data: { name, description, amount: Math.round(amount), currency } });
+  await prisma.priceItem.create({ data: { name, description } });
   revalidatePath("/prices");
   revalidatePath("/admin/prices");
 }
@@ -21,7 +21,7 @@ async function deleteItem(id: string) {
 }
 
 export default async function AdminPricesPage() {
-  const items = await prisma.priceItem.findMany({ orderBy: { amount: "asc" } });
+  const items = await prisma.priceItem.findMany({ orderBy: {  } });
   return (
     <main className="grid gap-8">
       <h1 className="text-xl font-semibold">Услуги</h1>
@@ -30,10 +30,6 @@ export default async function AdminPricesPage() {
           <label className="grid gap-1">
             <span className="text-sm">Наименование</span>
             <input className="border rounded px-3 py-2" name="name" required />
-          </label>
-          <label className="grid gap-1">
-            <span className="text-sm">(Опционально) Сумма</span>
-            <input className="border rounded px-3 py-2" name="amount" type="number" step="1" />
           </label>
         </div>
         <label className="grid gap-1">
@@ -49,7 +45,6 @@ export default async function AdminPricesPage() {
           <li key={i.id} className="border rounded p-4 flex items-center justify-between">
             <div>
               <div className="font-medium">{i.name}</div>
-              <div className="text-xs text-gray-600">{i.amount.toLocaleString("ru-RU")} {i.currency}</div>
             </div>
             <form action={deleteItem.bind(null, i.id)}>
               <button className="text-sm text-red-600">Удалить</button>

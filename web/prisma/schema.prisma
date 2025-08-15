@@ -44,7 +44,6 @@ model Location {
   longitude    Float
   address      String?
   description  String?
-  coverImageUrl String?
   galleryUrls  Json?
   isPartner    Boolean  @default(true)
   createdAt    DateTime @default(now())
@@ -55,8 +54,6 @@ model PriceItem {
   id          String   @id @default(cuid())
   name        String
   description String?
-  amount      Int
-  currency    String   @default("RUB")
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
@@ -71,3 +68,10 @@ model Page {
   updatedAt   DateTime @updatedAt
 }
 
+model Document {
+  id          String   @id @default(cuid())
+  title       String
+  fileUrl     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

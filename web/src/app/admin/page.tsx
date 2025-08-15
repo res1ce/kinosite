@@ -7,8 +7,8 @@ export default function AdminHomePage() {
         <Card title="Новости" href="/admin/events" description="Добавление и редактирование новостей" />
         <Card title="Локации" href="/admin/locations" description="Добавление и редактирование каталога локаций" />
         <Card title="Услуги" href="/admin/prices" description="Добавление и редактирование списка услуг" />
-        <Card title="О нас" href="/admin/pages" description="Добавление и редактирование информации на странице о нас" />
-        <Card title="Документы" href="/admin/pages" description="Добавление и редактирование информации в документах" />
+        <Card title="О нас" href="/admin/pages/about" description="Добавление и редактирование информации на странице о нас" />
+        <Card title="Документы" href="/admin/documents" description="Добавление и редактирование информации в документах" />
       </div>
     </div>
   );
