@@ -1,36 +1,88 @@
 "use client";
 import { useState } from "react";
-import { ImagePlus } from "lucide-react";
+import { ImagePlus, Loader } from "lucide-react";
 
 export default function ImagesUploader() {
-  const [files, setFiles] = useState<File[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
   const [urls, setUrls] = useState<string[]>([]);
 
-  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const f = Array.from(e.target.files || []);
-    setFiles(f);
+  const upload = async (files: File[]) => {
+    setIsUploading(true);
+    try {
+      const form = new FormData();
+      files.forEach((f) => form.append("files", f));
+      const res = await fetch("/api/upload", { method: "POST", body: form });
+      const data = await res.json();
+      if (data.urls) {
+        setUrls((prevUrls) => [...prevUrls, ...data.urls]);
+        const hidden = document.querySelector<HTMLInputElement>("input[name='galleryUrls']");
+        if (hidden) hidden.value = JSON.stringify([...urls, ...data.urls]);
+      }
+    } finally {
+      setIsUploading(false);
+    }
   };
 
-  const upload = async () => {
-    const form = new FormData();
-    files.forEach((f) => form.append("files", f));
-    const res = await fetch("/api/upload", { method: "POST", body: form });
-    const data = await res.json();
-    setUrls(data.urls || []);
+  const onChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length > 0) {
+      await upload(files);
+    }
+  };
+
+  const removeImage = (urlToRemove: string) => {
+    const newUrls = urls.filter(url => url !== urlToRemove);
+    setUrls(newUrls);
     const hidden = document.querySelector<HTMLInputElement>("input[name='galleryUrls']");
-    if (hidden) hidden.value = JSON.stringify(data.urls || []);
+    if (hidden) hidden.value = JSON.stringify(newUrls);
   };
 
   return (
-    <div className="grid gap-2">
-      <input type="file" multiple accept="image/*" onChange={onChange} />
-      <div className="flex gap-2 flex-wrap">
-        {urls.map((u) => (
-          <img key={u} src={u} alt="" className="h-16 w-16 object-cover rounded" />
-        ))}
+    <div className="grid gap-3">
+      <div className="relative">
+        <input
+          type="file"
+          multiple
+          accept="image/*"
+          onChange={onChange}
+          className="block w-full text-sm text-gray-500
+            file:me-4 file:py-2 file:px-4
+            file:rounded-lg file:border-0
+            file:text-sm file:font-semibold
+            file:bg-blue-600 file:text-white
+            hover:file:bg-blue-700
+            file:disabled:opacity-50 file:disabled:pointer-events-none"
+          disabled={isUploading}
+        />
+        {isUploading && (
+          <div className="absolute inset-0 bg-white/50 flex items-center justify-center">
+            <Loader className="w-5 h-5 text-blue-600 animate-spin" />
+          </div>
+        )}
       </div>
+      {urls.length > 0 && (
+        <div className="grid gap-2">
+          <div className="text-sm font-medium text-gray-700">Загруженные изображения:</div>
+          <div className="flex gap-3 flex-wrap">
+            {urls.map((url) => (
+              <div key={url} className="relative group">
+                <img src={url} alt="" className="h-20 w-20 object-cover rounded-lg" />
+                <button
+                  type="button"
+                  onClick={() => removeImage(url)}
+                  className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                  </svg>
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
       <input type="hidden" name="galleryUrls" />
-      <button type="button" onClick={upload} className="justify-self-start bg-black text-white px-3 py-1 rounded flex items-center gap-2"><ImagePlus size={16} /> Загрузить</button>
     </div>
   );
 }

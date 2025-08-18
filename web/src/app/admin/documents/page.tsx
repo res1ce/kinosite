@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import FileUploader from "@/components/FileUploader";
+import DocumentsClient from "./DocumentsClient";
 
 async function createDocument(formData: FormData) {
   "use server";
@@ -46,45 +46,12 @@ export default async function AdminDocumentsPage() {
   return (
     <main className="grid gap-8">
       <h1 className="text-xl font-semibold">Документы</h1>
-      
-      <form action={createDocument} className="grid gap-3 border rounded p-4">
-        <div className="grid gap-1">
-          <label className="text-sm">Название документа</label>
-          <input className="border rounded px-3 py-2" name="title" required />
-        </div>
-        <div className="grid gap-1">
-          <label className="text-sm">Файл</label>
-          <FileUploader name="fileUrl" accept=".pdf,.doc,.docx" />
-        </div>
-        <div>
-          <button className="bg-black text-white px-4 py-2 rounded">Добавить</button>
-        </div>
-      </form>
-
-      <ul className="grid gap-3">
-        {documents.map((doc) => (
-          <li key={doc.id} className="border rounded p-4 flex items-center justify-between">
-            <div>
-              <div className="font-medium">{doc.title}</div>
-              <a 
-                href={doc.fileUrl} 
-                download 
-                className="text-sm text-blue-600 hover:underline"
-              >
-                Скачать
-              </a>
-            </div>
-            <div className="flex gap-2">
-              <form action={updateDocument.bind(null, doc.id)}>
-                <button className="text-sm text-blue-600">Изменить</button>
-              </form>
-              <form action={deleteDocument.bind(null, doc.id)}>
-                <button className="text-sm text-red-600">Удалить</button>
-              </form>
-            </div>
-          </li>
-        ))}
-      </ul>
+      <DocumentsClient
+        documents={documents}
+        createDocument={createDocument}
+        updateDocument={updateDocument}
+        deleteDocument={deleteDocument}
+      />
     </main>
   );
 }

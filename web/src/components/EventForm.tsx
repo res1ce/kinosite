@@ -23,7 +23,7 @@ export default function EventForm({
   onCancel?: () => void;
 }) {
   return (
-    <form action={onSubmit} className="grid gap-3 border rounded p-4">
+    <form action={onSubmit} className="grid gap-3 rounded p-4">
       <div className="grid gap-1">
         <label className="text-sm">Заголовок</label>
         <input 
@@ -89,16 +89,34 @@ export default function EventForm({
           />
         </div>
       </div>
-      <div className="flex gap-2">
-        <button type="submit" className="bg-black text-white px-4 py-2 rounded">
+      <div className="flex gap-2 pt-2">
+        <button 
+          type="submit" 
+          className="inline-flex items-center gap-1 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            {event ? (
+              <>
+                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+                <polyline points="17 21 17 13 7 13 7 21"/>
+                <polyline points="7 3 7 8 15 8"/>
+              </>
+            ) : (
+              <path d="M12 5v14M5 12h14"/>
+            )}
+          </svg>
           {event ? "Сохранить" : "Добавить"}
         </button>
         {onCancel && (
-          <button 
-            type="button" 
+          <button
+            type="button"
             onClick={onCancel}
-            className="border border-gray-300 px-4 py-2 rounded"
+            className="inline-flex items-center gap-1 bg-gray-100 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-200 transition-colors"
           >
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
             Отмена
           </button>
         )}
