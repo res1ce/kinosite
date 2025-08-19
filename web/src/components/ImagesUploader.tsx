@@ -1,10 +1,20 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ImagePlus, Loader } from "lucide-react";
 
-export default function ImagesUploader() {
+export default function ImagesUploader({ initialUrls = [] }: { initialUrls?: string[] }) {
   const [isUploading, setIsUploading] = useState(false);
-  const [urls, setUrls] = useState<string[]>([]);
+  const [urls, setUrls] = useState<string[]>(initialUrls);
+
+  useEffect(() => {
+    setUrls(initialUrls);
+  }, [initialUrls]);
+
+  // Separate effect for updating the hidden input
+  useEffect(() => {
+    const hidden = document.querySelector<HTMLInputElement>("input[name='galleryUrls']");
+    if (hidden) hidden.value = JSON.stringify(urls);
+  }, [urls]);
 
   const upload = async (files: File[]) => {
     setIsUploading(true);
@@ -14,9 +24,7 @@ export default function ImagesUploader() {
       const res = await fetch("/api/upload", { method: "POST", body: form });
       const data = await res.json();
       if (data.urls) {
-        setUrls((prevUrls) => [...prevUrls, ...data.urls]);
-        const hidden = document.querySelector<HTMLInputElement>("input[name='galleryUrls']");
-        if (hidden) hidden.value = JSON.stringify([...urls, ...data.urls]);
+        setUrls(prevUrls => [...prevUrls, ...data.urls]);
       }
     } finally {
       setIsUploading(false);
@@ -31,10 +39,7 @@ export default function ImagesUploader() {
   };
 
   const removeImage = (urlToRemove: string) => {
-    const newUrls = urls.filter(url => url !== urlToRemove);
-    setUrls(newUrls);
-    const hidden = document.querySelector<HTMLInputElement>("input[name='galleryUrls']");
-    if (hidden) hidden.value = JSON.stringify(newUrls);
+    setUrls(prevUrls => prevUrls.filter(url => url !== urlToRemove));
   };
 
   return (

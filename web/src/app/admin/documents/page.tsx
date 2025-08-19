@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import DocumentsClient from "./DocumentsClient";
+import BackButton from "@/components/BackButton";
 
 async function createDocument(formData: FormData) {
   "use server";
@@ -44,8 +45,11 @@ export default async function AdminDocumentsPage() {
   const documents = await prisma.document.findMany({ orderBy: { createdAt: "desc" } });
   
   return (
-    <main className="grid gap-8">
-      <h1 className="text-xl font-semibold">Документы</h1>
+    <main className="container mx-auto py-6 px-4">
+      <div className="mb-4">
+        <BackButton />
+      </div>
+      <h1 className="text-2xl font-bold mb-8">Документы</h1>
       <DocumentsClient
         documents={documents}
         createDocument={createDocument}

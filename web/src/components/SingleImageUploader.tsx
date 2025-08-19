@@ -1,10 +1,16 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Loader } from "lucide-react";
 
-export default function SingleImageUploader({ name }: { name: string }) {
+export default function SingleImageUploader({ name, initialUrl = "" }: { name: string; initialUrl?: string }) {
   const [isUploading, setIsUploading] = useState(false);
-  const [url, setUrl] = useState<string>("");
+  const [url, setUrl] = useState<string>(initialUrl);
+
+  useEffect(() => {
+    setUrl(initialUrl);
+    const hidden = document.querySelector<HTMLInputElement>(`input[name='${name}']`);
+    if (hidden) hidden.value = initialUrl;
+  }, [initialUrl, name]);
 
   const upload = async (file: File) => {
     setIsUploading(true);

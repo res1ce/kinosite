@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import EventsClient from "./EventsClient";
+import BackButton from "@/components/BackButton";
 
 async function createEvent(formData: FormData) {
   "use server";
@@ -74,6 +75,9 @@ export default async function AdminEventsPage() {
   const events = await prisma.event.findMany({ orderBy: { createdAt: "desc" } });
   return (
     <main className="container mx-auto py-6 px-4">
+      <div className="mb-4">
+        <BackButton />
+      </div>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Управление новостями</h1>
       </div>

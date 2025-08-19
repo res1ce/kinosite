@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useRef } from "react";
 import SingleImageUploader from "./SingleImageUploader";
 import ImagesUploader from "./ImagesUploader";
 
@@ -22,8 +22,30 @@ export default function EventForm({
   onSubmit: (formData: FormData) => Promise<void>;
   onCancel?: () => void;
 }) {
+  const formRef = useRef<HTMLFormElement>(null);
+
+  const handleSubmit = async (formData: FormData) => {
+    await onSubmit(formData);
+    if (!event) { // Только при создании новой новости
+      formRef.current?.reset(); // Очищаем все поля формы
+      // Очищаем значения загрузчиков изображений
+      const coverInput = document.querySelector<HTMLInputElement>("input[name='coverImageUrl']");
+      const galleryInput = document.querySelector<HTMLInputElement>("input[name='galleryUrls']");
+      if (coverInput) {
+        coverInput.value = "";
+        const coverEvent = new Event('change', { bubbles: true });
+        coverInput.dispatchEvent(coverEvent);
+      }
+      if (galleryInput) {
+        galleryInput.value = "";
+        const galleryEvent = new Event('change', { bubbles: true });
+        galleryInput.dispatchEvent(galleryEvent);
+      }
+    }
+  };
+
   return (
-    <form action={onSubmit} className="grid gap-3 rounded p-4">
+    <form ref={formRef} action={handleSubmit} className="grid gap-3 rounded p-4">
       <div className="grid gap-1">
         <label className="text-sm">Заголовок</label>
         <input 
@@ -34,7 +56,7 @@ export default function EventForm({
         />
       </div>
       <div className="grid gap-1">
-        <label className="text-sm">Слаг (URL)</label>
+        <label className="text-sm">Слаг (URL) - часть ссылки для показа в интернете (https://example.ru/СЛАГ)</label>
         <input 
           className="border rounded px-3 py-2" 
           name="slug" 
@@ -64,11 +86,16 @@ export default function EventForm({
       </div>
       <div className="grid gap-1">
         <label className="text-sm">Обложка</label>
-        <SingleImageUploader name="coverImageUrl" />
+        <SingleImageUploader 
+          name="coverImageUrl" 
+          initialUrl={event?.coverImageUrl || ""}
+        />
       </div>
       <div className="grid gap-1">
         <label className="text-sm">Галерея изображений</label>
-        <ImagesUploader />
+        <ImagesUploader 
+          initialUrls={event?.galleryUrls || []}
+        />
       </div>
       <div className="grid md:grid-cols-2 gap-3">
         <div className="grid gap-1">

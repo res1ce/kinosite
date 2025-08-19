@@ -1,7 +1,8 @@
 "use client";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import LocationPickerYandex from "@/components/LocationPickerYandex";
 import ImagesUploader from "@/components/ImagesUploader";
+import DeleteButton from "@/components/DeleteButton";
 
 interface Location {
   id: string;
@@ -40,6 +41,25 @@ export default function LocationsClient({
     setEditLocation(null);
   };
 
+  const formRef = useRef<HTMLFormElement>(null);
+
+  const handleSubmit = async (formData: FormData) => {
+    if (editId) {
+      await updateLocation(editId, formData);
+      handleCancel();
+    } else {
+      await createLocation(formData);
+      formRef.current?.reset();
+      // Очищаем значения загрузчика изображений
+      const galleryInput = document.querySelector<HTMLInputElement>("input[name='galleryUrls']");
+      if (galleryInput) {
+        galleryInput.value = "";
+        const event = new Event('change', { bubbles: true });
+        galleryInput.dispatchEvent(event);
+      }
+    }
+  };
+
   return (
     <div className="space-y-8">
       <div className="bg-white border rounded-lg shadow-sm p-6">
@@ -47,14 +67,8 @@ export default function LocationsClient({
           {editId ? "Редактировать локацию" : "Добавить локацию"}
         </h2>
         <form 
-          action={async (formData: FormData) => {
-            if (editId) {
-              await updateLocation(editId, formData);
-              handleCancel();
-            } else {
-              await createLocation(formData);
-            }
-          }} 
+          ref={formRef}
+          action={handleSubmit} 
           className="space-y-4"
         >
           <div className="grid md:grid-cols-2 gap-4">
@@ -125,7 +139,7 @@ export default function LocationsClient({
             <label className="text-sm font-medium text-gray-700">
               Галерея изображений
             </label>
-            <ImagesUploader />
+            <ImagesUploader initialUrls={editLocation?.galleryUrls || []} />
           </div>
 
           <LocationPickerYandex />
@@ -205,18 +219,7 @@ export default function LocationsClient({
                       </svg>
                       Изменить
                     </button>
-                    <form action={() => deleteLocation(location.id)}>
-                      <button 
-                        type="submit"
-                        className="inline-flex items-center gap-1 text-sm px-3 py-1.5 bg-red-50 text-red-600 rounded-md hover:bg-red-100 transition-colors"
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <polyline points="3 6 5 6 21 6"/>
-                          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-                        </svg>
-                        Удалить
-                      </button>
-                    </form>
+                    <DeleteButton onDelete={() => deleteLocation(location.id)} />
                   </div>
                 </div>
               </div>

@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import BackButton from "@/components/BackButton";
 
 async function updateAboutPage(formData: FormData) {
   "use server";
@@ -27,8 +28,11 @@ export default async function AdminAboutPage() {
   });
 
   return (
-    <main className="grid gap-8">
-      <h1 className="text-xl font-semibold">О нас</h1>
+    <main className="container mx-auto py-6 px-4">
+      <div className="mb-4">
+        <BackButton />
+      </div>
+      <h1 className="text-2xl font-bold mb-8">О нас</h1>
       
       <form action={updateAboutPage} className="grid gap-3">
         <div className="grid gap-1">

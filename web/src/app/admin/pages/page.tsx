@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import BackButton from "@/components/BackButton";
 
 async function upsertPage(formData: FormData) {
   "use server";
@@ -19,8 +20,11 @@ async function upsertPage(formData: FormData) {
 export default async function AdminPagesPage() {
   const pages = await prisma.page.findMany({ orderBy: { slug: "asc" } });
   return (
-    <main className="grid gap-8">
-      <h1 className="text-xl font-semibold">Страницы</h1>
+    <main className="container mx-auto py-6 px-4">
+      <div className="mb-4">
+        <BackButton />
+      </div>
+      <h1 className="text-2xl font-bold mb-8">Страницы</h1>
       <form action={upsertPage} className="grid gap-3 border rounded p-4">
         <div className="grid md:grid-cols-2 gap-3">
           <label className="grid gap-1">
