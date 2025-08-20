@@ -29,10 +29,10 @@ export default function RootLayout({
       >
         {children}
         <RevealOnScroll />
-        <div className="fixed bottom-4 right-4 flex gap-2 items-center translate-y-[-56px]">
-          <ThemeToggle />
-        </div>
       </body>
     </html>
   );
+  /*<div className="fixed bottom-4 right-4 flex gap-2 items-center translate-y-[-56px]">
+          <ThemeToggle />
+    </div>*/
 }
