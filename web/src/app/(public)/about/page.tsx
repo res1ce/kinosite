@@ -1,3 +1,4 @@
+// page.tsx "about"
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 
@@ -11,17 +12,13 @@ export default async function AboutPage() {
   }
 
   return (
-    <main className="container mx-auto py-8 px-4">
-      {/* Заголовок */}
-      <div className="text-center mb-10">
-        <h1 className="text-4xl font-bold text-gray-900">{aboutPage?.title || "О нас"}</h1>
-      </div>
-
-      {/* Контент */}
-      <div className="max-w-4xl mx-auto">
-        {aboutPage?.content ? (
+    <main className="grid">
+      <section className="py-20 bg-gradient-to-r from-[#6E0A6B]/10 to-transparent">
+        <div className="container mx-auto px-6 max-w-3xl text-center">
+          <h2 className="section-title mb-6">О нас</h2>
+          {aboutPage?.content ? (
           <article 
-            className="prose prose-lg prose-slate mx-auto dark:prose-invert"
+            className="prose prose-lg prose-slate mx-auto dark:prose-invert text-lg text-gray-700 dark:text-gray-300 leading-relaxed"
             dangerouslySetInnerHTML={{ __html: aboutPage.content }} 
           />
         ) : (
@@ -29,7 +26,8 @@ export default async function AboutPage() {
             Информация обновляется...
           </p>
         )}
-      </div>
+        </div>
+      </section>
     </main>
   );
 }
