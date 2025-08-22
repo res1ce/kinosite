@@ -1,191 +1,86 @@
 "use client";
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import Toolbar from "@/components/Toolbar";
+import Panel from "@/components/Panel";
 import FileUploader from "@/components/FileUploader";
 import DeleteButton from "@/components/DeleteButton";
 
-interface Document {
-  id: string;
-  title: string;
-  fileUrl: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
+interface Document { id: string; title: string; fileUrl: string; createdAt: string|Date; updatedAt: string|Date; }
 
 export default function DocumentsClient({
-  documents,
-  createDocument,
-  updateDocument,
-  deleteDocument,
+  documents, createDocument, updateDocument, deleteDocument,
 }: {
   documents: Document[];
-  createDocument: (formData: FormData) => Promise<void>;
-  updateDocument: (id: string, formData: FormData) => Promise<void>;
+  createDocument: (fd: FormData) => Promise<void>;
+  updateDocument: (id: string, fd: FormData) => Promise<void>;
   deleteDocument: (id: string) => Promise<void>;
 }) {
+  const [q, setQ] = useState("");
   const [editId, setEditId] = useState<string | null>(null);
-  const [editDocument, setEditDocument] = useState<Document | null>(null);
+  const [doc, setDoc] = useState<Document | null>(null);
 
-  const handleEdit = (document: Document) => {
-    setEditId(document.id);
-    setEditDocument(document);
-  };
-
-  const handleCancel = () => {
-    setEditId(null);
-    setEditDocument(null);
-  };
+  const filtered = useMemo(
+    () => documents.filter(d => [d.title, d.fileUrl].join(" ").toLowerCase().includes(q.toLowerCase())),
+    [documents, q]
+  );
 
   return (
-    <div className="grid gap-8">
-      <div className="bg-white border rounded-lg shadow-sm p-6">
-        <h2 className="text-lg font-semibold mb-4">Добавить новый документ</h2>
-        <form action={createDocument} className="space-y-4">
-          <div className="grid gap-1.5">
-            <label className="text-sm font-medium text-gray-700">Название документа</label>
-            <input 
-              className="w-full border rounded-md px-3 py-2 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500" 
-              name="title" 
-              required 
-              placeholder="Введите название документа"
-            />
-          </div>
-          <div className="grid gap-1.5">
-            <label className="text-sm font-medium text-gray-700">Файл</label>
-            <FileUploader name="fileUrl" accept=".pdf,.doc,.docx" />
-            <p className="text-sm text-gray-500">Поддерживаемые форматы: PDF, DOC, DOCX</p>
-          </div>
-          <div className="pt-2">
-            <button 
-              type="submit" 
-              className="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 5v14M5 12h14"/>
-              </svg>
-              Добавить документ
-            </button>
-          </div>
-        </form>
-      </div>
-
-      <ul className="grid gap-3">
-        {documents.map((doc) => (
-          <li key={doc.id} className="border rounded p-4">
-            {editId === doc.id ? (
-              <form
-                action={async (formData: FormData) => {
-                  // Если новый файл не был выбран, используем текущий URL
-                  const newFileUrl = formData.get("fileUrl");
-                  if (!newFileUrl && editDocument?.fileUrl) {
-                    formData.set("fileUrl", editDocument.fileUrl);
-                  }
-                  await updateDocument(doc.id, formData);
-                  handleCancel();
-                }}
-                className="grid gap-3"
-              >
-                <div className="grid gap-1.5">
-                  <label className="text-sm font-medium text-gray-700">Название документа</label>
-                  <input
-                    className="w-full border rounded-md px-3 py-2 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    name="title"
-                    defaultValue={editDocument?.title}
-                    required
-                  />
+    <div className="grid lg:grid-cols-3 gap-6 items-start">
+      <div className="lg:col-span-2 grid gap-4">
+        <Toolbar onSearch={setQ} right={<span className="text-sm text-gray-500">Найдено: {filtered.length}</span>} />
+        <ul className="grid md:grid-cols-2 gap-4">
+          {filtered.map((d) => (
+            <li key={d.id} className="rounded-2xl border bg-white dark:bg-[#111] p-4 shadow-sm hover:shadow-xl transition">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="font-medium truncate">{d.title}</div>
+                  <a className="text-xs text-[#6E0A6B] hover:underline break-all" href={d.fileUrl} target="_blank">Открыть</a>
+                  <div className="text-xs text-gray-500 mt-1">обновлено {new Date(d.updatedAt).toLocaleDateString("ru-RU")}</div>
                 </div>
-                <div className="grid gap-1.5">
-                  <label className="text-sm font-medium text-gray-700">Файл (необязательно)</label>
-                  <FileUploader name="fileUrl" accept=".pdf,.doc,.docx" />
-                  {editDocument?.fileUrl && (
-                    <div className="mt-1 p-3 bg-gray-50 rounded-md">
-                      <div className="text-sm text-gray-500 mb-1">Текущий файл:</div>
-                      <a
-                        href={editDocument.fileUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-sm text-blue-600 hover:underline inline-flex items-center gap-1"
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                          <polyline points="14 2 14 8 20 8"/>
-                          <line x1="12" y1="18" x2="12" y2="12"/>
-                          <line x1="9" y1="15" x2="15" y2="15"/>
-                        </svg>
-                        Посмотреть документ
-                      </a>
-                    </div>
-                  )}
-                  <p className="text-sm text-gray-500">Поддерживаемые форматы: PDF, DOC, DOCX</p>
-                </div>
-                <div className="flex gap-2 pt-2">
-                  <button 
-                    type="submit" 
-                    className="inline-flex items-center gap-1 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
-                      <polyline points="17 21 17 13 7 13 7 21"/>
-                      <polyline points="7 3 7 8 15 8"/>
-                    </svg>
-                    Сохранить
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleCancel}
-                    className="inline-flex items-center gap-1 bg-gray-100 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-200 transition-colors"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <line x1="18" y1="6" x2="6" y2="18"/>
-                      <line x1="6" y1="6" x2="18" y2="18"/>
-                    </svg>
-                    Отмена
-                  </button>
-                </div>
-              </form>
-            ) : (
-              <div className="flex items-center justify-between">
-                <div className="space-y-1">
-                  <div className="font-medium">{doc.title}</div>
-                  <div className="flex items-center gap-4">
-                    <a
-                      href={doc.fileUrl}
-                      download
-                      className="text-sm text-blue-600 hover:underline inline-flex items-center gap-1"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                        <polyline points="7 10 12 15 17 10"/>
-                        <line x1="12" y1="15" x2="12" y2="3"/>
-                      </svg>
-                      Скачать
-                    </a>
-                    <span className="text-sm text-gray-500">
-                      {new Date(doc.updatedAt).toLocaleDateString('ru-RU', {
-                        day: 'numeric',
-                        month: 'long',
-                        year: 'numeric',
-                      })}
-                    </span>
-                  </div>
-                </div>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => handleEdit(doc)}
-                    className="text-sm px-3 py-1.5 bg-blue-50 text-blue-600 rounded hover:bg-blue-100 transition-colors inline-flex items-center gap-1"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                    </svg>
-                    Изменить
-                  </button>
-                  <DeleteButton onDelete={() => deleteDocument(doc.id)} />
+                <div className="flex gap-2 shrink-0">
+                  <button onClick={() => { setEditId(d.id); setDoc(d); }} className="px-3 py-1.5 rounded-md bg-[#6E0A6B]/10 text-[#6E0A6B] hover:bg-[#6E0A6B]/15 transition">Изм.</button>
+                  <DeleteButton onDelete={() => deleteDocument(d.id)} />
                 </div>
               </div>
-            )}
-          </li>
-        ))}
-      </ul>
+            </li>
+          ))}
+          {filtered.length === 0 && (
+            <li className="col-span-full rounded-xl border bg-white dark:bg-[#111] p-10 text-center text-gray-500">Ничего не найдено</li>
+          )}
+        </ul>
+      </div>
+
+      <Panel title={editId ? "Редактировать документ" : "Добавить документ"}>
+        <form
+          action={async (fd: FormData) => {
+            if (editId) { if (!fd.get("fileUrl") && doc?.fileUrl) fd.set("fileUrl", doc.fileUrl); await updateDocument(editId, fd); setEditId(null); setDoc(null); }
+            else { await createDocument(fd); }
+          }}
+          className="grid gap-4"
+        >
+          <Field label="Название">
+            <input name="title" required defaultValue={doc?.title}
+              className="w-full rounded-lg border px-3 py-2 bg-white dark:bg-black/20 focus:outline-none focus:ring-2 focus:ring-[#6E0A6B]/60" />
+          </Field>
+          <Field label="Файл">
+            <FileUploader name="fileUrl" accept=".pdf,.doc,.docx" />
+            {doc?.fileUrl && <a className="text-xs text-[#6E0A6B] hover:underline mt-2 inline-block" href={doc.fileUrl} target="_blank">Текущий файл</a>}
+          </Field>
+          <button className="px-4 py-2 rounded-lg bg-[#6E0A6B] text-white hover:brightness-110 active:scale-95 transition">
+            {editId ? "Сохранить" : "Добавить"}
+          </button>
+          {editId && (
+            <button type="button" onClick={() => { setEditId(null); setDoc(null); }}
+              className="px-4 py-2 rounded-lg bg-gray-100 dark:bg-black/30 hover:bg-gray-200 transition">
+              Отмена
+            </button>
+          )}
+        </form>
+      </Panel>
     </div>
   );
+}
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return <label className="grid gap-1.5"><span className="text-sm font-medium">{label}</span>{children}</label>;
 }

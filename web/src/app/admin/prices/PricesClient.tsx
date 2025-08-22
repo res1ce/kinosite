@@ -1,156 +1,82 @@
 "use client";
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import Toolbar from "@/components/Toolbar";
+import Panel from "@/components/Panel";
 import DeleteButton from "@/components/DeleteButton";
 
-interface PriceItem {
-  id: string;
-  name: string;
-  description: string | null;
-  createdAt: Date;
-  updatedAt: Date;
-}
+interface PriceItem { id: string; name: string; description: string | null; updatedAt: string|Date; }
 
 export default function PricesClient({
-  priceItems,
-  createPriceItem,
-  updatePriceItem,
-  deletePriceItem,
+  priceItems, createPriceItem, updatePriceItem, deletePriceItem,
 }: {
   priceItems: PriceItem[];
-  createPriceItem: (formData: FormData) => Promise<void>;
-  updatePriceItem: (id: string, formData: FormData) => Promise<void>;
+  createPriceItem: (fd: FormData) => Promise<void>;
+  updatePriceItem: (id: string, fd: FormData) => Promise<void>;
   deletePriceItem: (id: string) => Promise<void>;
 }) {
+  const [q, setQ] = useState("");
   const [editId, setEditId] = useState<string | null>(null);
   const [editItem, setEditItem] = useState<PriceItem | null>(null);
-
-  const handleEdit = (item: PriceItem) => {
-    setEditId(item.id);
-    setEditItem(item);
-  };
-
-  const handleCancel = () => {
-    setEditId(null);
-    setEditItem(null);
-  };
+  const filtered = useMemo(() => priceItems.filter(i => [i.name, i.description].join(" ").toLowerCase().includes(q.toLowerCase())), [priceItems, q]);
 
   return (
-    <div className="space-y-8">
-      <div className="bg-white border rounded-lg shadow-sm p-6">
-        <h2 className="text-lg font-semibold mb-4">
-          {editId ? "Редактировать услугу" : "Добавить услугу"}
-        </h2>
-        <form 
-          action={async (formData: FormData) => {
-            if (editId) {
-              await updatePriceItem(editId, formData);
-              handleCancel();
-            } else {
-              await createPriceItem(formData);
-            }
-          }} 
-          className="space-y-4"
-        >
-          <div className="grid gap-1.5">
-            <label className="text-sm font-medium text-gray-700">
-              Название услуги
-            </label>
-            <input
-              name="name"
-              required
-              defaultValue={editItem?.name}
-              className="w-full border rounded-md px-3 py-2 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          <div className="grid gap-1.5">
-            <label className="text-sm font-medium text-gray-700">
-              Описание
-            </label>
-            <textarea
-              name="description"
-              rows={4}
-              defaultValue={editItem?.description || ''}
-              className="w-full border rounded-md px-3 py-2 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          <div className="flex gap-2">
-            <button
-              type="submit"
-              className="inline-flex items-center gap-1 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                {editId ? (
-                  <>
-                    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
-                    <polyline points="17 21 17 13 7 13 7 21"/>
-                    <polyline points="7 3 7 8 15 8"/>
-                  </>
-                ) : (
-                  <path d="M12 5v14M5 12h14"/>
-                )}
-              </svg>
-              {editId ? "Сохранить" : "Добавить"}
-            </button>
-            {editId && (
-              <button
-                type="button"
-                onClick={handleCancel}
-                className="inline-flex items-center gap-1 bg-gray-100 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-200 transition-colors"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="18" y1="6" x2="6" y2="18"/>
-                  <line x1="6" y1="6" x2="18" y2="18"/>
-                </svg>
-                Отмена
-              </button>
-            )}
-          </div>
-        </form>
-      </div>
-
-      <div className="space-y-4">
-        <h2 className="text-lg font-semibold">Список услуг</h2>
-        <div className="grid gap-4">
-          {priceItems.map((item) => (
-            <div key={item.id} className="bg-white border rounded-lg shadow-sm overflow-hidden">
-              <div className="p-4">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-medium text-gray-900">{item.name}</h3>
-                    </div>
-                    {item.description && (
-                      <p className="mt-2 text-sm text-gray-600">{item.description}</p>
-                    )}
-                    <p className="mt-2 text-xs text-gray-500">
-                      Последнее обновление: {new Date(item.updatedAt).toLocaleDateString('ru-RU', {
-                        day: 'numeric',
-                        month: 'long',
-                        year: 'numeric'
-                      })}
-                    </p>
-                  </div>
-                  <div className="flex gap-2 flex-shrink-0">
-                    <button
-                      onClick={() => handleEdit(item)}
-                      className="inline-flex items-center gap-1 text-sm px-3 py-1.5 bg-blue-50 text-blue-600 rounded-md hover:bg-blue-100 transition-colors"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                      </svg>
-                      Изменить
-                    </button>
-                    <DeleteButton onDelete={() => deletePriceItem(item.id)} />
-                  </div>
+    <div className="grid lg:grid-cols-3 gap-6 items-start">
+      <div className="lg:col-span-2 grid gap-4">
+        <Toolbar onSearch={setQ} />
+        <ul className="grid md:grid-cols-2 gap-4">
+          {filtered.map((i) => (
+            <li key={i.id} className="rounded-2xl border bg-white dark:bg-[#111] p-4 shadow-sm hover:shadow-xl transition">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="font-semibold">{i.name}</div>
+                  {i.description && <p className="text-sm text-gray-600 dark:text-gray-300 mt-1 line-clamp-2">{i.description}</p>}
+                  <div className="text-xs text-gray-500 mt-2">обновлено {new Date(i.updatedAt).toLocaleDateString("ru-RU")}</div>
+                </div>
+                <div className="flex gap-2 shrink-0">
+                  <button onClick={() => { setEditId(i.id); setEditItem(i); }} className="px-3 py-1.5 rounded-md bg-[#6E0A6B]/10 text-[#6E0A6B] hover:bg-[#6E0A6B]/15 transition">Изм.</button>
+                  <DeleteButton onDelete={() => deletePriceItem(i.id)} />
                 </div>
               </div>
-            </div>
+            </li>
           ))}
-        </div>
+          {filtered.length === 0 && (
+            <li className="col-span-full rounded-xl border bg-white dark:bg-[#111] p-10 text-center text-gray-500">
+              Ничего не найдено
+            </li>
+          )}
+        </ul>
       </div>
+
+      <Panel title={editId ? "Редактировать услугу" : "Добавить услугу"}>
+        <form
+          action={async (fd: FormData) => {
+            if (editId) { await updatePriceItem(editId, fd); setEditId(null); setEditItem(null); }
+            else { await createPriceItem(fd); }
+          }}
+          className="grid gap-4"
+        >
+          <Field label="Название">
+            <input name="name" defaultValue={editItem?.name} required
+              className="w-full rounded-lg border px-3 py-2 bg-white dark:bg-black/20 focus:outline-none focus:ring-2 focus:ring-[#6E0A6B]/60" />
+          </Field>
+          <Field label="Описание">
+            <textarea name="description" rows={4} defaultValue={editItem?.description || ""}
+              className="w-full rounded-lg border px-3 py-2 bg-white dark:bg_black/20 dark:bg-black/20 focus:outline-none focus:ring-2 focus:ring-[#6E0A6B]/60" />
+          </Field>
+          <button className="px-4 py-2 rounded-lg bg-[#6E0A6B] text-white hover:brightness-110 active:scale-95 transition">
+            {editId ? "Сохранить" : "Добавить"}
+          </button>
+          {editId && (
+            <button type="button" onClick={() => { setEditId(null); setEditItem(null); }}
+              className="px-4 py-2 rounded-lg bg-gray-100 dark:bg-black/30 hover:bg-gray-200 transition">
+              Отмена
+            </button>
+          )}
+        </form>
+      </Panel>
     </div>
   );
+}
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return <label className="grid gap-1.5"><span className="text-sm font-medium">{label}</span>{children}</label>;
 }

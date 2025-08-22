@@ -1,25 +1,28 @@
 import { getLocations, createLocation, updateLocation, deleteLocation } from "@/app/api/locations/actions";
+import { prisma } from "@/lib/prisma";
+import SectionTopbar from "@/components/SectionTopbar";
 import LocationsClient from "./LocationsClient";
-import BackButton from "@/components/BackButton";
 
 export default async function AdminLocationsPage() {
-  const locations = await getLocations();
-  
+  const [locations, counters] = await Promise.all([
+    getLocations(),
+    Promise.all([ 
+      (async () => ({ label: "Всего локаций", value: await prisma.location.count() }))(),
+      (async () => ({ label: "Всего новостей", value: await prisma.event.count() }))(),
+      (async () => ({ label: "Документов", value: await prisma.document.count() }))(),
+      (async () => ({ label: "Обновлено за 7 дней", value: await prisma.location.count({ where: { updatedAt: { gte: new Date(Date.now() - 7*864e5) } } }) }))(),
+    ]),
+  ]);
+
   return (
-    <div className="container mx-auto max-w-5xl py-8 px-4">
-      <div className="mb-4">
-        <BackButton />
-      </div>
-      <h1 className="text-2xl font-bold mb-8">Управление локациями</h1>
+    <main className="grid gap-6">
+      <SectionTopbar title="Локации" counters={counters} />
       <LocationsClient
         locations={locations}
         createLocation={createLocation}
         updateLocation={updateLocation}
         deleteLocation={deleteLocation}
       />
-    </div>
+    </main>
   );
 }
-
-
-

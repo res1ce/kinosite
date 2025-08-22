@@ -41,8 +41,8 @@ export default function FileUploader({ name, accept }: { name: string; accept?: 
             file:me-4 file:py-2 file:px-4
             file:rounded-lg file:border-0
             file:text-sm file:font-semibold
-            file:bg-blue-600 file:text-white
-            hover:file:bg-blue-700
+            file:bg-[#6E0A6B] file:text-white
+            hover:file:bg-[#A10B9B]
             file:disabled:opacity-50 file:disabled:pointer-events-none"
           disabled={isUploading}
         />

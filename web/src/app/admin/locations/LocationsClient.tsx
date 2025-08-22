@@ -1,5 +1,7 @@
 "use client";
-import { useState, useRef } from "react";
+import { useMemo, useState } from "react";
+import Toolbar from "@/components/Toolbar";
+import Panel from "@/components/Panel";
 import LocationPickerYandex from "@/components/LocationPickerYandex";
 import ImagesUploader from "@/components/ImagesUploader";
 import DeleteButton from "@/components/DeleteButton";
@@ -11,236 +13,133 @@ interface Location {
   longitude: number;
   address: string | null;
   description: string | null;
-  galleryUrls: any;
+  galleryUrls: string[] | null;   // Json? → string[] | null
   isPartner: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: Date | string;
+  updatedAt: Date | string;
 }
 
+
 export default function LocationsClient({
-  locations,
-  createLocation,
-  updateLocation,
-  deleteLocation,
+  locations, createLocation, updateLocation, deleteLocation,
 }: {
   locations: Location[];
-  createLocation: (formData: FormData) => Promise<void>;
-  updateLocation: (id: string, formData: FormData) => Promise<void>;
+  createLocation: (fd: FormData) => Promise<void>;
+  updateLocation: (id: string, fd: FormData) => Promise<void>;
   deleteLocation: (id: string) => Promise<void>;
 }) {
+  const [query, setQuery] = useState("");
   const [editId, setEditId] = useState<string | null>(null);
   const [editLocation, setEditLocation] = useState<Location | null>(null);
 
-  const handleEdit = (location: Location) => {
-    setEditId(location.id);
-    setEditLocation(location);
-  };
-
-  const handleCancel = () => {
-    setEditId(null);
-    setEditLocation(null);
-  };
-
-  const formRef = useRef<HTMLFormElement>(null);
-
-  const handleSubmit = async (formData: FormData) => {
-    if (editId) {
-      await updateLocation(editId, formData);
-      handleCancel();
-    } else {
-      await createLocation(formData);
-      formRef.current?.reset();
-      // Очищаем значения загрузчика изображений
-      const galleryInput = document.querySelector<HTMLInputElement>("input[name='galleryUrls']");
-      if (galleryInput) {
-        galleryInput.value = "";
-        const event = new Event('change', { bubbles: true });
-        galleryInput.dispatchEvent(event);
-      }
-    }
-  };
+  const filtered = useMemo(
+    () => locations.filter(l => [l.name, l.address, l.description].join(" ").toLowerCase().includes(query.toLowerCase())),
+    [locations, query]
+  );
 
   return (
-    <div className="space-y-8">
-      <div className="bg-white border rounded-lg shadow-sm p-6">
-        <h2 className="text-lg font-semibold mb-4">
-          {editId ? "Редактировать локацию" : "Добавить локацию"}
-        </h2>
-        <form 
-          ref={formRef}
-          action={handleSubmit} 
-          className="space-y-4"
+    <div className="grid lg:grid-cols-3 gap-6 items-start">
+      <div className="lg:col-span-2 grid gap-4">
+        <Toolbar onSearch={setQuery} />
+        <div className="grid md:grid-cols-2 gap-5">
+          {filtered.map((l) => (
+            <div key={l.id} className="group rounded-2xl border bg-white dark:bg-[#111] overflow-hidden shadow-sm hover:shadow-xl transition">
+              {/* Галерея превью */}
+              <div className="relative h-40 overflow-hidden">
+                <div className="absolute inset-0 grid grid-cols-2">
+                  {[0,1,2,3].map(i => (
+                    <div key={i} className="border border-white/10">
+                      <div className="w-full h-full bg-center bg-cover"
+                           style={{ backgroundImage: `url(${l.galleryUrls?.[i] || "/window.svg"})` }} />
+                    </div>
+                  ))}
+                </div>
+                <span className="absolute top-3 left-3 px-2 py-1 rounded-md text-[11px] bg-[#6E0A6B] text-white shadow">Локация</span>
+              </div>
+              <div className="p-4 grid gap-2">
+                <div className="flex items-start justify-between gap-3">
+                  <h3 className="font-semibold leading-snug hover:text-[#6E0A6B] transition">{l.name}</h3>
+                  <div className="flex gap-2 shrink-0">
+                    <button
+                      onClick={() => { setEditId(l.id); setEditLocation(l); }}
+                      className="px-3 py-1.5 rounded-md bg-[#6E0A6B]/10 text-[#6E0A6B] hover:bg-[#6E0A6B]/15 transition"
+                    >
+                      Изм.
+                    </button>
+                    <DeleteButton onDelete={() => deleteLocation(l.id)} />
+                  </div>
+                </div>
+                {l.address && <p className="text-sm text-gray-600">{l.address}</p>}
+                {l.description && <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2">{l.description}</p>}
+                <div className="text-xs text-gray-500">обновлено {new Date(l.updatedAt).toLocaleDateString("ru-RU")}</div>
+              </div>
+            </div>
+          ))}
+          {filtered.length === 0 && (
+            <div className="col-span-full rounded-xl border bg-white dark:bg-[#111] p-10 text-center text-gray-500">
+              Ничего не найдено
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Правая панель */}
+      <Panel title={editId ? "Редактировать локацию" : "Добавить локацию"}>
+        <form
+          action={async (fd: FormData) => {
+            if (editId) { await updateLocation(editId, fd); setEditId(null); setEditLocation(null); }
+            else { await createLocation(fd); }
+          }}
+          className="grid gap-4"
         >
-          <div className="grid md:grid-cols-2 gap-4">
-            <div className="grid gap-1.5">
-              <label className="text-sm font-medium text-gray-700">
-                Название локации
-              </label>
-              <input
-                name="name"
-                required
-                defaultValue={editLocation?.name}
-                className="w-full border rounded-md px-3 py-2 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <div className="grid gap-1.5">
-              <label className="text-sm font-medium text-gray-700">
-                Широта
-              </label>
-              <input
-                name="latitude"
-                type="number"
-                step="any"
-                required
-                defaultValue={editLocation?.latitude}
-                className="w-full border rounded-md px-3 py-2 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <div className="grid gap-1.5">
-              <label className="text-sm font-medium text-gray-700">
-                Долгота
-              </label>
-              <input
-                name="longitude"
-                type="number"
-                step="any"
-                required
-                defaultValue={editLocation?.longitude}
-                className="w-full border rounded-md px-3 py-2 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
+          <Field label="Название">
+            <input name="name" defaultValue={editLocation?.name}
+                   className="w-full rounded-lg border px-3 py-2 bg-white dark:bg-black/20 focus:outline-none focus:ring-2 focus:ring-[#6E0A6B]/60" required />
+          </Field>
+          <div className="grid grid-cols-2 gap-3">
+            <Field label="Широта">
+              <input name="latitude" type="number" step="any" defaultValue={editLocation?.latitude}
+                     className="w-full rounded-lg border px-3 py-2 bg-white dark:bg-black/20 focus:outline-none focus:ring-2 focus:ring-[#6E0A6B]/60" required />
+            </Field>
+            <Field label="Долгота">
+              <input name="longitude" type="number" step="any" defaultValue={editLocation?.longitude}
+                     className="w-full rounded-lg border px-3 py-2 bg-white dark:bg-black/20 focus:outline-none focus:ring-2 focus:ring-[#6E0A6B]/60" required />
+            </Field>
           </div>
-
-          <div className="grid gap-1.5">
-            <label className="text-sm font-medium text-gray-700">
-              Адрес
-            </label>
-            <input
-              name="address"
-              defaultValue={editLocation?.address || ''}
-              className="w-full border rounded-md px-3 py-2 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          <div className="grid gap-1.5">
-            <label className="text-sm font-medium text-gray-700">
-              Описание локации
-            </label>
-            <textarea
-              name="description"
-              rows={4}
-              required
-              defaultValue={editLocation?.description || ''}
-              className="w-full border rounded-md px-3 py-2 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          <div className="grid gap-1.5">
-            <label className="text-sm font-medium text-gray-700">
-              Галерея изображений
-            </label>
+          <Field label="Адрес">
+            <input name="address" defaultValue={editLocation?.address || ""}
+                   className="w-full rounded-lg border px-3 py-2 bg-white dark:bg-black/20 focus:outline-none focus:ring-2 focus:ring-[#6E0A6B]/60" />
+          </Field>
+          <Field label="Описание">
+            <textarea name="description" rows={4} defaultValue={editLocation?.description || ""}
+                      className="w-full rounded-lg border px-3 py-2 bg-white dark:bg-black/20 focus:outline-none focus:ring-2 focus:ring-[#6E0A6B]/60" />
+          </Field>
+          <Field label="Галерея">
             <ImagesUploader initialUrls={editLocation?.galleryUrls || []} />
-          </div>
-
+          </Field>
           <LocationPickerYandex />
-
           <div className="flex gap-2">
-            <button
-              type="submit"
-              className="inline-flex items-center gap-1 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                {editId ? (
-                  <>
-                    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
-                    <polyline points="17 21 17 13 7 13 7 21"/>
-                    <polyline points="7 3 7 8 15 8"/>
-                  </>
-                ) : (
-                  <path d="M12 5v14M5 12h14"/>
-                )}
-              </svg>
+            <button className="px-4 py-2 rounded-lg bg-[#6E0A6B] text-white hover:brightness-110 active:scale-95 transition">
               {editId ? "Сохранить" : "Добавить"}
             </button>
             {editId && (
-              <button
-                type="button"
-                onClick={handleCancel}
-                className="inline-flex items-center gap-1 bg-gray-100 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-200 transition-colors"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="18" y1="6" x2="6" y2="18"/>
-                  <line x1="6" y1="6" x2="18" y2="18"/>
-                </svg>
+              <button type="button" onClick={() => { setEditId(null); setEditLocation(null); }}
+                className="px-4 py-2 rounded-lg bg-gray-100 dark:bg-black/30 hover:bg-gray-200 transition">
                 Отмена
               </button>
             )}
           </div>
         </form>
-      </div>
-
-      <div className="space-y-4">
-        <h2 className="text-lg font-semibold">Список локаций</h2>
-        <div className="grid gap-4">
-          {locations.map((location) => (
-            <div key={location.id} className="bg-white border rounded-lg shadow-sm overflow-hidden">
-              <div className="p-4">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-medium text-gray-900">{location.name}</h3>
-                    </div>
-                    {location.address && (
-                      <p className="mt-1 text-sm text-gray-600">{location.address}</p>
-                    )}
-                    {location.description && (
-                      <p className="mt-2 text-sm text-gray-600">{location.description}</p>
-                    )}
-                    <div className="mt-2 flex items-center gap-3 text-xs text-gray-500">
-                      <span>Широта: {location.latitude}</span>
-                      <span>Долгота: {location.longitude}</span>
-                    </div>
-                    <p className="mt-2 text-xs text-gray-500">
-                      Последнее обновление: {new Date(location.updatedAt).toLocaleDateString('ru-RU', {
-                        day: 'numeric',
-                        month: 'long',
-                        year: 'numeric'
-                      })}
-                    </p>
-                  </div>
-                  <div className="flex gap-2 flex-shrink-0">
-                    <button
-                      onClick={() => handleEdit(location)}
-                      className="inline-flex items-center gap-1 text-sm px-3 py-1.5 bg-blue-50 text-blue-600 rounded-md hover:bg-blue-100 transition-colors"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                      </svg>
-                      Изменить
-                    </button>
-                    <DeleteButton onDelete={() => deleteLocation(location.id)} />
-                  </div>
-                </div>
-              </div>
-              {location.galleryUrls && location.galleryUrls.length > 0 && (
-                <div className="bg-gray-50 px-4 py-3">
-                  <div className="flex gap-2 overflow-auto">
-                    {location.galleryUrls.map((url: string, index: number) => (
-                      <img 
-                        key={index}
-                        src={url}
-                        alt=""
-                        className="h-20 w-20 object-cover rounded-md flex-shrink-0"
-                      />
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
+      </Panel>
     </div>
+  );
+}
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <label className="grid gap-1.5">
+      <span className="text-sm font-medium">{label}</span>
+      {children}
+    </label>
   );
 }
