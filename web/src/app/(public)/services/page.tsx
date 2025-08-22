@@ -8,7 +8,7 @@ export default async function ServicesPage() {
   });
 
   return (
-    <main className="container mx-auto px-6 py-20 grid gap-10">
+    <main className="container mx-auto px-6 py-20 grid gap-10 animate-fadeUp">
       <header className="section-hero">
         <h1 className="section-title">Услуги</h1>
         <p className="section-subtitle">Сопровождение проектов и консультации</p>
@@ -16,7 +16,7 @@ export default async function ServicesPage() {
 
       <ul className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
         {services.map((service, i) => (
-          <li key={service.id} className="service-card animate-fadeUp" style={{ animationDelay: `${i*0.05}s` }}>
+          <li key={service.id} className="service-card" style={{ animationDelay: `${i*0.05}s` }}>
             <h2 className="text-lg font-semibold flex items-center gap-2 text-[#6E0A6B]">
               <CheckCircle2 size={18} /> {service.name}
             </h2>

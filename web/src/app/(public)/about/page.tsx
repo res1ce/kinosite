@@ -12,22 +12,32 @@ export default async function AboutPage() {
   }
 
   return (
-    <main className="grid">
-      <section className="py-20 bg-gradient-to-r from-[#6E0A6B]/10 to-transparent">
-        <div className="container mx-auto px-6 max-w-3xl text-center">
-          <h2 className="section-title mb-6">О нас</h2>
-          {aboutPage?.content ? (
-          <article 
-            className="prose prose-lg prose-slate mx-auto dark:prose-invert text-lg text-gray-700 dark:text-gray-300 leading-relaxed"
-            dangerouslySetInnerHTML={{ __html: aboutPage.content }} 
+<main>
+  <section className="py-20 animate-fadeUp">
+    <div className="container mx-auto px-6 max-w-4xl">
+      <div className="text-center mb-12">
+        <h2 className="text-3xl md:text-4xl font-bold mb-4">
+          О нас
+        </h2>
+        <p className="text-gray-600 dark:text-gray-400 text-lg">
+          Узнайте больше о нашей миссии и работе
+        </p>
+      </div>
+
+      <div className="rounded-2xl shadow-md bg-white dark:bg-[#111] p-8 md:p-12">
+        {aboutPage?.content ? (
+          <article
+            className="prose prose-lg prose-slate dark:prose-invert max-w-none text-gray-800 dark:text-gray-200 leading-relaxed"
+            dangerouslySetInnerHTML={{ __html: aboutPage.content }}
           />
         ) : (
-          <p className="text-gray-600 text-center">
+          <p className="text-gray-600 dark:text-gray-400 text-center text-lg">
             Информация обновляется...
           </p>
         )}
-        </div>
-      </section>
-    </main>
+      </div>
+    </div>
+  </section>
+</main>
   );
 }

@@ -13,7 +13,7 @@ export default async function NewsPage() {
 
   return (
     <main className="container mx-auto px-6 py-20 grid gap-8">
-      <header className="section-hero">
+      <header className="section-hero animate-fadeUp">
         <h1 className="section-title">Новости</h1>
         <p className="section-subtitle">События, анонсы и отчёты кинокомиссии</p>
       </header>

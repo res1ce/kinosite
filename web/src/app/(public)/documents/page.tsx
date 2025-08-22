@@ -7,7 +7,7 @@ export default async function DocumentsPage() {
   });
 
   return (
-    <section className="py-20 container mx-auto px-6">
+    <section className="py-20 container mx-auto px-6 animate-fadeUp">
       <h2 className="section-title text-center mb-12">Документы</h2>
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         {documents.map((doc) => (

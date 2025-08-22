@@ -14,21 +14,35 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
       {/* Header */}
       <header className="fixed top-0 left-0 w-full z-50 transition backdrop-blur bg-white/70 dark:bg-black/40 shadow-sm">
         <div className="container mx-auto px-6 flex items-center justify-between h-16">
-          <Link href="/" className="font-bold text-xl text-[#6E0A6B]">Кинокомиссия</Link>
+          {/* Лого */}
+          <Link
+            href="/"
+            className="font-bold text-xl text-[#6E0A6B] hover:text-[#9d2c99] transition-colors"
+          >
+            Кинокомиссия
+          </Link>
+
+          {/* Навигация */}
           <nav className="hidden md:flex gap-6">
             {nav.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className="main-nav-item"
+                className="relative px-2 py-1 font-medium text-gray-700 dark:text-gray-200 transition-colors 
+                          hover:text-[#6E0A6B] group"
               >
                 {item.title}
+                {/* Подчеркивание */}
+                <span className="absolute left-0 -bottom-1 w-0 h-0.5 bg-gradient-to-r from-[#6E0A6B] to-purple-500 transition-all duration-300 group-hover:w-full"></span>
               </Link>
             ))}
           </nav>
+
+          {/* CTA */}
           <Link
             href="/contacts"
-            className="hidden md:inline-block px-5 py-2 rounded-lg bg-[#6E0A6B] text-white font-medium hover:scale-105 transition"
+            className="hidden md:inline-block px-5 py-2 rounded-lg bg-gradient-to-r from-[#6E0A6B] to-purple-600 text-white font-medium 
+                      shadow-md hover:shadow-lg hover:scale-105 active:scale-95 transition-all"
           >
             Связаться
           </Link>
