@@ -1,7 +1,9 @@
+// app/layout.tsx
 import Link from "next/link";
+import { prisma } from "@/lib/prisma";
+import ContactModal from "@/components/ContactModal";
 
-// layout.tsx
-export default function PublicLayout({ children }: { children: React.ReactNode }) {
+export default async function PublicLayout({ children }: { children: React.ReactNode }) {
   const nav = [
     { title: "Новости", href: "/news" },
     { title: "Локации", href: "/locations" },
@@ -9,6 +11,16 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
     { title: "Документы", href: "/documents" },
     { title: "О нас", href: "/about" },
   ];
+
+  const site = await prisma.siteContent.findUnique({ where: { slug: "main" } });
+
+  const footerDescription =
+    site?.footerDescription || "Помощь в организации съёмок и продвижении региона.";
+  const footerContacts =
+    site?.footerContacts || "Чита, Забайкальский край\ninfo@kino.ru";
+
+  const contactLines = footerContacts.split("\n").map((l) => l.trim()).filter(Boolean);
+
   return (
     <div className="min-h-svh flex flex-col">
       {/* Header */}
@@ -32,20 +44,18 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
                           hover:text-[#6E0A6B] group"
               >
                 {item.title}
-                {/* Подчеркивание */}
                 <span className="absolute left-0 -bottom-1 w-0 h-0.5 bg-gradient-to-r from-[#6E0A6B] to-purple-500 transition-all duration-300 group-hover:w-full"></span>
               </Link>
             ))}
           </nav>
 
           {/* CTA */}
-          <Link
-            href="/contacts"
-            className="hidden md:inline-block px-5 py-2 rounded-lg bg-gradient-to-r from-[#6E0A6B] to-purple-600 text-white font-medium 
-                      shadow-md hover:shadow-lg hover:scale-105 active:scale-95 transition-all"
-          >
-            Связаться
-          </Link>
+        <ContactModal
+          phone={site?.contactPhone || "+7 (999) 123-45-67"}
+          email={site?.contactEmail || "info@kino.ru"}
+          variant="header"
+        />
+
         </div>
       </header>
 
@@ -57,9 +67,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
         <div className="container mx-auto px-6 py-12 grid md:grid-cols-3 gap-8">
           <div>
             <h3 className="font-bold text-lg mb-3">Кинокомиссия</h3>
-            <p className="text-sm text-gray-200">
-              Помощь в организации съёмок и продвижении региона.
-            </p>
+            <p className="text-sm text-gray-200">{footerDescription}</p>
           </div>
           <div>
             <h3 className="font-bold text-lg mb-3">Навигация</h3>
@@ -72,8 +80,9 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
           </div>
           <div>
             <h3 className="font-bold text-lg mb-3">Контакты</h3>
-            <p className="text-sm">Чита, Забайкальский край</p>
-            <p className="text-sm">info@kino.ru</p>
+            {contactLines.map((line, idx) => (
+              <p className="text-sm" key={idx}>{line}</p>
+            ))}
           </div>
         </div>
         <div className="text-center text-sm py-4 bg-black/20">

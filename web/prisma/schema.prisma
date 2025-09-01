@@ -75,3 +75,21 @@ model Document {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
+
+model SiteContent {
+  id                String   @id @default(cuid())
+  slug              String   @unique @default("main") // singleton config
+  heroText          String
+  feature1Number    String
+  feature1Label     String
+  feature2Number    String
+  feature2Label     String
+  feature3Number    String
+  feature3Label     String
+  footerDescription String
+  footerContacts    String
+  contactPhone      String   @default("+7 (999) 123-45-67") // новый
+  contactEmail      String   @default("info@kino.ru")       // новый (назначение письма)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}

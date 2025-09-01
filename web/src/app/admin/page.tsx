@@ -10,8 +10,9 @@ export default function AdminHomePage() {
         <Card title="Новости"   href="/admin/events"    description="Добавление и редактирование новостей" />
         <Card title="Локации"   href="/admin/locations" description="Каталог локаций и галереи" />
         <Card title="Услуги"    href="/admin/prices"    description="Список услуг" />
-        <Card title="О нас"     href="/admin/pages/about" description="Контент страницы «О нас»" />
         <Card title="Документы" href="/admin/documents" description="Файлы и ссылки на документы" />
+        <Card title="О нас"     href="/admin/pages/about" description="Контент страницы «О нас»" />
+        <Card title="Информация на сайте"     href="/admin/site" description="Контент на главной странице и подвале" />
       </div>
     </div>
   );

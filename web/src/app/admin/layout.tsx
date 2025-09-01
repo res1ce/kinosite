@@ -11,6 +11,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { href: "/admin/prices", title: "Услуги" },
     { href: "/admin/documents", title: "Документы" },
     { href: "/admin/pages/about", title: "О нас" },
+    { href: "/admin/site", title: "Информация на сайте" },
   ];
 
   return (
