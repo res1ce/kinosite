@@ -24,15 +24,10 @@ export default function LocationPickerYandex() {
 
   return (
     <div className="grid gap-2">
-      <label className="text-sm">Поиск адреса</label>
-      <div className="flex gap-2">
-        <input 
-          className="border rounded px-3 py-2 w-full" 
-          value={query} 
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Введите адрес" 
-        />
-      </div>
+      <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-teal-500"></span>
+          Карта для автоматической постанвки координат
+      </label>
       <div className="h-80 rounded overflow-hidden">
         <YMaps>
           <Map
@@ -46,9 +41,21 @@ export default function LocationPickerYandex() {
           </Map>
         </YMaps>
       </div>
-      <p className="text-xs text-gray-600">
-        Нажмите на карту, чтобы поставить метку. Координаты подставятся автоматически.
-      </p>
+      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4">
+        <div className="flex items-start gap-3">
+          <div className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <div className="text-sm text-blue-700 dark:text-blue-300">
+            <p className="font-medium mb-1">Как использовать карту:</p>
+            <ul className="text-xs space-y-1 text-blue-600 dark:text-blue-400">
+              <li>• Кликните по карте, чтобы поставить метку, долгота и широта подставятся автоматически</li>
+            </ul>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

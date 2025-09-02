@@ -168,7 +168,11 @@ export default function DocumentsClient({
               
               <Field label="Файл документа">
                 <div className="space-y-3">
-                  <FileUploader name="fileUrl" accept=".pdf,.doc,.docx" />
+                  <FileUploader 
+                    name="fileUrl" 
+                    accept=".pdf,.doc,.docx" 
+                    variant="amber" 
+                  />
                   {doc?.fileUrl && (
                     <div className="p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
                       <div className="flex items-center gap-2 text-sm text-amber-700 dark:text-amber-300">
