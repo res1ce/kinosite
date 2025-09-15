@@ -327,13 +327,6 @@ export default function LocationsPage() {
                 
                 <div className="flex gap-3">
                   <div className="relative">
-                    <button
-                      onClick={() => setIsFilterOpen(!isFilterOpen)}
-                      className="flex items-center gap-2 px-6 py-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl text-white hover:bg-white/20 transition-all duration-300"
-                    >
-                      <Filter size={20} />
-                      {selectedCategory}
-                    </button>
                     
                     {isFilterOpen && (
                       <div className="absolute top-full right-0 mt-2 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden animate-scaleIn z-20">
@@ -354,25 +347,6 @@ export default function LocationsPage() {
                         ))}
                       </div>
                     )}
-                  </div>
-
-                  <div className="flex bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl overflow-hidden">
-                    <button
-                      onClick={() => setViewMode('grid')}
-                      className={`p-4 transition-all duration-300 ${
-                        viewMode === 'grid' ? 'bg-white/20 text-white' : 'text-white/70 hover:text-white hover:bg-white/10'
-                      }`}
-                    >
-                      <Grid size={20} />
-                    </button>
-                    <button
-                      onClick={() => setViewMode('list')}
-                      className={`p-4 transition-all duration-300 ${
-                        viewMode === 'list' ? 'bg-white/20 text-white' : 'text-white/70 hover:text-white hover:bg-white/10'
-                      }`}
-                    >
-                      <List size={20} />
-                    </button>
                   </div>
                 </div>
               </div>
@@ -495,31 +469,10 @@ export default function LocationsPage() {
                                 {location.name}
                               </h3>
                               <div className="flex items-center gap-2">
-                                <div className="flex items-center gap-1">
-                                  <Star size={14} className="text-yellow-500 fill-current" />
-                                  <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                                    {location.rating}
-                                  </span>
-                                </div>
-                                <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
                                 <span className="text-xs px-2 py-1 bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 rounded-full">
                                   {location.category}
                                 </span>
                               </div>
-                            </div>
-                          </div>
-
-                          {/* Popularity Badge */}
-                          <div className="text-right">
-                            <div className="text-xs text-gray-500 mb-1">Популярность</div>
-                            <div className="flex items-center gap-1">
-                              <div className="w-8 h-1 bg-gray-200 rounded-full overflow-hidden">
-                                <div 
-                                  className="h-full bg-gradient-to-r from-green-400 to-blue-500 rounded-full transition-all duration-1000"
-                                  style={{ width: `${location.popularity}%` }}
-                                ></div>
-                              </div>
-                              <span className="text-xs font-semibold text-gray-600">{location.popularity}%</span>
                             </div>
                           </div>
                         </div>
@@ -534,18 +487,6 @@ export default function LocationsPage() {
                             {location.address}
                           </div>
                         )}
-
-                        {/* Features */}
-                        <div className="flex flex-wrap gap-2">
-                          {location.features.slice(0, 3).map((feature, idx) => (
-                            <span 
-                              key={idx}
-                              className="px-2 py-1 text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-full"
-                            >
-                              {feature}
-                            </span>
-                          ))}
-                        </div>
                       </div>
 
                       {/* Shimmer Effect */}
@@ -577,37 +518,6 @@ export default function LocationsPage() {
                   </button>
                 </div>
               )}
-            </div>
-          </div>
-        </section>
-
-        {/* Stats Section */}
-        <section className="relative py-20 overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-900/10 to-purple-900/10"></div>
-          <div className="container mx-auto px-6">
-            <div className="grid md:grid-cols-4 gap-8">
-              {[
-                { number: locations.length + '+', label: 'Локаций в каталоге', icon: <MapPin size={24} />, color: 'from-blue-500 to-cyan-500' },
-                { number: '15+', label: 'Категорий площадок', icon: <Grid size={24} />, color: 'from-purple-500 to-pink-500' },
-                { number: '200+', label: 'Успешных съемок', icon: <Camera size={24} />, color: 'from-green-500 to-teal-500' },
-                { number: '4.8', label: 'Средний рейтинг', icon: <Star size={24} />, color: 'from-yellow-500 to-orange-500' }
-              ].map((stat, i) => (
-                <div 
-                  key={stat.label}
-                  className="text-center animate-fadeUp"
-                  style={{ animationDelay: `${i * 0.1}s` }}
-                >
-                  <div className={`inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r ${stat.color} rounded-2xl text-white mb-4 animate-floating shadow-lg`}>
-                    {stat.icon}
-                  </div>
-                  <div className="text-3xl font-black bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-2">
-                    {stat.number}
-                  </div>
-                  <div className="text-gray-600 dark:text-gray-400 font-medium">
-                    {stat.label}
-                  </div>
-                </div>
-              ))}
             </div>
           </div>
         </section>

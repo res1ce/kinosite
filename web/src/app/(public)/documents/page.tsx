@@ -141,13 +141,6 @@ export default function DocumentsPage() {
               </div>
               
               <div className="relative">
-                <button
-                  onClick={() => setIsFilterOpen(!isFilterOpen)}
-                  className="flex items-center gap-2 px-6 py-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl text-white hover:bg-white/20 transition-all duration-300"
-                >
-                  <Filter size={20} />
-                  {selectedCategory}
-                </button>
                 
                 {isFilterOpen && (
                   <div className="absolute top-full right-0 mt-2 bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden z-20">
@@ -176,25 +169,6 @@ export default function DocumentsPage() {
 
       {/* Documents Grid */}
       <section className="container mx-auto px-6 py-20">
-        {/* Stats */}
-        <div className="grid md:grid-cols-4 gap-6 mb-16">
-          {[
-            { number: mockDocuments.length.toString(), label: 'Документов', icon: <FileText size={24} /> },
-            { number: '6', label: 'Категорий', icon: <Archive size={24} /> },
-            { number: mockDocuments.filter(d => d.isRequired).length.toString(), label: 'Обязательных', icon: <Shield size={24} /> },
-            { number: Math.round(mockDocuments.reduce((acc, doc) => acc + doc.downloadCount, 0) / 1000) + 'K', label: 'Скачиваний', icon: <Download size={24} /> }
-          ].map((stat, i) => (
-            <div key={stat.label} className="text-center p-6 bg-white rounded-2xl shadow-lg animate-fadeUp" style={{ animationDelay: `${i * 0.1}s` }}>
-              <div className={`inline-flex items-center justify-center w-14 h-14 bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl text-white mb-4 animate-floating`}>
-                {stat.icon}
-              </div>
-              <div className="text-3xl font-black bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent mb-2">
-                {stat.number}
-              </div>
-              <div className="text-gray-600 font-medium">{stat.label}</div>
-            </div>
-          ))}
-        </div>
 
         {/* Documents List */}
         <div className="space-y-6">
@@ -203,14 +177,7 @@ export default function DocumentsPage() {
               key={doc.id}
               className="group relative p-6 bg-white rounded-2xl shadow-lg hover:shadow-2xl border border-gray-100 transition-all duration-500 overflow-hidden animate-fadeUp"
               style={{ animationDelay: `${i * 0.1}s` }}
-            >
-              {doc.isRequired && (
-                <div className="absolute top-4 right-4">
-                  <span className="px-3 py-1 text-xs font-semibold bg-red-100 text-red-700 rounded-full">
-                    Обязательный
-                  </span>
-                </div>
-              )}
+            > 
 
               <div className="flex items-start gap-6">
                 {/* Icon */}
@@ -241,13 +208,6 @@ export default function DocumentsPage() {
                       <Archive size={14} />
                       <span>{doc.fileSize}</span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Download size={14} />
-                      <span>{doc.downloadCount.toLocaleString()} скачиваний</span>
-                    </div>
-                    <span className="px-2 py-1 bg-amber-100 text-amber-700 rounded-full text-xs font-medium">
-                      {doc.category}
-                    </span>
                   </div>
 
                   {/* Actions */}
@@ -299,35 +259,6 @@ export default function DocumentsPage() {
               </button>
             </div>
           )}
-        </div>
-      </section>
-
-      {/* Help Section */}
-      <section className="relative py-20 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-amber-900/10 to-orange-900/10"></div>
-        
-        <div className="relative container mx-auto px-6">
-          <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-4xl font-bold mb-8 bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent animate-fadeUp">
-              Нужна помощь с документами?
-            </h2>
-            
-            <p className="text-xl text-gray-600 mb-12 animate-fadeUp" style={{ animationDelay: '0.1s' }}>
-              Наши специалисты помогут заполнить формы и подготовить все необходимые документы
-            </p>
-            
-            <div className="flex flex-col sm:flex-row justify-center gap-6 animate-fadeUp" style={{ animationDelay: '0.2s' }}>
-              <button className="group flex items-center justify-center gap-3 px-8 py-4 bg-gradient-to-r from-amber-600 to-orange-600 text-white font-bold rounded-2xl shadow-2xl hover:shadow-amber-500/25 transform hover:scale-105 transition-all duration-300 shimmer-effect">
-                <Users size={20} />
-                <span>Получить консультацию</span>
-              </button>
-              
-              <button className="group flex items-center justify-center gap-3 px-8 py-4 bg-white border-2 border-amber-600 text-amber-600 font-bold rounded-2xl hover:bg-amber-50 transform hover:scale-105 transition-all duration-300">
-                <FileText size={20} />
-                <span>Заполнить заявку</span>
-              </button>
-            </div>
-          </div>
         </div>
       </section>
     </main>

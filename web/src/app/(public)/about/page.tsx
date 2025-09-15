@@ -117,12 +117,11 @@ export default function AboutPage() {
             </p>
 
             {/* Key Stats */}
-            <div className="grid md:grid-cols-4 gap-6 mb-12 animate-fadeUp" style={{ animationDelay: '0.3s' }}>
+            <div className="grid md:grid-cols-3 gap-6 mb-12 animate-fadeUp" style={{ animationDelay: '0.3s' }}>
               {[
                 { number: '15+', label: 'Лет опыта', icon: <Calendar size={20} /> },
                 { number: '200+', label: 'Проектов', icon: <Trophy size={20} /> },
                 { number: '250+', label: 'Локаций', icon: <MapPin size={20} /> },
-                { number: '4.9', label: 'Рейтинг', icon: <Star size={20} /> }
               ].map((stat, i) => (
                 <div key={stat.label} className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 animate-fadeUp" style={{ animationDelay: `${0.4 + i * 0.1}s` }}>
                   <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-xl mx-auto mb-3 animate-floating">
@@ -142,7 +141,7 @@ export default function AboutPage() {
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-16 animate-fadeUp">
             <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent mb-6">
-              Наша история и ценности
+              Наши задачи и цели
             </h2>
             <p className="text-xl text-gray-600">
               Узнайте больше о том, как мы развиваем кинематограф в регионе
@@ -154,48 +153,6 @@ export default function AboutPage() {
               className="prose prose-lg max-w-none text-gray-800 leading-relaxed"
               dangerouslySetInnerHTML={{ __html: mockAboutContent }}
             />
-          </div>
-        </div>
-      </section>
-
-      {/* Timeline */}
-      <section className="relative py-20 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-purple-900/5 to-indigo-900/5"></div>
-        
-        <div className="relative container mx-auto px-6">
-          <div className="text-center mb-16 animate-fadeUp">
-            <h2 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent mb-6">
-              Ключевые вехи
-            </h2>
-            <p className="text-xl text-gray-600">
-              Важные моменты в истории нашей кинокомиссии
-            </p>
-          </div>
-
-          <div className="max-w-4xl mx-auto">
-            {achievements.map((achievement, i) => (
-              <div 
-                key={achievement.year}
-                className={`flex items-center gap-8 mb-12 animate-fadeUp ${i % 2 === 0 ? '' : 'flex-row-reverse'}`}
-                style={{ animationDelay: `${i * 0.2}s` }}
-              >
-                <div className="flex-1">
-                  <div className={`bg-white rounded-2xl shadow-lg p-6 ${i % 2 === 0 ? 'ml-8' : 'mr-8'}`}>
-                    <div className="flex items-center gap-4 mb-3">
-                      <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full flex items-center justify-center text-white font-bold animate-floating">
-                        {achievement.year.slice(-2)}
-                      </div>
-                      <h3 className="text-xl font-bold text-gray-900">{achievement.title}</h3>
-                    </div>
-                    <p className="text-gray-600 leading-relaxed">{achievement.description}</p>
-                  </div>
-                </div>
-                
-                <div className="flex-shrink-0">
-                  <div className="w-4 h-4 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full"></div>
-                </div>
-              </div>
-            ))}
           </div>
         </div>
       </section>
@@ -259,28 +216,21 @@ export default function AboutPage() {
             </div>
             
             <h2 className="text-5xl md:text-6xl font-black text-white mb-8 leading-tight animate-fadeUp" style={{ animationDelay: '0.1s' }}>
-              Готовы создать что-то 
+              Хотите уточнить какие-либо
               <span className="block bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-                невероятное?
+                вопросы?
               </span>
             </h2>
             
             <p className="text-xl text-white/80 mb-12 leading-relaxed max-w-2xl mx-auto animate-fadeUp" style={{ animationDelay: '0.2s' }}>
-              Свяжитесь с нами и узнайте, как мы можем помочь воплотить вашу творческую идею в жизнь
+              Свяжитесь с нами и узнайте, как мы можем вам помочь
             </p>
             
             <div className="flex flex-col sm:flex-row justify-center gap-6 animate-fadeUp" style={{ animationDelay: '0.3s' }}>
               <button className="px-12 py-5 bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 text-white font-bold text-lg rounded-3xl shadow-2xl hover:shadow-purple-500/25 transform hover:scale-105 transition-all duration-500 shimmer-effect">
                 <span className="flex items-center justify-center gap-3">
                   <Sparkles size={20} />
-                  <span>Начать проект</span>
-                </span>
-              </button>
-              
-              <button className="px-12 py-5 bg-white/10 backdrop-blur-sm text-white font-bold text-lg rounded-3xl hover:bg-white/20 transform hover:scale-105 transition-all duration-300">
-                <span className="flex items-center justify-center gap-3">
-                  <Users size={20} />
-                  <span>Встретиться с командой</span>
+                  <span>Наши контакты</span>
                 </span>
               </button>
             </div>

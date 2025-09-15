@@ -169,13 +169,6 @@ export default function NewsPage() {
                 </div>
                 
                 <div className="relative">
-                  <button
-                    onClick={() => setIsFilterOpen(!isFilterOpen)}
-                    className="flex items-center gap-2 px-6 py-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl text-white hover:bg-white/20 transition-all duration-300"
-                  >
-                    <Filter size={20} />
-                    {selectedCategory}
-                  </button>
                   
                   {isFilterOpen && (
                     <div className="absolute top-full right-0 mt-2 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden animate-scaleIn z-20">
@@ -222,13 +215,6 @@ export default function NewsPage() {
                           style={{ backgroundImage: `url(${item.coverImageUrl})` }}
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-                        
-                        {/* Category Badge */}
-                        <div className="absolute top-4 left-4">
-                          <span className="inline-flex items-center px-3 py-1.5 text-xs font-semibold text-white category-badge rounded-full backdrop-blur-sm">
-                            {item.category}
-                          </span>
-                        </div>
 
                         {/* Date Badge */}
                         <div className="absolute top-4 right-4">
@@ -291,59 +277,6 @@ export default function NewsPage() {
               </button>
             </div>
           )}
-        </section>
-
-        {/* Featured Section */}
-        <section className="relative py-20 overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-purple-900/10 to-pink-900/10"></div>
-          <div className="container mx-auto px-6">
-            <div className="text-center mb-16 animate-fadeUp">
-              <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-4">
-                Не пропустите
-              </h2>
-              <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-                Самые важные события и анонсы кинокомиссии
-              </p>
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-8">
-              <div 
-                className="group relative p-8 bg-gradient-to-br from-purple-500 to-pink-600 rounded-3xl text-white overflow-hidden animate-fadeUp"
-                style={{ animationDelay: '0.2s' }}
-              >
-                <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
-                <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full translate-y-12 -translate-x-12"></div>
-                
-                <div className="relative z-10">
-                  <h3 className="text-2xl font-bold mb-4">Подписка на новости</h3>
-                  <p className="mb-6 opacity-90">
-                    Получайте актуальную информацию о событиях кинокомиссии
-                  </p>
-                  <button className="px-6 py-3 bg-white text-purple-600 font-semibold rounded-2xl hover:bg-gray-100 transform hover:scale-105 transition-all duration-300">
-                    Подписаться
-                  </button>
-                </div>
-              </div>
-
-              <div 
-                className="group relative p-8 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-3xl text-white overflow-hidden animate-fadeUp"
-                style={{ animationDelay: '0.4s' }}
-              >
-                <div className="absolute top-0 right-0 w-28 h-28 bg-white/10 rounded-full -translate-y-14 translate-x-14"></div>
-                <div className="absolute bottom-0 left-0 w-36 h-36 bg-white/10 rounded-full translate-y-18 -translate-x-18"></div>
-                
-                <div className="relative z-10">
-                  <h3 className="text-2xl font-bold mb-4">Архив событий</h3>
-                  <p className="mb-6 opacity-90">
-                    Изучите историю развития киноиндустрии в регионе
-                  </p>
-                  <button className="px-6 py-3 bg-white text-blue-600 font-semibold rounded-2xl hover:bg-gray-100 transform hover:scale-105 transition-all duration-300">
-                    Посмотреть
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
         </section>
       </main>
     </>

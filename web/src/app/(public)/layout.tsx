@@ -92,7 +92,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
   const nav = [
     { title: "Новости", href: "/news" },
     { title: "Локации", href: "/locations" },
-    { title: "Услуги", href: "/services" },
+    // { title: "Услуги", href: "/services" },
     { title: "Документы", href: "/documents" },
     { title: "О нас", href: "/about" },
   ];
