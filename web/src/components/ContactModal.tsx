@@ -2,16 +2,17 @@
 
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { Phone, Mail, Check } from "lucide-react";
+import { Phone, Mail, Check, X } from "lucide-react";
+import React from "react";
 
 export default function ContactModal({
   phone,
   email,
-  variant = "header", // "header" | "cta"
+  children,
 }: {
   phone: string;
   email: string;
-  variant?: "header" | "cta";
+  children: React.ReactNode;
 }) {
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -28,6 +29,11 @@ export default function ContactModal({
     } else {
       document.body.style.overflow = "";
     }
+    
+    // Cleanup on unmount
+    return () => {
+      document.body.style.overflow = "";
+    };
   }, [open]);
 
   const copyToClipboard = async (text: string, type: 'phone' | 'email') => {
@@ -46,48 +52,99 @@ export default function ContactModal({
     }
   };
 
-  const buttonClass =
-    variant === "header"
-      ? "px-5 py-2 rounded-lg bg-gradient-to-r from-[#6E0A6B] to-purple-600 text-white font-medium shadow-md hover:shadow-lg hover:scale-105 active:scale-95 transition-all hover:cursor-pointer"
-      : "px-10 py-5 rounded-xl bg-white text-[#6E0A6B] font-semibold shadow-xl hover:scale-105 transition-transform text-lg hover:cursor-pointer";
+  // Clone children and add onClick handler
+  const triggerElement = typeof children === 'object' && children !== null && 'type' in children 
+    ? React.cloneElement(children as React.ReactElement<{ onClick?: () => void }>, {
+        onClick: () => setOpen(true)
+      })
+    : (
+        <button onClick={() => setOpen(true)}>
+          {children}
+        </button>
+      );
 
   const modal = (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* фон */}
+    <div 
+      className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
+      style={{ 
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100vw',
+        height: '100vh'
+      }}
+    >
+      {/* Background overlay */}
       <div
         className="absolute inset-0 bg-black/60 backdrop-blur-sm"
         onClick={() => setOpen(false)}
       />
 
-      {/* окно */}
-      <div className="relative z-10 w-full max-w-md bg-white dark:bg-[#111] rounded-2xl shadow-2xl p-8 animate-fadeUp">
-        <button
-          onClick={() => setOpen(false)}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 text-xl"
-        >
-          ✕
-        </button>
-
-        <h2 className="text-2xl font-bold mb-6 text-center text-[#6E0A6B]">
-          Контакты
-        </h2>
-
-        <div className="grid gap-6 text-center">
+      {/* Modal content */}
+      <div className="relative z-10 w-full max-w-md mx-auto">
+        <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl p-8 animate-scaleIn border border-gray-200 dark:border-gray-700">
+          {/* Close button */}
           <button
-            onClick={() => copyToClipboard(phone, 'phone')}
-            className="flex items-center justify-center gap-3 px-6 py-4 rounded-xl bg-gradient-to-r from-[#6E0A6B] to-purple-600 text-white font-medium shadow-md hover:scale-105 transition-transform cursor-pointer"
+            onClick={() => setOpen(false)}
+            className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200"
           >
-            {copiedPhone ? <Check size={20} /> : <Phone size={20} />}
-            {copiedPhone ? "Скопировано!" : phone}
+            <X size={20} />
           </button>
 
-          <button
-            onClick={() => copyToClipboard(email, 'email')}
-            className="flex items-center justify-center gap-3 px-6 py-4 rounded-xl border border-[#6E0A6B] text-[#6E0A6B] font-medium hover:bg-[#6E0A6B] hover:text-white transition cursor-pointer"
-          >
-            {copiedEmail ? <Check size={20} /> : <Mail size={20} />}
-            {copiedEmail ? "Скопировано!" : email}
-          </button>
+          {/* Title */}
+          <div className="text-center mb-8">
+            <div className="w-16 h-16 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Phone className="text-white" size={24} />
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+              Наши контакты
+            </h2>
+            <p className="text-gray-600 dark:text-gray-400">
+              Нажмите, чтобы скопировать
+            </p>
+          </div>
+
+          {/* Contact buttons */}
+          <div className="space-y-4">
+            <button
+              onClick={() => copyToClipboard(phone, 'phone')}
+              className="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200 group"
+            >
+              <div className="flex items-center justify-center w-6 h-6">
+                {copiedPhone ? (
+                  <Check size={20} className="animate-bounce" />
+                ) : (
+                  <Phone size={20} />
+                )}
+              </div>
+              <span className="flex-1 text-left">
+                {copiedPhone ? "Скопировано!" : phone}
+              </span>
+            </button>
+
+            <button
+              onClick={() => copyToClipboard(email, 'email')}
+              className="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-xl border-2 border-purple-600 text-purple-600 dark:text-purple-400 font-semibold hover:bg-purple-600 hover:text-white dark:hover:bg-purple-600 dark:hover:text-white transition-all duration-200 group"
+            >
+              <div className="flex items-center justify-center w-6 h-6">
+                {copiedEmail ? (
+                  <Check size={20} className="animate-bounce" />
+                ) : (
+                  <Mail size={20} />
+                )}
+              </div>
+              <span className="flex-1 text-left">
+                {copiedEmail ? "Скопировано!" : email}
+              </span>
+            </button>
+          </div>
+
+          {/* Additional info */}
+          <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700 text-center">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Работаем ежедневно с 9:00 до 18:00
+            </p>
+          </div>
         </div>
       </div>
     </div>
@@ -95,9 +152,7 @@ export default function ContactModal({
 
   return (
     <>
-      <button onClick={() => setOpen(true)} className={buttonClass}>
-        Связаться с нами
-      </button>
+      {triggerElement}
       {mounted && open && createPortal(modal, document.body)}
     </>
   );

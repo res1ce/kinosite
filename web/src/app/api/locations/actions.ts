@@ -19,6 +19,7 @@ export async function createLocation(formData: FormData) {
   const description = String(formData.get("description") || "").trim();
   let galleryUrls = null;
   const galleryUrlsStr = formData.get("galleryUrls");
+  const category = formData.get("category") as string;
   if (typeof galleryUrlsStr === 'string') {
     try {
       galleryUrls = JSON.parse(galleryUrlsStr);
@@ -37,6 +38,7 @@ export async function createLocation(formData: FormData) {
       address,
       description,
       galleryUrls,
+      category,
     } 
   });
 
@@ -50,6 +52,7 @@ export async function updateLocation(id: string, formData: FormData) {
   const longitude = Number(formData.get("longitude"));
   const address = String(formData.get("address") || "").trim() || null;
   const description = String(formData.get("description") || "").trim();
+  const category = formData.get("category") as string;
   let galleryUrls = null;
   const galleryUrlsStr = formData.get("galleryUrls");
   if (typeof galleryUrlsStr === 'string') {
@@ -71,6 +74,7 @@ export async function updateLocation(id: string, formData: FormData) {
       address,
       description,
       galleryUrls,
+      category,
     }
   });
 

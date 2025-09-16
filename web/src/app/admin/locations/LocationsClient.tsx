@@ -1,6 +1,6 @@
 //LocationsClient.tsx - ПОЛНАЯ ФУНКЦИОНАЛЬНОСТЬ СОХРАНЕНА
 "use client";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import Toolbar from "@/components/Toolbar";
 import Panel from "@/components/Panel";
 import LocationPickerYandex from "@/components/LocationPickerYandex";
@@ -16,6 +16,7 @@ interface Location {
   description: string | null;
   galleryUrls: string[] | null;
   isPartner: boolean;
+  category: "ARCHITECTURE" | "NATURE" | "STUDIO";
   createdAt: Date | string;
   updatedAt: Date | string;
 }
@@ -31,7 +32,15 @@ export default function LocationsClient({
   const [query, setQuery] = useState("");
   const [editId, setEditId] = useState<string | null>(null);
   const [editLocation, setEditLocation] = useState<Location | null>(null);
+  const [category, setCategory] = useState<"ARCHITECTURE" | "NATURE" | "STUDIO">("ARCHITECTURE");
 
+  useEffect(() => {
+    if (editLocation) {
+      setCategory(editLocation.category);
+    } else {
+      setCategory("ARCHITECTURE");
+    }
+  }, [editLocation]);
   const filtered = useMemo(
     () => locations.filter(l => [l.name, l.address, l.description].join(" ").toLowerCase().includes(query.toLowerCase())),
     [locations, query]
@@ -66,7 +75,9 @@ export default function LocationsClient({
                     </div>
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
                     <span className="absolute top-4 left-4 px-3 py-1.5 rounded-xl text-xs bg-teal-500 text-white shadow-lg font-medium">
-                      Локация
+                      {l.category === "ARCHITECTURE" && "Архитектура"}
+                      {l.category === "NATURE" && "Природа"}
+                      {l.category === "STUDIO" && "Студия"}
                     </span>
                     {l.isPartner && (
                       <span className="absolute top-4 right-4 px-3 py-1.5 rounded-xl text-xs bg-amber-500 text-white shadow-lg font-medium">
@@ -168,6 +179,21 @@ export default function LocationsClient({
                 />
               </Field>
               
+              <Field label="Категория">
+                <select
+                  name="category"
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value as typeof category)}
+                  className="w-full rounded-xl border-2 border-gray-200 dark:border-gray-600 px-4 py-3 
+                            bg-white dark:bg-gray-900/50 focus:outline-none focus:border-teal-500 
+                            focus:ring-4 focus:ring-teal-500/20 transition-all duration-200"
+                >
+                  <option value="ARCHITECTURE">Архитектура</option>
+                  <option value="NATURE">Природа</option>
+                  <option value="STUDIO">Студия</option>
+                </select>
+              </Field>
+
               <div className="grid grid-cols-2 gap-4">
                 <Field label="Широта">
                   <input 

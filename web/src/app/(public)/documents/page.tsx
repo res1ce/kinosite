@@ -1,84 +1,72 @@
 "use client";
 
 import { FileText, Download, Calendar, Search, Filter, Archive, Shield, Award, Users } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-// Mock documents data
-const mockDocuments = [
-  {
-    id: '1',
-    title: 'Положение о кинокомиссии',
-    description: 'Основной документ, регламентирующий деятельность кинокомиссии региона',
-    fileUrl: '/documents/regulations.pdf',
-    fileSize: '2.4 МБ',
-    category: 'Положения',
-    updatedAt: '2024-08-15',
-    downloadCount: 1247,
-    isRequired: true
-  },
-  {
-    id: '2',
-    title: 'Заявка на съемки',
-    description: 'Форма заявки для получения разрешения на киносъемки',
-    fileUrl: '/documents/application.docx',
-    fileSize: '1.2 МБ',
-    category: 'Заявки',
-    updatedAt: '2024-09-01',
-    downloadCount: 892,
-    isRequired: true
-  },
-  {
-    id: '3',
-    title: 'Прайс-лист услуг',
-    description: 'Актуальные расценки на услуги кинокомиссии',
-    fileUrl: '/documents/prices.pdf',
-    fileSize: '856 КБ',
-    category: 'Прайсы',
-    updatedAt: '2024-08-30',
-    downloadCount: 654,
-    isRequired: false
-  },
-  {
-    id: '4',
-    title: 'Договор на услуги',
-    description: 'Типовой договор на оказание услуг кинокомиссии',
-    fileUrl: '/documents/contract.pdf',
-    fileSize: '1.8 МБ',
-    category: 'Договоры',
-    updatedAt: '2024-07-20',
-    downloadCount: 423,
-    isRequired: false
-  },
-  {
-    id: '5',
-    title: 'Техническое задание',
-    description: 'Шаблон технического задания для съемочных проектов',
-    fileUrl: '/documents/technical.docx',
-    fileSize: '965 КБ',
-    category: 'Шаблоны',
-    updatedAt: '2024-08-10',
-    downloadCount: 332,
-    isRequired: false
-  },
-  {
-    id: '6',
-    title: 'Согласие на обработку данных',
-    description: 'Форма согласия на обработку персональных данных',
-    fileUrl: '/documents/privacy.pdf',
-    fileSize: '654 КБ',
-    category: 'Согласия',
-    updatedAt: '2024-06-15',
-    downloadCount: 789,
-    isRequired: true
-  }
-];
+// Document type based on your Prisma model
+interface Document {
+  id: string;
+  title: string;
+  fileUrl: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// Extended interface for UI purposes
+interface ExtendedDocument extends Document {
+  description?: string;
+  fileSize?: string;
+  category?: string;
+  downloadCount?: number;
+  isRequired?: boolean;
+}
 
 export default function DocumentsPage() {
+  const [documents, setDocuments] = useState<ExtendedDocument[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('Все');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-  const categories = ['Все', 'Положения', 'Заявки', 'Прайсы', 'Договоры', 'Шаблоны', 'Согласия'];
+  // Fetch documents from API
+  useEffect(() => {
+    const fetchDocuments = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('/api/documents');
+        
+        if (!response.ok) {
+          throw new Error('Ошибка загрузки документов');
+        }
+        
+        const data = await response.json();
+        
+        // Transform data for UI (add missing fields with defaults)
+        const transformedData = data.map((doc: Document) => ({
+          ...doc,
+          createdAt: new Date(doc.createdAt),
+          updatedAt: new Date(doc.updatedAt),
+          description: `Документ ${doc.title}`, // Default description
+          fileSize: 'Неизвестно', // Default file size
+          category: 'Документы', // Default category
+          downloadCount: 0, // Default download count
+          isRequired: false // Default required status
+        }));
+        
+        setDocuments(transformedData);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Произошла ошибка');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDocuments();
+  }, []);
+
+  // Extract unique categories from documents
+  const categories = ['Все', ...Array.from(new Set(documents.map(doc => doc.category || 'Документы')))];
 
   const categoryIcons = {
     'Положения': <Shield size={16} />,
@@ -87,15 +75,70 @@ export default function DocumentsPage() {
     'Договоры': <Users size={16} />,
     'Шаблоны': <Archive size={16} />,
     'Согласия': <Shield size={16} />,
+    'Документы': <FileText size={16} />,
     'Все': <FileText size={16} />
   };
 
-  const filteredDocuments = mockDocuments.filter(doc => {
+  const filteredDocuments = documents.filter(doc => {
     const matchesSearch = doc.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         doc.description.toLowerCase().includes(searchTerm.toLowerCase());
+                         (doc.description || '').toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === 'Все' || doc.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
+
+  // Helper function to format file size
+  const getFileSize = async (url: string): Promise<string> => {
+    try {
+      const response = await fetch(url, { method: 'HEAD' });
+      const contentLength = response.headers.get('content-length');
+      if (contentLength) {
+        const bytes = parseInt(contentLength);
+        if (bytes < 1024) return `${bytes} Б`;
+        if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} КБ`;
+        return `${(bytes / (1024 * 1024)).toFixed(1)} МБ`;
+      }
+    } catch (error) {
+      console.error('Error getting file size:', error);
+    }
+    return 'Неизвестно';
+  };
+
+  if (loading) {
+    return (
+      <main className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-amber-50/30">
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="text-center">
+            <div className="w-16 h-16 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-4 animate-spin">
+              <FileText className="text-white" size={24} />
+            </div>
+            <p className="text-lg text-gray-600">Загрузка документов...</p>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+  if (error) {
+    return (
+      <main className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-amber-50/30">
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="text-center">
+            <div className="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+              <FileText className="text-white" size={24} />
+            </div>
+            <h2 className="text-xl font-bold text-gray-900 mb-2">Ошибка загрузки</h2>
+            <p className="text-gray-600 mb-4">{error}</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="px-6 py-3 bg-gradient-to-r from-amber-600 to-orange-600 text-white font-semibold rounded-xl hover:shadow-lg transition-all duration-300"
+            >
+              Попробовать снова
+            </button>
+          </div>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-amber-50/30">
@@ -139,29 +182,6 @@ export default function DocumentsPage() {
                   className="w-full pl-12 pr-4 py-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl text-white placeholder-white/60 focus:outline-none focus:border-amber-400 transition-all duration-300"
                 />
               </div>
-              
-              <div className="relative">
-                
-                {isFilterOpen && (
-                  <div className="absolute top-full right-0 mt-2 bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden z-20">
-                    {categories.map((category) => (
-                      <button
-                        key={category}
-                        onClick={() => {
-                          setSelectedCategory(category);
-                          setIsFilterOpen(false);
-                        }}
-                        className={`flex items-center gap-3 w-full text-left px-6 py-3 hover:bg-gray-100 transition-colors ${
-                          selectedCategory === category ? 'bg-amber-100 text-amber-700' : ''
-                        }`}
-                      >
-                        {categoryIcons[category as keyof typeof categoryIcons]}
-                        {category}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
             </div>
           </div>
         </div>
@@ -169,7 +189,6 @@ export default function DocumentsPage() {
 
       {/* Documents Grid */}
       <section className="container mx-auto px-6 py-20">
-
         {/* Documents List */}
         <div className="space-y-6">
           {filteredDocuments.map((doc, i) => (
@@ -178,7 +197,6 @@ export default function DocumentsPage() {
               className="group relative p-6 bg-white rounded-2xl shadow-lg hover:shadow-2xl border border-gray-100 transition-all duration-500 overflow-hidden animate-fadeUp"
               style={{ animationDelay: `${i * 0.1}s` }}
             > 
-
               <div className="flex items-start gap-6">
                 {/* Icon */}
                 <div className="flex-shrink-0 w-16 h-16 bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform duration-300">
@@ -202,11 +220,7 @@ export default function DocumentsPage() {
                   <div className="flex flex-wrap items-center gap-6 text-sm text-gray-500 mb-4">
                     <div className="flex items-center gap-2">
                       <Calendar size={14} />
-                      <span>Обновлено {new Date(doc.updatedAt).toLocaleDateString('ru-RU')}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Archive size={14} />
-                      <span>{doc.fileSize}</span>
+                      <span>Обновлено {doc.updatedAt.toLocaleDateString('ru-RU')}</span>
                     </div>
                   </div>
 
@@ -215,6 +229,7 @@ export default function DocumentsPage() {
                     <a
                       href={doc.fileUrl}
                       target="_blank"
+                      rel="noopener noreferrer"
                       className="group flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-600 to-orange-600 text-white font-semibold rounded-xl hover:shadow-lg transform hover:scale-105 transition-all duration-300 shimmer-effect"
                     >
                       <Download size={16} />
@@ -224,6 +239,7 @@ export default function DocumentsPage() {
                     <a
                       href={doc.fileUrl}
                       target="_blank"
+                      rel="noopener noreferrer"
                       className="flex items-center gap-2 px-6 py-3 bg-gray-100 text-gray-700 font-semibold rounded-xl hover:bg-gray-200 transition-all duration-300"
                     >
                       <FileText size={16} />
@@ -237,26 +253,31 @@ export default function DocumentsPage() {
             </div>
           ))}
 
-          {filteredDocuments.length === 0 && (
+          {filteredDocuments.length === 0 && !loading && (
             <div className="text-center py-16 animate-fadeUp">
               <div className="w-24 h-24 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-6 animate-floating">
                 <Search className="text-white" size={32} />
               </div>
               <h3 className="text-2xl font-bold text-gray-900 mb-4">
-                Документы не найдены
+                {documents.length === 0 ? 'Документы отсутствуют' : 'Документы не найдены'}
               </h3>
               <p className="text-gray-600 max-w-md mx-auto mb-8">
-                Попробуйте изменить параметры поиска или выбрать другую категорию
+                {documents.length === 0 
+                  ? 'В системе пока нет загруженных документов'
+                  : 'Попробуйте изменить параметры поиска или выбрать другую категорию'
+                }
               </p>
-              <button
-                onClick={() => {
-                  setSearchTerm('');
-                  setSelectedCategory('Все');
-                }}
-                className="px-8 py-3 bg-gradient-to-r from-amber-600 to-orange-600 text-white font-semibold rounded-2xl hover:shadow-lg transform hover:scale-105 transition-all duration-300"
-              >
-                Сбросить фильтры
-              </button>
+              {documents.length > 0 && (
+                <button
+                  onClick={() => {
+                    setSearchTerm('');
+                    setSelectedCategory('Все');
+                  }}
+                  className="px-8 py-3 bg-gradient-to-r from-amber-600 to-orange-600 text-white font-semibold rounded-2xl hover:shadow-lg transform hover:scale-105 transition-all duration-300"
+                >
+                  Сбросить фильтры
+                </button>
+              )}
             </div>
           )}
         </div>

@@ -480,15 +480,17 @@ function CTA({ site, isVisible }: { site: any; isVisible: any }) {
           </p>
           
           <div className="animate-rotateIn" style={{ animationDelay: '1s' }}>
-            <button className="group relative px-12 py-5 bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white font-bold text-lg rounded-3xl shadow-2xl hover:shadow-purple-500/25 transform hover:scale-105 transition-all duration-500 overflow-hidden shimmer-effect hover-glow animate-floating">
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-              <span className="relative flex items-center gap-3">
-                <span>Связаться с нами</span>
-                <div className="transform group-hover:rotate-45 transition-transform duration-300">
-                  ✦
-                </div>
-              </span>
-            </button>
+            <ContactModal phone={site.contactPhone} email={site.contactEmail}>
+              <button className="group relative px-12 py-5 bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white font-bold text-lg rounded-3xl shadow-2xl hover:shadow-purple-500/25 transform hover:scale-105 transition-all duration-500 overflow-hidden shimmer-effect hover-glow animate-floating">
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <span className="relative flex items-center gap-3">
+                  <span>Связаться с нами</span>
+                  <div className="transform group-hover:rotate-45 transition-transform duration-300">
+                    ✦
+                  </div>
+                </span>
+              </button>
+            </ContactModal>
           </div>
         </div>
       </div>

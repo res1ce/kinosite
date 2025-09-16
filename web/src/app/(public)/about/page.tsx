@@ -1,90 +1,127 @@
 "use client";
 
+import ContactModal from "@/components/ContactModal";
 import { Users, Target, Award, Star, Heart, MapPin, Calendar, Trophy, Sparkles } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-// Mock about data
-const mockAboutContent = `
-  <h2>История создания</h2>
-  <p>Забайкальская кинокомиссия была основана в 2009 году с целью развития киноиндустрии в регионе и привлечения съемочных групп со всей России и зарубежья. За 15 лет работы мы стали ведущей региональной кинокомиссией, способствуя созданию более 200 кинопроектов.</p>
-  
-  <h3>Наша миссия</h3>
-  <p>Мы стремимся показать красоту и уникальность Забайкальского края через кинематограф, поддерживая как начинающих, так и опытных режиссеров в реализации их творческих проектов. Наша работа способствует развитию туризма и экономики региона.</p>
-  
-  <h3>Достижения</h3>
-  <p>За годы работы кинокомиссия получила множество наград и признаний:</p>
-  <ul>
-    <li>Лауреат премии "Лучшая региональная кинокомиссия" 2022 года</li>
-    <li>Поддержано более 50 международных проектов</li>
-    <li>Создан каталог из 250+ уникальных локаций</li>
-    <li>Организовано 15+ кинофестивалей и мероприятий</li>
-  </ul>
-  
-  <h3>Команда</h3>
-  <p>В нашей команде работают опытные специалисты в области кинопроизводства, локация-менеджеры, юристы и координаторы. Каждый член команды обладает глубокими знаниями региона и многолетним опытом работы с съемочными группами.</p>
-`;
+interface TeamMember {
+  id: string;
+  name: string;
+  position: string;
+  experience: string;
+  photo: string;
+  description: string;
+  order: number;
+}
 
-const teamMembers = [
-  {
-    name: 'Александр Петров',
-    position: 'Директор кинокомиссии',
-    experience: '15 лет',
-    photo: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&q=80',
-    description: 'Основатель кинокомиссии, продюсер более 80 проектов'
-  },
-  {
-    name: 'Елена Сидорова',
-    position: 'Локация-менеджер',
-    experience: '12 лет',
-    photo: 'https://images.unsplash.com/photo-1494790108755-2616b612b300?w=300&q=80',
-    description: 'Эксперт по локациям, знает каждый уголок региона'
-  },
-  {
-    name: 'Дмитрий Козлов',
-    position: 'Координатор проектов',
-    experience: '8 лет',
-    photo: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=300&q=80',
-    description: 'Специалист по организации съемок и логистике'
-  },
-  {
-    name: 'Анна Волкова',
-    position: 'Юрист',
-    experience: '10 лет',
-    photo: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=300&q=80',
-    description: 'Эксперт по правовым вопросам в сфере кино'
-  }
-];
+interface AboutPage {
+  id: string;
+  slug: string;
+  title: string;
+  content: string;
+  isPublished: boolean;
+}
 
-const achievements = [
-  {
-    year: '2009',
-    title: 'Основание кинокомиссии',
-    description: 'Создание первой региональной кинокомиссии в Забайкалье'
-  },
-  {
-    year: '2015',
-    title: 'Международное признание',
-    description: 'Первый международный проект и выход на мировой рынок'
-  },
-  {
-    year: '2020',
-    title: '100-й проект',
-    description: 'Достижение знакового рубежа в 100 поддержанных проектов'
-  },
-  {
-    year: '2022',
-    title: 'Лауреат премии',
-    description: 'Получение премии "Лучшая региональная кинокомиссия"'
-  },
-  {
-    year: '2024',
-    title: 'Цифровая трансформация',
-    description: 'Запуск онлайн-платформы для работы с клиентами'
-  }
-];
+interface SiteContent {
+  id: string;
+  slug: string;
+  heroText: string;
+  feature1Number: string;
+  feature1Label: string;
+  feature2Number: string;
+  feature2Label: string;
+  feature3Number: string;
+  feature3Label: string;
+  footerDescription: string;
+  footerContacts: string;
+  contactPhone: string;
+  contactEmail: string;
+}
 
 export default function AboutPage() {
-  const [selectedMember, setSelectedMember] = useState(null);
+  const [selectedMember, setSelectedMember] = useState<string | null>(null);
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
+  const [aboutContent, setAboutContent] = useState<string>('');
+  const [siteContent, setSiteContent] = useState<SiteContent | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        
+        // Fetch team members
+        const teamResponse = await fetch('/api/team');
+        if (!teamResponse.ok) throw new Error('Ошибка загрузки команды');
+        const teamData = await teamResponse.json();
+        setTeamMembers(teamData);
+
+        // Fetch about page content
+        const aboutResponse = await fetch('/api/pages/about');
+        if (aboutResponse.ok) {
+          const aboutData = await aboutResponse.json();
+          setAboutContent(aboutData.content || '');
+        }
+
+        // Fetch site content for hero stats
+        const siteResponse = await fetch('/api/site-content');
+        if (siteResponse.ok) {
+          const siteData = await siteResponse.json();
+          setSiteContent(siteData);
+        }
+
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Произошла ошибка');
+        console.error('Error fetching data:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // Default stats if no site content is available
+  const defaultStats = [
+    { number: '15+', label: 'Лет опыта', icon: <Calendar size={20} /> },
+    { number: '200+', label: 'Проектов', icon: <Trophy size={20} /> },
+    { number: '250+', label: 'Локаций', icon: <MapPin size={20} /> },
+  ];
+
+  // Use site content stats if available, otherwise use defaults
+  const stats = siteContent ? [
+    { 
+      number: siteContent.feature1Number, 
+      label: siteContent.feature1Label, 
+      icon: <Calendar size={20} /> 
+    },
+    { 
+      number: siteContent.feature2Number, 
+      label: siteContent.feature2Label, 
+      icon: <Trophy size={20} /> 
+    },
+    { 
+      number: siteContent.feature3Number, 
+      label: siteContent.feature3Label, 
+      icon: <MapPin size={20} /> 
+    },
+  ] : defaultStats;
+
+  if (loading) {
+    return (
+      <main className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-purple-50/30">
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="text-center">
+            <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full flex items-center justify-center mx-auto mb-4 animate-spin">
+              <Users className="text-white" size={24} />
+            </div>
+            <p className="text-lg text-gray-600">Загрузка страницы...</p>
+          </div>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-purple-50/30">
@@ -113,16 +150,12 @@ export default function AboutPage() {
             </h1>
 
             <p className="text-xl text-white/80 mb-12 leading-relaxed max-w-2xl mx-auto animate-fadeUp" style={{ animationDelay: '0.2s' }}>
-              Развиваем киноиндустрию Забайкалья и создаем возможности для творческих проектов
+              {siteContent?.heroText || 'Развиваем киноиндустрию Забайкалья и создаем возможности для творческих проектов'}
             </p>
 
             {/* Key Stats */}
             <div className="grid md:grid-cols-3 gap-6 mb-12 animate-fadeUp" style={{ animationDelay: '0.3s' }}>
-              {[
-                { number: '15+', label: 'Лет опыта', icon: <Calendar size={20} /> },
-                { number: '200+', label: 'Проектов', icon: <Trophy size={20} /> },
-                { number: '250+', label: 'Локаций', icon: <MapPin size={20} /> },
-              ].map((stat, i) => (
+              {stats.map((stat, i) => (
                 <div key={stat.label} className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 animate-fadeUp" style={{ animationDelay: `${0.4 + i * 0.1}s` }}>
                   <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-xl mx-auto mb-3 animate-floating">
                     <div className="text-white">{stat.icon}</div>
@@ -137,72 +170,87 @@ export default function AboutPage() {
       </section>
 
       {/* Mission & Values */}
-      <section className="container mx-auto px-6 py-20">
-        <div className="max-w-4xl mx-auto">
+      {aboutContent && (
+        <section className="container mx-auto px-6 py-20">
+          <div className="max-w-4xl mx-auto">
+            <div className="text-center mb-16 animate-fadeUp">
+              <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent mb-6">
+                Наши задачи и цели
+              </h2>
+              <p className="text-xl text-gray-600">
+                Узнайте больше о том, как мы развиваем кинематограф в регионе
+              </p>
+            </div>
+
+            <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-12 animate-fadeUp" style={{ animationDelay: '0.1s' }}>
+              <article
+                className="prose prose-lg max-w-none text-gray-800 leading-relaxed"
+                dangerouslySetInnerHTML={{ __html: aboutContent }}
+              />
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Team Section */}
+      {teamMembers.length > 0 && (
+        <section className="container mx-auto px-6 py-20">
           <div className="text-center mb-16 animate-fadeUp">
-            <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent mb-6">
-              Наши задачи и цели
+            <h2 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent mb-6">
+              Наша команда
             </h2>
             <p className="text-xl text-gray-600">
-              Узнайте больше о том, как мы развиваем кинематограф в регионе
+              Профессионалы, которые делают проекты реальностью
             </p>
           </div>
 
-          <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-12 animate-fadeUp" style={{ animationDelay: '0.1s' }}>
-            <article
-              className="prose prose-lg max-w-none text-gray-800 leading-relaxed"
-              dangerouslySetInnerHTML={{ __html: mockAboutContent }}
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* Team Section */}
-      <section className="container mx-auto px-6 py-20">
-        <div className="text-center mb-16 animate-fadeUp">
-          <h2 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent mb-6">
-            Наша команда
-          </h2>
-          <p className="text-xl text-gray-600">
-            Профессионалы, которые делают проекты реальностью
-          </p>
-        </div>
-
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {teamMembers.map((member, i) => (
-            <div 
-              key={member.name}
-              className="group bg-white rounded-3xl shadow-xl overflow-hidden hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-500 animate-fadeUp"
-              style={{ animationDelay: `${i * 0.1}s` }}
-              onClick={() => setSelectedMember(selectedMember === member.name ? null : member.name)}
-            >
-              <div className="relative h-64 overflow-hidden">
-                <div 
-                  className="w-full h-full bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
-                  style={{ backgroundImage: `url(${member.photo})` }}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-purple-900/50 to-transparent"></div>
+          <div className={`grid gap-8 ${
+            teamMembers.length === 1 ? 'grid-cols-1 max-w-md mx-auto' :
+            teamMembers.length === 2 ? 'grid-cols-1 md:grid-cols-2 max-w-4xl mx-auto' :
+            teamMembers.length === 3 ? 'grid-cols-1 md:grid-cols-3 max-w-6xl mx-auto' :
+            'grid-cols-1 md:grid-cols-2 lg:grid-cols-4'
+          }`}>
+            {teamMembers.map((member, i) => (
+              <div 
+                key={member.id}
+                className="group bg-white rounded-3xl shadow-xl overflow-hidden hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-500 animate-fadeUp cursor-pointer"
+                style={{ animationDelay: `${i * 0.1}s` }}
+                onClick={() => setSelectedMember(selectedMember === member.id ? null : member.id)}
+              >
+                <div className="relative h-64 overflow-hidden">
+                  {member.photo ? (
+                    <div 
+                      className="w-full h-full bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
+                      style={{ backgroundImage: `url(${member.photo})` }}
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-purple-200 to-indigo-200 flex items-center justify-center">
+                      <Users className="w-16 h-16 text-purple-500" />
+                    </div>
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-purple-900/50 to-transparent"></div>
+                  
+                  <div className="absolute bottom-4 left-4 text-white">
+                    <div className="text-sm font-medium opacity-90">{member.experience} опыта</div>
+                  </div>
+                </div>
                 
-                <div className="absolute bottom-4 left-4 text-white">
-                  <div className="text-sm font-medium opacity-90">{member.experience} опыта</div>
+                <div className="p-6">
+                  <h3 className="text-xl font-bold text-gray-900 mb-1 group-hover:text-purple-600 transition-colors">
+                    {member.name}
+                  </h3>
+                  <div className="text-purple-600 font-medium mb-3">{member.position}</div>
+                  <p className={`text-gray-600 text-sm leading-relaxed transition-all duration-300 ${
+                    selectedMember === member.id ? 'opacity-100' : 'line-clamp-2'
+                  }`}>
+                    {member.description}
+                  </p>
                 </div>
               </div>
-              
-              <div className="p-6">
-                <h3 className="text-xl font-bold text-gray-900 mb-1 group-hover:text-purple-600 transition-colors">
-                  {member.name}
-                </h3>
-                <div className="text-purple-600 font-medium mb-3">{member.position}</div>
-                <p className={`text-gray-600 text-sm leading-relaxed transition-all duration-300 ${
-                  selectedMember === member.name ? 'opacity-100' : 'line-clamp-2'
-                }`}>
-                  {member.description}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* CTA Section */}
       <section className="relative py-20 overflow-hidden">
@@ -227,12 +275,14 @@ export default function AboutPage() {
             </p>
             
             <div className="flex flex-col sm:flex-row justify-center gap-6 animate-fadeUp" style={{ animationDelay: '0.3s' }}>
-              <button className="px-12 py-5 bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 text-white font-bold text-lg rounded-3xl shadow-2xl hover:shadow-purple-500/25 transform hover:scale-105 transition-all duration-500 shimmer-effect">
-                <span className="flex items-center justify-center gap-3">
-                  <Sparkles size={20} />
-                  <span>Наши контакты</span>
-                </span>
-              </button>
+              <ContactModal phone={siteContent?.contactPhone ?? ''} email={siteContent?.contactEmail ?? ''}>
+                <button className="px-12 py-5 bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 text-white font-bold text-lg rounded-3xl shadow-2xl hover:shadow-purple-500/25 transform hover:scale-105 transition-all duration-500 shimmer-effect">
+                  <span className="flex items-center justify-center gap-3">
+                    <Sparkles size={20} />
+                    <span>Наши контакты</span>
+                  </span>
+                </button>
+              </ContactModal>
             </div>
           </div>
         </div>

@@ -3,76 +3,176 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { Menu, X, Phone, Mail, ChevronDown } from "lucide-react";
+import { createPortal } from "react-dom";
+import { Menu, X, Phone, Mail, Check } from "lucide-react";
 
-// Mock data for demo
-const mockSite = {
+interface SiteContent {
+  id: string;
+  slug: string;
+  heroText: string;
+  feature1Number: string;
+  feature1Label: string;
+  feature2Number: string;
+  feature2Label: string;
+  feature3Number: string;
+  feature3Label: string;
+  footerDescription: string;
+  footerContacts: string;
+  contactPhone: string;
+  contactEmail: string;
+}
+
+// Default fallback data
+const defaultSite = {
   contactPhone: "+7 (999) 123-45-67",
   contactEmail: "info@kino.ru",
   footerDescription: "Помощь в организации съёмок и продвижении региона.",
   footerContacts: "Чита, Забайкальский край\ninfo@kino.ru"
 };
 
-function ContactModal({ phone, email, variant }: { phone: string; email: string; variant: string }) {
+// Fixed ContactModal component with proper portal positioning
+function ContactModal({ 
+  phone, 
+  email, 
+  children,
+  className = ""
+}: { 
+  phone: string; 
+  email: string; 
+  children: React.ReactNode;
+  className?: string;
+}) {
   const [isOpen, setIsOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const [copiedPhone, setCopiedPhone] = useState(false);
+  const [copiedEmail, setCopiedEmail] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isOpen]);
+
+  const copyToClipboard = async (text: string, type: 'phone' | 'email') => {
+    try {
+      await navigator.clipboard.writeText(text);
+      
+      if (type === 'phone') {
+        setCopiedPhone(true);
+        setTimeout(() => setCopiedPhone(false), 2000);
+      } else {
+        setCopiedEmail(true);
+        setTimeout(() => setCopiedEmail(false), 2000);
+      }
+    } catch (err) {
+      console.error('Не удалось скопировать: ', err);
+    }
+  };
+
+  const modal = (
+    <div 
+      className="fixed inset-0 z-[99999] flex items-center justify-center p-4"
+      style={{ 
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100vw',
+        height: '100vh',
+        zIndex: 99999
+      }}
+    >
+      {/* Background overlay */}
+      <div
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+        onClick={() => setIsOpen(false)}
+      />
+
+      {/* Modal content */}
+      <div className="relative z-10 w-full max-w-md mx-auto">
+        <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl p-8 animate-scaleIn border border-gray-200 dark:border-gray-700">
+          {/* Close button */}
+          <button
+            onClick={() => setIsOpen(false)}
+            className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200"
+          >
+            <X size={20} />
+          </button>
+
+          {/* Title */}
+          <div className="text-center mb-8">
+            <div className="w-16 h-16 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Phone className="text-white" size={24} />
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+              Наши контакты
+            </h2>
+            <p className="text-gray-600 dark:text-gray-400">
+              Нажмите, чтобы скопировать
+            </p>
+          </div>
+
+          {/* Contact buttons */}
+          <div className="space-y-4">
+            <button
+              onClick={() => copyToClipboard(phone, 'phone')}
+              className="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200 group"
+            >
+              <div className="flex items-center justify-center w-6 h-6">
+                {copiedPhone ? (
+                  <Check size={20} className="animate-bounce" />
+                ) : (
+                  <Phone size={20} />
+                )}
+              </div>
+              <span className="flex-1 text-left">
+                {copiedPhone ? "Скопировано!" : phone}
+              </span>
+            </button>
+
+            <button
+              onClick={() => copyToClipboard(email, 'email')}
+              className="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-xl border-2 border-purple-600 text-purple-600 dark:text-purple-400 font-semibold hover:bg-purple-600 hover:text-white dark:hover:bg-purple-600 dark:hover:text-white transition-all duration-200 group"
+            >
+              <div className="flex items-center justify-center w-6 h-6">
+                {copiedEmail ? (
+                  <Check size={20} className="animate-bounce" />
+                ) : (
+                  <Mail size={20} />
+                )}
+              </div>
+              <span className="flex-1 text-left">
+                {copiedEmail ? "Скопировано!" : email}
+              </span>
+            </button>
+          </div>
+
+          {/* Additional info */}
+          <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700 text-center">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Работаем ежедневно с 9:00 до 18:00
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <>
-      {variant === "header" && (
-        <button
-          onClick={() => setIsOpen(true)}
-          className="group relative px-6 py-2.5 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-purple-500/25 transform hover:scale-105 transition-all duration-300 overflow-hidden shimmer-effect"
-        >
-          <div className="absolute inset-0 bg-gradient-to-r from-pink-600 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-          <span className="relative flex items-center gap-2">
-            <Phone size={16} />
-            Связаться
-          </span>
-        </button>
-      )}
-      
-      {variant === "cta" && (
-        <button
-          onClick={() => setIsOpen(true)}
-          className="group relative px-12 py-5 bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white font-bold text-lg rounded-3xl shadow-2xl hover:shadow-purple-500/25 transform hover:scale-105 transition-all duration-500 overflow-hidden shimmer-effect hover-glow animate-floating"
-        >
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-          <span className="relative flex items-center gap-3">
-            <span>Связаться с нами</span>
-            <div className="transform group-hover:rotate-45 transition-transform duration-300">
-              ✦
-            </div>
-          </span>
-        </button>
-      )}
-
-      {isOpen && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4 animate-fadeIn">
-          <div className="bg-white dark:bg-gray-900 rounded-3xl p-8 max-w-md w-full animate-scaleIn">
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">Контакты</h3>
-              <button
-                onClick={() => setIsOpen(false)}
-                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors"
-              >
-                <X size={20} />
-              </button>
-            </div>
-            
-            <div className="space-y-4">
-              <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-xl">
-                <Phone className="text-purple-600" size={20} />
-                <span className="font-semibold">{phone}</span>
-              </div>
-              
-              <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-xl">
-                <Mail className="text-blue-600" size={20} />
-                <span className="font-semibold">{email}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <button onClick={() => setIsOpen(true)} className={className}>
+        {children}
+      </button>
+      {mounted && isOpen && createPortal(modal, document.body)}
     </>
   );
 }
@@ -80,6 +180,8 @@ function ContactModal({ phone, email, variant }: { phone: string; email: string;
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [siteContent, setSiteContent] = useState<SiteContent | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -87,6 +189,25 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const fetchSiteContent = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('/api/site-content');
+        if (response.ok) {
+          const data = await response.json();
+          setSiteContent(data);
+        }
+      } catch (error) {
+        console.error('Error fetching site content:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSiteContent();
   }, []);
 
   const nav = [
@@ -97,9 +218,13 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
     { title: "О нас", href: "/about" },
   ];
 
-  const site = mockSite;
-  const footerDescription = site?.footerDescription || "Помощь в организации съёмок и продвижении региона.";
-  const footerContacts = site?.footerContacts || "Чита, Забайкальский край\ninfo@kino.ru";
+  // Use site content if available, otherwise use defaults
+  const site = siteContent || defaultSite;
+  const footerDescription = site.footerDescription || defaultSite.footerDescription;
+  const footerContacts = site.footerContacts || defaultSite.footerContacts;
+  const contactPhone = site.contactPhone || defaultSite.contactPhone;
+  const contactEmail = site.contactEmail || defaultSite.contactEmail;
+  
   const contactLines = footerContacts.split("\n").map((l) => l.trim()).filter(Boolean);
 
   return (
@@ -113,11 +238,11 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
         @keyframes scaleIn {
           from {
             opacity: 0;
-            transform: scale(0.9);
+            transform: scale(0.95) translateY(20px);
           }
           to {
             opacity: 1;
-            transform: scale(1);
+            transform: scale(1) translateY(0);
           }
         }
 
@@ -263,11 +388,17 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
 
             {/* Desktop CTA */}
             <div className="hidden lg:block animate-slideInDown" style={{ animationDelay: '0.8s' }}>
-              <ContactModal
-                phone={site?.contactPhone || "+7 (999) 123-45-67"}
-                email={site?.contactEmail || "info@kino.ru"}
-                variant="header"
-              />
+              <ContactModal 
+                phone={contactPhone} 
+                email={contactEmail}
+                className="group relative px-6 py-2.5 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-purple-500/25 transform hover:scale-105 transition-all duration-300 overflow-hidden shimmer-effect"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-pink-600 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <span className="relative flex items-center gap-2">
+                  <Phone size={16} />
+                  Связаться
+                </span>
+              </ContactModal>
             </div>
 
             {/* Mobile Menu Button */}
@@ -296,10 +427,16 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
                 ))}
                 <div className="pt-4 animate-fadeUp" style={{ animationDelay: '0.6s' }}>
                   <ContactModal
-                    phone={site?.contactPhone || "+7 (999) 123-45-67"}
-                    email={site?.contactEmail || "info@kino.ru"}
-                    variant="header"
-                  />
+                    phone={contactPhone}
+                    email={contactEmail}
+                    className="w-full group relative px-6 py-2.5 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-purple-500/25 transform hover:scale-105 transition-all duration-300 overflow-hidden shimmer-effect"
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-r from-pink-600 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <span className="relative flex items-center justify-center gap-2">
+                      <Phone size={16} />
+                      Связаться
+                    </span>
+                  </ContactModal>
                 </div>
               </nav>
             </div>
@@ -319,53 +456,60 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
           <div className="absolute bottom-10 right-10 w-40 h-40 bg-blue-500/20 rounded-full blur-3xl animate-floating" style={{ animationDelay: '2s' }}></div>
           
           <div className="relative z-10 container mx-auto px-6 py-16">
-            <div className="grid md:grid-cols-3 gap-12 mb-12">
-              {/* Company Info */}
-              <div className="space-y-4 animate-fadeUp">
-                <h3 className="text-2xl font-bold text-white mb-4">Кинокомиссия</h3>
-                <p className="text-white/80 leading-relaxed">{footerDescription}</p>
-                <div className="flex gap-4">
-                  <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center animate-floating">
-                    <span className="text-white font-bold">🎬</span>
-                  </div>
-                  <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center animate-floating" style={{ animationDelay: '1s' }}>
-                    <span className="text-white font-bold">📍</span>
-                  </div>
-                </div>
+            {loading ? (
+              <div className="text-center py-8">
+                <div className="w-8 h-8 bg-white/20 rounded-full animate-spin mx-auto mb-4"></div>
+                <p className="text-white/60">Загрузка контактов...</p>
               </div>
-
-              {/* Navigation */}
-              <div className="space-y-4 animate-fadeUp" style={{ animationDelay: '0.2s' }}>
-                <h3 className="text-xl font-bold text-white mb-4">Навигация</h3>
-                <ul className="space-y-3">
-                  {nav.map((item, i) => (
-                    <li key={item.href}>
-                      <Link 
-                        href={item.href} 
-                        className="group flex items-center gap-2 text-white/80 hover:text-white transition-all duration-300 animate-fadeUp"
-                        style={{ animationDelay: `${i * 0.1 + 0.3}s` }}
-                      >
-                        <div className="w-1 h-1 bg-purple-400 rounded-full group-hover:w-2 transition-all duration-300"></div>
-                        <span className="group-hover:translate-x-1 transition-transform duration-300">{item.title}</span>
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              {/* Contacts */}
-              <div className="space-y-4 animate-fadeUp" style={{ animationDelay: '0.4s' }}>
-                <h3 className="text-xl font-bold text-white mb-4">Контакты</h3>
-                <div className="space-y-3">
-                  {contactLines.map((line, idx) => (
-                    <div key={idx} className="flex items-center gap-3 p-3 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 animate-fadeUp" style={{ animationDelay: `${idx * 0.1 + 0.5}s` }}>
-                      <div className="w-2 h-2 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full animate-pulse"></div>
-                      <span className="text-white/90 text-sm font-medium">{line}</span>
+            ) : (
+              <div className="grid md:grid-cols-3 gap-12 mb-12">
+                {/* Company Info */}
+                <div className="space-y-4 animate-fadeUp">
+                  <h3 className="text-2xl font-bold text-white mb-4">Кинокомиссия</h3>
+                  <p className="text-white/80 leading-relaxed">{footerDescription}</p>
+                  <div className="flex gap-4">
+                    <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center animate-floating">
+                      <span className="text-white font-bold">🎬</span>
                     </div>
-                  ))}
+                    <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center animate-floating" style={{ animationDelay: '1s' }}>
+                      <span className="text-white font-bold">📍</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Navigation */}
+                <div className="space-y-4 animate-fadeUp" style={{ animationDelay: '0.2s' }}>
+                  <h3 className="text-xl font-bold text-white mb-4">Навигация</h3>
+                  <ul className="space-y-3">
+                    {nav.map((item, i) => (
+                      <li key={item.href}>
+                        <Link 
+                          href={item.href} 
+                          className="group flex items-center gap-2 text-white/80 hover:text-white transition-all duration-300 animate-fadeUp"
+                          style={{ animationDelay: `${i * 0.1 + 0.3}s` }}
+                        >
+                          <div className="w-1 h-1 bg-purple-400 rounded-full group-hover:w-2 transition-all duration-300"></div>
+                          <span className="group-hover:translate-x-1 transition-transform duration-300">{item.title}</span>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* Contacts */}
+                <div className="space-y-4 animate-fadeUp" style={{ animationDelay: '0.4s' }}>
+                  <h3 className="text-xl font-bold text-white mb-4">Контакты</h3>
+                  <div className="space-y-3">
+                    {contactLines.map((line, idx) => (
+                      <div key={idx} className="flex items-center gap-3 p-3 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 animate-fadeUp" style={{ animationDelay: `${idx * 0.1 + 0.5}s` }}>
+                        <div className="w-2 h-2 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full animate-pulse"></div>
+                        <span className="text-white/90 text-sm font-medium">{line}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
 
             {/* Bottom */}
             <div className="pt-8 border-t border-white/20 text-center animate-fadeUp" style={{ animationDelay: '0.6s' }}>
