@@ -4,61 +4,131 @@ import { useEffect, useState } from "react";
 import { CalendarDays, MapPin, Clock, Share, ArrowLeft, Eye, Heart, ArrowRight } from "lucide-react";
 import Link from "next/link";
 
-// Mock data for demo
-const mockNewsItem = {
-  id: '1',
-  slug: 'film-festival-2024',
-  title: 'Забайкальский кинофестиваль 2024',
-  shortDescription: 'Грандиозное событие года! Встречайте лучшие фильмы региона на главном кинофестивале Забайкалья.',
-  content: `
-    <h2>Долгожданное событие</h2>
-    <p>Забайкальский кинофестиваль 2024 станет настоящим праздником для всех любителей кино. В этом году мы представим более 50 фильмов от талантливых режиссеров региона.</p>
-    
-    <h3>Программа фестиваля</h3>
-    <p>Фестиваль пройдет в несколько этапов:</p>
-    <ul>
-      <li>Открытие и гала-премьера</li>
-      <li>Показы конкурсных фильмов</li>
-      <li>Мастер-классы от известных режиссеров</li>
-      <li>Церемония награждения</li>
-    </ul>
-    
-    <h3>Особенности этого года</h3>
-    <p>Впервые в истории фестиваля будет представлена специальная программа документальных фильмов о природе Забайкалья. Также планируется проведение круглого стола по развитию региональной киноиндустрии.</p>
-  `,
-  date: new Date('2024-09-15'),
-  location: 'Культурный центр, г. Чита',
-  coverImageUrl: 'https://images.unsplash.com/photo-1489599500846-a62a3c6b0ff3?w=1200&q=80',
-  category: 'Фестивали',
-  galleryUrls: [
-    'https://images.unsplash.com/photo-1489599500846-a62a3c6b0ff3?w=400&q=80',
-    'https://images.unsplash.com/photo-1485846234645-a62644f84728?w=400&q=80',
-    'https://images.unsplash.com/photo-1440404653325-ab127d49abc1?w=400&q=80',
-    'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&q=80'
-  ]
-};
+interface Event {
+  id: string;
+  title: string;
+  slug: string;
+  shortDescription: string;
+  content: string;
+  coverImageUrl: string | null;
+  galleryUrls: string[] | null;
+  date: Date;
+  location: string | null;
+  isPublished: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 export default function NewsDetails({ params }: { params: Promise<{ slug: string }> }) {
-  const [item, setItem] = useState(mockNewsItem);
+  const [event, setEvent] = useState<Event | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [isLiked, setIsLiked] = useState(false);
-  const [viewCount, setViewCount] = useState(1247);
+  const [viewCount, setViewCount] = useState(0);
+  const [slug, setSlug] = useState<string>('');
 
   useEffect(() => {
-    // Имитация загрузки по slug
-    // В реальном приложении здесь был бы запрос к API
-  }, []);
+    // Получаем slug из params
+    params.then(({ slug }) => {
+      setSlug(slug);
+    });
+  }, [params]);
+
+  useEffect(() => {
+    if (!slug) return;
+
+    const fetchEvent = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`/api/events/${slug}`);
+        
+        if (!response.ok) {
+          if (response.status === 404) {
+            throw new Error('Событие не найдено');
+          }
+          throw new Error('Ошибка загрузки события');
+        }
+        
+        const data = await response.json();
+        
+        // Преобразуем данные для совместимости
+        const eventData: Event = {
+          ...data,
+          date: new Date(data.date),
+          createdAt: new Date(data.createdAt),
+          updatedAt: new Date(data.updatedAt),
+          // Парсим galleryUrls если это JSON строка
+          galleryUrls: Array.isArray(data.galleryUrls) 
+            ? data.galleryUrls 
+            : (data.galleryUrls ? JSON.parse(data.galleryUrls) : null)
+        };
+        
+        setEvent(eventData);
+        // Генерируем случайное количество просмотров (в реальном приложении это было бы из базы)
+        setViewCount(Math.floor(Math.random() * 2000) + 500);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Произошла ошибка');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEvent();
+  }, [slug]);
 
   const handleShare = () => {
+    if (!event) return;
+    
     if (navigator.share) {
       navigator.share({
-        title: item.title,
-        text: item.shortDescription,
+        title: event.title,
+        text: event.shortDescription,
         url: window.location.href,
       });
     } else {
       navigator.clipboard.writeText(window.location.href);
     }
   };
+
+  // Loading state
+  if (loading) {
+    return (
+      <main className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-purple-50/30">
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="text-center">
+            <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-4 animate-spin">
+              <CalendarDays className="text-white" size={24} />
+            </div>
+            <p className="text-lg text-gray-600">Загрузка события...</p>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+  // Error state
+  if (error || !event) {
+    return (
+      <main className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-purple-50/30">
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="text-center">
+            <div className="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+              <ArrowLeft className="text-white" size={24} />
+            </div>
+            <h2 className="text-xl font-bold text-gray-900 mb-2">Событие не найдено</h2>
+            <p className="text-gray-600 mb-4">{error || 'Запрашиваемое событие не существует'}</p>
+            <Link
+              href="/news"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-xl hover:shadow-lg transition-all duration-300"
+            >
+              <ArrowLeft size={16} />
+              Вернуться к новостям
+            </Link>
+          </div>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <>
@@ -113,13 +183,57 @@ export default function NewsDetails({ params }: { params: Promise<{ slug: string
             background-attachment: scroll;
           }
         }
+
+        @keyframes floating {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-10px); }
+        }
+
+        @keyframes fadeUp {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes slideInDown {
+          from {
+            opacity: 0;
+            transform: translateY(-20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        .animate-floating {
+          animation: floating 6s ease-in-out infinite;
+        }
+
+        .animate-fadeUp {
+          animation: fadeUp 0.6s ease-out forwards;
+          opacity: 0;
+        }
+
+        .animate-slideInDown {
+          animation: slideInDown 0.5s ease-out;
+        }
       `}</style>
 
       <main>
         {/* Enhanced Hero Section */}
         <section 
           className="relative h-[70vh] min-h-[500px] parallax-hero overflow-hidden"
-          style={{ backgroundImage: `url(${item.coverImageUrl})` }}
+          style={{ 
+            backgroundImage: event.coverImageUrl 
+              ? `url(${event.coverImageUrl})` 
+              : 'linear-gradient(135deg, #7c3aed, #ec4899, #06b6d4)'
+          }}
         >
           <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/50 to-black/70"></div>
           
@@ -164,48 +278,44 @@ export default function NewsDetails({ params }: { params: Promise<{ slug: string
           {/* Content */}
           <div className="relative z-10 container mx-auto px-6 h-full flex items-end pb-16">
             <div className="max-w-4xl">
-              {/* Category & Stats */}
+              {/* Stats */}
               <div className="flex flex-wrap items-center gap-4 mb-6 animate-fadeUp">
                 <span className="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white text-sm font-semibold rounded-full">
-                  {item.category}
+                  Событие
                 </span>
                 <div className="flex items-center gap-4 text-white/80 text-sm">
                   <span className="flex items-center gap-1">
-                    <Eye size={14} />
-                    {viewCount.toLocaleString()} просмотров
-                  </span>
-                  <span className="flex items-center gap-1">
                     <Clock size={14} />
-                    5 мин чтения
+                    {Math.ceil(event.content.length / 1000)} мин чтения
                   </span>
                 </div>
               </div>
 
               <h1 className="text-4xl md:text-6xl font-black text-white mb-6 leading-tight animate-fadeUp" style={{ animationDelay: '0.2s' }}>
-                {item.title}
+                {event.title}
               </h1>
               
               <div className="flex flex-wrap gap-6 text-white/90 mb-8 animate-fadeUp" style={{ animationDelay: '0.4s' }}>
                 <div className="flex items-center gap-2">
                   <CalendarDays size={18} />
                   <span className="font-medium">
-                    {item.date.toLocaleDateString("ru-RU", { 
+                    {event.date.toLocaleDateString("ru-RU", { 
                       year: 'numeric', 
                       month: 'long', 
                       day: 'numeric' 
                     })}
                   </span>
                 </div>
-                {item.location && (
+                {event.location && (
                   <div className="flex items-center gap-2">
                     <MapPin size={18} />
-                    <span className="font-medium">{item.location}</span>
+                    <span className="font-medium">{event.location}</span>
                   </div>
                 )}
               </div>
 
               <p className="text-xl text-white/90 leading-relaxed max-w-3xl animate-fadeUp" style={{ animationDelay: '0.6s' }}>
-                {item.shortDescription}
+                {event.shortDescription}
               </p>
             </div>
           </div>
@@ -216,20 +326,20 @@ export default function NewsDetails({ params }: { params: Promise<{ slug: string
           <div className="max-w-4xl mx-auto">
             <article 
               className="prose prose-lg animate-fadeUp"
-              dangerouslySetInnerHTML={{ __html: item.content }}
+              dangerouslySetInnerHTML={{ __html: event.content }}
             />
 
             {/* Gallery */}
-            {item.galleryUrls && item.galleryUrls.length > 0 && (
+            {event.galleryUrls && event.galleryUrls.length > 0 && (
               <div className="mt-16 animate-fadeUp" style={{ animationDelay: '0.2s' }}>
                 <h2 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-8">
                   Галерея событий
                 </h2>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                  {item.galleryUrls.map((url, index) => (
+                  {event.galleryUrls.map((url, index) => (
                     <div 
                       key={index} 
-                      className="group aspect-square rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transform hover:scale-105 transition-all duration-500"
+                      className="group aspect-square rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transform hover:scale-105 transition-all duration-500 animate-fadeUp"
                       style={{ animationDelay: `${index * 0.1}s` }}
                     >
                       <div 
@@ -241,6 +351,53 @@ export default function NewsDetails({ params }: { params: Promise<{ slug: string
                 </div>
               </div>
             )}
+
+            {/* Event Info */}
+            <div className="mt-16 p-8 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-3xl animate-fadeUp" style={{ animationDelay: '0.4s' }}>
+              <h3 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-6">
+                Детали события
+              </h3>
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <CalendarDays className="text-purple-600" size={20} />
+                    <div>
+                      <p className="font-semibold text-gray-900 dark:text-white">Дата проведения</p>
+                      <p className="text-gray-600 dark:text-gray-300">
+                        {event.date.toLocaleDateString("ru-RU", { 
+                          weekday: 'long',
+                          year: 'numeric', 
+                          month: 'long', 
+                          day: 'numeric' 
+                        })}
+                      </p>
+                    </div>
+                  </div>
+                  
+                  {event.location && (
+                    <div className="flex items-center gap-3">
+                      <MapPin className="text-purple-600" size={20} />
+                      <div>
+                        <p className="font-semibold text-gray-900 dark:text-white">Место проведения</p>
+                        <p className="text-gray-600 dark:text-gray-300">{event.location}</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+                
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <Clock className="text-purple-600" size={20} />
+                    <div>
+                      <p className="font-semibold text-gray-900 dark:text-white">Опубликовано</p>
+                      <p className="text-gray-600 dark:text-gray-300">
+                        {event.createdAt.toLocaleDateString("ru-RU")}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -248,31 +405,17 @@ export default function NewsDetails({ params }: { params: Promise<{ slug: string
         <section className="bg-gradient-to-r from-gray-50 to-purple-50/20 dark:from-gray-900 dark:to-purple-900/10 py-20">
           <div className="container mx-auto px-6">
             <h2 className="text-4xl font-bold text-center mb-12 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent animate-fadeUp">
-              Похожие новости
+              Другие события
             </h2>
             
-            <div className="grid md:grid-cols-3 gap-8">
-              {[1, 2, 3].map((i) => (
-                <div 
-                  key={i}
-                  className="group bg-white dark:bg-gray-800 rounded-3xl shadow-lg hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-500 overflow-hidden animate-fadeUp"
-                  style={{ animationDelay: `${i * 0.1}s` }}
-                >
-                  <div className="h-48 bg-gradient-to-br from-purple-400 to-pink-500"></div>
-                  <div className="p-6">
-                    <h3 className="font-bold text-lg mb-3 group-hover:text-purple-600 transition-colors">
-                      Связанная новость {i}
-                    </h3>
-                    <p className="text-gray-600 text-sm mb-4">
-                      Краткое описание связанной новости для привлечения внимания читателей.
-                    </p>
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs text-gray-500">15 сент 2024</span>
-                      <ArrowRight size={16} className="text-purple-600 group-hover:translate-x-1 transition-transform duration-300" />
-                    </div>
-                  </div>
-                </div>
-              ))}
+            <div className="text-center animate-fadeUp" style={{ animationDelay: '0.2s' }}>
+              <Link
+                href="/news"
+                className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-2xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300"
+              >
+                <span>Посмотреть все события</span>
+                <ArrowRight size={16} />
+              </Link>
             </div>
           </div>
         </section>

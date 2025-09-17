@@ -2,6 +2,7 @@
 
 import { YMaps, Map, Placemark } from "@pbe/react-yandex-maps";
 import { MapPin, Search, Camera, Mountain, Building } from "lucide-react";
+import Link from "next/link";
 import { JSX, useEffect, useState } from "react";
 
 // Анимации (useScrollAnimation)
@@ -333,107 +334,84 @@ export default function LocationsClient({ locations }: { locations: any[] }) {
               </div>
             </div>
 
-            {/* Locations List */}
-            <div 
-              className="space-y-4 animate-fadeUp"
-              id="locations-list"
-              data-animate
-              style={{ animationDelay: '0.2s' }}
-            >
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                  Список локаций
-                </h2>
-                <div className="text-sm text-gray-500">
-                  {filteredLocations.length} из {locations.length}
+              {/* Locations List */}
+              <div 
+                className="space-y-4 animate-fadeUp"
+                id="locations-list"
+                data-animate
+                style={{ animationDelay: '0.2s' }}
+              >
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                    Список локаций
+                  </h2>
+                  <div className="text-sm text-gray-500">
+                    {filteredLocations.length} из {locations.length}
+                  </div>
                 </div>
-              </div>
 
-              <div className="max-h-[600px] overflow-y-auto custom-scrollbar space-y-4">
-                {filteredLocations.map((location, i) => (
-                  <div
-                    key={location.id}
-                    id={`location-${i}`}
-                    data-animate
-                    className={`location-card group animate-on-scroll cursor-pointer ${visibleItems.has(`location-${i}`) ? 'visible' : ''}`}
-                    style={{ animationDelay: `${i * 0.1}s` }}
-                    onClick={() => handleLocationClick(location)}
-                  >
-                    <div className={`relative p-6 rounded-3xl border transition-all duration-500 overflow-hidden ${
-                      selectedLocation?.id === location.id 
-                        ? 'bg-gradient-to-br from-blue-50 to-purple-50 border-blue-300 shadow-lg' 
-                        : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-md hover:shadow-xl'
-                    }`}>
-                      {/* Background Image */}
-                      {location.coverImage && (
-                        <div 
-                          className="absolute top-0 right-0 w-24 h-24 rounded-bl-3xl bg-cover bg-center opacity-20 group-hover:opacity-30 transition-opacity duration-300"
-                          style={{ backgroundImage: `url(${location.coverImage})` }}
-                        />
-                      )}
+                <div className="max-h-[600px] overflow-y-auto custom-scrollbar space-y-4">
+                  {filteredLocations.map((location, i) => (
+                    <Link
+                      href={`/locations/${location.slug}`}
+                      key={location.id}
+                      id={`location-${i}`}
+                      data-animate
+                      className={`location-card group animate-on-scroll cursor-pointer block ${visibleItems.has(`location-${i}`) ? 'visible' : ''}`}
+                      style={{ animationDelay: `${i * 0.1}s` }}
+                    >
+                      <div className={`relative p-6 rounded-3xl border transition-all duration-500 overflow-hidden ${
+                        selectedLocation?.id === location.id 
+                          ? 'bg-gradient-to-br from-blue-50 to-purple-50 border-blue-300 shadow-lg' 
+                          : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-md hover:shadow-xl'
+                      }`}>
+                        {/* Background Image */}
+                        {location.coverImage && (
+                          <div 
+                            className="absolute top-0 right-0 w-24 h-24 rounded-bl-3xl bg-cover bg-center opacity-20 group-hover:opacity-30 transition-opacity duration-300"
+                            style={{ backgroundImage: `url(${location.coverImage})` }}
+                          />
+                        )}
 
-                      {/* Content */}
-                      <div className="relative z-10">
-                        <div className="flex items-start justify-between mb-3">
-                          <div className="flex items-center gap-3">
-                            <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform duration-300">
-                              {categoryMap[location.category]?.icon || <MapPin size={16} />}
-                            </div>
-                            <div>
-                              <h3 className="font-bold text-lg text-gray-900 dark:text-white group-hover:text-blue-600 transition-colors">
-                                {location.name}
-                              </h3>
-                              <div className="flex items-center gap-2">
-                                <span className="text-xs px-2 py-1 bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 rounded-full">
-                                  {getCategoryLabel(location.category)}
-                                </span>
+                        {/* Content */}
+                        <div className="relative z-10">
+                          <div className="flex items-start justify-between mb-3">
+                            <div className="flex items-center gap-3">
+                              <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform duration-300">
+                                {categoryMap[location.category]?.icon || <MapPin size={16} />}
+                              </div>
+                              <div>
+                                <h3 className="font-bold text-lg text-gray-900 dark:text-white group-hover:text-blue-600 transition-colors">
+                                  {location.name}
+                                </h3>
+                                <div className="flex items-center gap-2">
+                                  <span className="text-xs px-2 py-1 bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 rounded-full">
+                                    {getCategoryLabel(location.category)}
+                                  </span>
+                                </div>
                               </div>
                             </div>
                           </div>
+
+                          <p className="text-sm text-gray-600 dark:text-gray-300 mb-4 line-clamp-2 leading-relaxed">
+                            {location.description}
+                          </p>
+
+                          {location.address && (
+                            <div className="flex items-center gap-2 text-xs text-gray-500 mb-4">
+                              <MapPin size={12} />
+                              {location.address}
+                            </div>
+                          )}
                         </div>
 
-                        <p className="text-sm text-gray-600 dark:text-gray-300 mb-4 line-clamp-2 leading-relaxed">
-                          {location.description}
-                        </p>
-
-                        {location.address && (
-                          <div className="flex items-center gap-2 text-xs text-gray-500 mb-4">
-                            <MapPin size={12} />
-                            {location.address}
-                          </div>
-                        )}
+                        {/* Shimmer Effect */}
+                        <div className="shimmer-effect"></div>
                       </div>
-
-                      {/* Shimmer Effect */}
-                      <div className="shimmer-effect"></div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {filteredLocations.length === 0 && (
-                <div className="text-center py-16 animate-fadeUp">
-                  <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-6 animate-floating">
-                    <Search className="text-white" size={28} />
-                  </div>
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
-                    Локации не найдены
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-400 mb-6">
-                    Попробуйте изменить параметры поиска
-                  </p>
-                  <button
-                    onClick={() => {
-                      setSearchTerm('');
-                      setSelectedCategory('Все');
-                    }}
-                    className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-2xl hover:shadow-lg transform hover:scale-105 transition-all duration-300"
-                  >
-                    Сбросить фильтры
-                  </button>
+                    </Link>
+                  ))}
                 </div>
-              )}
-            </div>
+              </div>
           </div>
         </section>
       </main>

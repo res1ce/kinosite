@@ -16,6 +16,7 @@ export async function createLocation(formData: FormData) {
   const latitude = Number(formData.get("latitude"));
   const longitude = Number(formData.get("longitude"));
   const address = String(formData.get("address") || "").trim() || null;
+  const slug = String(formData.get("slug") || "").trim();
   const description = String(formData.get("description") || "").trim();
   let galleryUrls = null;
   const galleryUrlsStr = formData.get("galleryUrls");
@@ -34,7 +35,8 @@ export async function createLocation(formData: FormData) {
     data: { 
       name,  
       latitude, 
-      longitude, 
+      longitude,
+      slug, 
       address,
       description,
       galleryUrls,
@@ -51,6 +53,7 @@ export async function updateLocation(id: string, formData: FormData) {
   const latitude = Number(formData.get("latitude"));
   const longitude = Number(formData.get("longitude"));
   const address = String(formData.get("address") || "").trim() || null;
+  const slug = String(formData.get("slug") || "").trim();
   const description = String(formData.get("description") || "").trim();
   const category = formData.get("category") as string;
   let galleryUrls = null;
@@ -71,6 +74,7 @@ export async function updateLocation(id: string, formData: FormData) {
       name,
       latitude,
       longitude,
+      slug,
       address,
       description,
       galleryUrls,
