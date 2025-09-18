@@ -2,7 +2,6 @@
 "use client";
 import { useMemo, useState, useEffect } from "react";
 import Toolbar from "@/components/Toolbar";
-import Panel from "@/components/Panel";
 import LocationPickerYandex from "@/components/LocationPickerYandex";
 import ImagesUploader from "@/components/ImagesUploader";
 import DeleteButton from "@/components/DeleteButton";

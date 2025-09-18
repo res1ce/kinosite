@@ -1,7 +1,7 @@
 // LocationDetailsClient.tsx "Детальная страница локации"
 'use client';
 
-import { MapPin, Star, Camera, Clock, Share, ArrowLeft, Heart, Eye, Navigation, Phone, Mail, Calendar } from "lucide-react";
+import { MapPin, Camera, Clock, Share, ArrowLeft, Eye, Navigation} from "lucide-react";
 import { YMaps, Map, Placemark } from "@pbe/react-yandex-maps";
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -51,9 +51,7 @@ function useScrollAnimation() {
 }
 
 export default function LocationDetailsClient({ location }: LocationDetailsClientProps) {
-  const [activeImageIndex, setActiveImageIndex] = useState(0);
-  const [isLiked, setIsLiked] = useState(false);
-  const [selectedSeason, setSelectedSeason] = useState('summer');
+  const [, setActiveImageIndex] = useState(0);
   const visibleItems = useScrollAnimation();
 
   // Генерируем дополнительные данные на основе имеющихся
@@ -111,13 +109,6 @@ export default function LocationDetailsClient({ location }: LocationDetailsClien
       navigator.clipboard.writeText(window.location.href);
     }
   };
-
-  const seasons = [
-    { key: 'spring', name: 'Весна', emoji: '🌸' },
-    { key: 'summer', name: 'Лето', emoji: '☀️' },
-    { key: 'autumn', name: 'Осень', emoji: '🍂' },
-    { key: 'winter', name: 'Зима', emoji: '❄️' }
-  ];
 
   return (
     <>

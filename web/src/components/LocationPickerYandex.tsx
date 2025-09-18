@@ -5,7 +5,6 @@ import { YMaps, Map, Placemark } from "@pbe/react-yandex-maps";
 
 export default function LocationPickerYandex() {
   const [pos, setPos] = useState<[number, number]>([52.034, 113.499]);
-  const [query, setQuery] = useState("");
 
   const updateCoordinateInputs = (lat: number, lng: number) => {
     const latInput = document.querySelector<HTMLInputElement>("input[name='latitude']");

@@ -1,6 +1,6 @@
 "use client";
 
-import { FileText, Download, Calendar, Search, Filter, Archive, Shield, Award, Users } from "lucide-react";
+import { FileText, Download, Calendar, Search } from "lucide-react";
 import { useState, useEffect } from "react";
 
 // Document type based on your Prisma model
@@ -27,7 +27,6 @@ export default function DocumentsPage() {
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('Все');
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   // Fetch documents from API
   useEffect(() => {
@@ -65,43 +64,12 @@ export default function DocumentsPage() {
     fetchDocuments();
   }, []);
 
-  // Extract unique categories from documents
-  const categories = ['Все', ...Array.from(new Set(documents.map(doc => doc.category || 'Документы')))];
-
-  const categoryIcons = {
-    'Положения': <Shield size={16} />,
-    'Заявки': <FileText size={16} />,
-    'Прайсы': <Award size={16} />,
-    'Договоры': <Users size={16} />,
-    'Шаблоны': <Archive size={16} />,
-    'Согласия': <Shield size={16} />,
-    'Документы': <FileText size={16} />,
-    'Все': <FileText size={16} />
-  };
-
   const filteredDocuments = documents.filter(doc => {
     const matchesSearch = doc.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          (doc.description || '').toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === 'Все' || doc.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
-
-  // Helper function to format file size
-  const getFileSize = async (url: string): Promise<string> => {
-    try {
-      const response = await fetch(url, { method: 'HEAD' });
-      const contentLength = response.headers.get('content-length');
-      if (contentLength) {
-        const bytes = parseInt(contentLength);
-        if (bytes < 1024) return `${bytes} Б`;
-        if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} КБ`;
-        return `${(bytes / (1024 * 1024)).toFixed(1)} МБ`;
-      }
-    } catch (error) {
-      console.error('Error getting file size:', error);
-    }
-    return 'Неизвестно';
-  };
 
   if (loading) {
     return (

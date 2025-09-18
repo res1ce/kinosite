@@ -7,7 +7,7 @@ export async function seedAdmin() {
   const passwordHash = await bcrypt.hash(password, 10);
   await prisma.user.upsert({
     where: { email },
-    create: { email, passwordHash, role: "ADMIN" as any, name: "Администратор" },
+    create: { email, passwordHash, role: "ADMIN", name: "Администратор" },
     update: {},
   });
 }

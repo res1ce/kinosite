@@ -1,6 +1,5 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { ImagePlus, Loader } from "lucide-react";
 
 type ColorVariant = "blue" | "teal" | "amber" | "purple";
 
@@ -130,12 +129,11 @@ export default function ImagesUploader({
           </div>
           
           <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-4">
-            {urls.map((url, index) => (
+            {urls.map((url) => (
               <div key={url} className="group relative aspect-square">
-                <img 
-                  src={url} 
-                  alt={`Изображение ${index + 1}`} 
-                  className="w-full h-full object-cover rounded-xl border border-gray-200 dark:border-gray-600 group-hover:scale-105 transition-transform duration-200" 
+                <div 
+                  className="w-full h-full bg-cover bg-center rounded-xl border border-gray-200 dark:border-gray-600 group-hover:scale-105 transition-transform duration-200"
+                  style={{ backgroundImage: `url(${url})` }}
                 />
                 <button
                   type="button"

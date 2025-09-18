@@ -90,7 +90,7 @@ export async function POST(request: Request) {
         shortDescription,
         content,
         coverImageUrl,
-        galleryUrls: galleryUrls ? JSON.stringify(galleryUrls) : null,
+        galleryUrls: galleryUrls ? JSON.stringify(galleryUrls) : undefined,
         date: new Date(date),
         location,
         isPublished: true

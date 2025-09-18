@@ -1,7 +1,6 @@
 "use client";
 import { useMemo, useState } from "react";
 import Toolbar from "@/components/Toolbar";
-import Panel from "@/components/Panel";
 import EventForm from "@/components/EventForm";
 import DeleteButton from "@/components/DeleteButton";
 
@@ -89,7 +88,11 @@ export default function EventsClient({
                         {Array.isArray(e.galleryUrls) && e.galleryUrls.length > 0 && (
                           <div className="flex gap-2 overflow-auto pb-2">
                             {e.galleryUrls.slice(0, 6).map((u, i) => (
-                              <img key={i} src={u} alt="" className="h-12 w-12 rounded-lg object-cover ring-2 ring-white/20 flex-shrink-0" />
+                              <div 
+                                key={i} 
+                                className="h-12 w-12 rounded-lg bg-cover bg-center ring-2 ring-white/20 flex-shrink-0" 
+                                style={{ backgroundImage: `url(${u})` }}
+                              />
                             ))}
                           </div>
                         )}

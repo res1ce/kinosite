@@ -3,14 +3,6 @@ import { revalidatePath } from "next/cache";
 import EventsClient from "./EventsClient";
 import SectionTopbar from "@/components/SectionTopbar";
 
-interface Event {
-  id: string; title: string; slug: string;
-  shortDescription: string; content: string;
-  coverImageUrl: string | null; galleryUrls: string[] | null;
-  date: Date; location: string | null;
-  createdAt: string | Date; updatedAt: string | Date;
-}
-
 async function createEvent(formData: FormData) { "use server";
   const title = String(formData.get("title") || "").trim();
   const slug = String(formData.get("slug") || "").trim();

@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import SingleImageUploader from "./SingleImageUploader";
 import ImagesUploader from "./ImagesUploader";
 

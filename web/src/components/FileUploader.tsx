@@ -1,6 +1,5 @@
 "use client";
 import React, { useState } from "react";
-import { Upload } from "lucide-react";
 
 type ColorVariant = "blue" | "teal" | "amber" | "purple";
 
@@ -74,15 +73,6 @@ export default function FileUploader({
     const file = e.target.files?.[0];
     if (file) {
       await upload(file);
-    }
-  };
-
-  const handleRemove = () => {
-    setUrl("");
-    const hidden = document.querySelector<HTMLInputElement>(`input[name='${name}']`);
-    if (hidden) hidden.value = "";
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
     }
   };
 

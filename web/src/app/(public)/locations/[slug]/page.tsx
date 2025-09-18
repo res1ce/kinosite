@@ -4,15 +4,15 @@ import { notFound } from "next/navigation";
 import LocationDetailsClient from './LocationDetailsClient'
 
 type Props = {
-  params: { slug: string }
+  params: Promise<{ slug: string }>
 };
 
 export default async function LocationDetails({ params }: Props) {
-  // Исправляем поиск по slug вместо id
+  const { slug } = await params;
+  
   const location = await prisma.location.findUnique({
     where: { 
-      slug: params.slug,
-      // Можно добавить дополнительные условия если нужно
+      slug: slug,
     }
   });
 

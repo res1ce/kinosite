@@ -1,7 +1,6 @@
 // pages/about
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import BackButton from "@/components/BackButton";
 import SingleImageUploader from "@/components/SingleImageUploader";
 
 async function updateAboutPage(formData: FormData) {
@@ -145,7 +144,7 @@ export default async function AdminAboutPage() {
             </div>
             <div>
               <h1 className="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                Страница "О нас"
+                Страница &quot;О нас&quot;
               </h1>
               <p className="text-gray-600 dark:text-gray-400 mt-1">
                 Редактирование содержимого страницы и управление командой
@@ -347,10 +346,9 @@ export default async function AdminAboutPage() {
                       {/* Photo */}
                       <div className="flex-shrink-0">
                         {member.photo ? (
-                          <img 
-                            src={member.photo} 
-                            alt={member.name}
-                            className="w-20 h-20 object-cover rounded-xl border-2 border-gray-200 dark:border-gray-600"
+                          <div 
+                            className="w-20 h-20 bg-cover bg-center rounded-xl border-2 border-gray-200 dark:border-gray-600"
+                            style={{ backgroundImage: `url(${member.photo})` }}
                           />
                         ) : (
                           <div className="w-20 h-20 bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600 rounded-xl flex items-center justify-center">

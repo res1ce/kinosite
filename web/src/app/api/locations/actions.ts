@@ -2,6 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { Category } from "@prisma/client";
 
 export async function getLocations() {
   return await prisma.location.findMany({
@@ -20,7 +21,11 @@ export async function createLocation(formData: FormData) {
   const description = String(formData.get("description") || "").trim();
   let galleryUrls = null;
   const galleryUrlsStr = formData.get("galleryUrls");
-  const category = formData.get("category") as string;
+  const categoryStr = formData.get("category") as string;
+  
+  // Проверяем и приводим category к правильному типу
+  const category = categoryStr as Category || Category.ARCHITECTURE;
+  
   if (typeof galleryUrlsStr === 'string') {
     try {
       galleryUrls = JSON.parse(galleryUrlsStr);
@@ -55,7 +60,11 @@ export async function updateLocation(id: string, formData: FormData) {
   const address = String(formData.get("address") || "").trim() || null;
   const slug = String(formData.get("slug") || "").trim();
   const description = String(formData.get("description") || "").trim();
-  const category = formData.get("category") as string;
+  const categoryStr = formData.get("category") as string;
+  
+  // Проверяем и приводим category к правильному типу
+  const category = categoryStr as Category || Category.ARCHITECTURE;
+  
   let galleryUrls = null;
   const galleryUrlsStr = formData.get("galleryUrls");
   if (typeof galleryUrlsStr === 'string') {

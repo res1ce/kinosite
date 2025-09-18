@@ -1,10 +1,20 @@
-import { prisma } from "@/lib/prisma";
-import LocationsClient from "./LocationsClient";
+import { prisma } from '@/lib/prisma'
+import LocationsClient from './LocationsClient'
 
 export default async function LocationsPage() {
-  const locations = await prisma.location.findMany({
-    orderBy: { createdAt: "desc" },
+  const rawLocations = await prisma.location.findMany({
+    orderBy: { createdAt: 'desc' }
   });
+
+  // Преобразуем данные для совместимости с клиентским компонентом
+  const locations = rawLocations.map(location => ({
+    ...location,
+    galleryUrls: Array.isArray(location.galleryUrls) 
+      ? location.galleryUrls as string[]
+      : location.galleryUrls 
+        ? JSON.parse(location.galleryUrls as string) 
+        : null
+  }));
 
   return <LocationsClient locations={locations} />;
 }

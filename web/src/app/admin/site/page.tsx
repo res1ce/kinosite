@@ -1,7 +1,6 @@
 // app/admin/site/page.tsx
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import BackButton from "@/components/BackButton"; // если у вас есть компонент, иначе уберите импорт
 
 async function updateSiteContent(formData: FormData) {
   "use server";

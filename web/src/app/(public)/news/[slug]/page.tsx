@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from "react";
-import { CalendarDays, MapPin, Clock, Share, ArrowLeft, Eye, Heart, ArrowRight } from "lucide-react";
+import { CalendarDays, MapPin, Clock, Share, ArrowLeft, Heart, ArrowRight } from "lucide-react";
 import Link from "next/link";
 
 interface Event {
@@ -24,7 +24,6 @@ export default function NewsDetails({ params }: { params: Promise<{ slug: string
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isLiked, setIsLiked] = useState(false);
-  const [viewCount, setViewCount] = useState(0);
   const [slug, setSlug] = useState<string>('');
 
   useEffect(() => {
@@ -64,8 +63,6 @@ export default function NewsDetails({ params }: { params: Promise<{ slug: string
         };
         
         setEvent(eventData);
-        // Генерируем случайное количество просмотров (в реальном приложении это было бы из базы)
-        setViewCount(Math.floor(Math.random() * 2000) + 500);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Произошла ошибка');
       } finally {

@@ -1,6 +1,5 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { Loader } from "lucide-react";
 
 type ColorVariant = "blue" | "teal" | "amber" | "purple";
 
@@ -130,7 +129,10 @@ export default function SingleImageUploader({
           </div>
           
           <div className="relative group inline-block">
-            <img src={url} alt="Загруженное изображение" className="h-24 w-24 object-cover rounded-xl border-2 border-gray-200 dark:border-gray-600 group-hover:scale-105 transition-transform duration-200" />
+            <div 
+              className="h-24 w-24 bg-cover bg-center rounded-xl border-2 border-gray-200 dark:border-gray-600 group-hover:scale-105 transition-transform duration-200"
+              style={{ backgroundImage: `url(${url})` }}
+            />
             <button 
               type="button"
               onClick={handleRemove}

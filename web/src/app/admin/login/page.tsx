@@ -20,6 +20,7 @@ export default function AdminLoginPage() {
       if (res?.ok) window.location.href = "/admin";
     } catch (err) {
       setError("Произошла ошибка при входе");
+      console.error(err);
     } finally {
       setIsLoading(false);
     }

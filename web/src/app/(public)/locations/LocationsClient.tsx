@@ -5,6 +5,23 @@ import { MapPin, Search, Camera, Mountain, Building } from "lucide-react";
 import Link from "next/link";
 import { JSX, useEffect, useState } from "react";
 
+interface Location {
+  id: string;
+  name: string;
+  latitude: number;
+  longitude: number;
+  slug: string;
+  address: string | null;
+  description: string | null;
+  galleryUrls: string[] | null;
+  isPartner: boolean;
+  category: "ARCHITECTURE" | "NATURE" | "STUDIO";
+  createdAt: Date;
+  updatedAt: Date;
+  coverImage?: string;
+  rating?: number;
+}
+
 // Анимации (useScrollAnimation)
 function useScrollAnimation() {
   const [visibleItems, setVisibleItems] = useState(new Set());
@@ -30,12 +47,10 @@ function useScrollAnimation() {
   return visibleItems;
 }
 
-export default function LocationsClient({ locations }: { locations: any[] }) {
+export default function LocationsClient({ locations }: { locations: Location[] }) {
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("Все");
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [selectedLocation, setSelectedLocation] = useState<any>(null);
+  const [selectedCategory] = useState("Все");
+  const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
   const [mapCenter, setMapCenter] = useState<[number, number]>([52.034, 113.499]);
 
   const visibleItems = useScrollAnimation();
@@ -57,17 +72,9 @@ export default function LocationsClient({ locations }: { locations: any[] }) {
     if (russianCategory === "Все") return "Все";
     
     const entry = Object.entries(categoryMap).find(
-      ([_, value]) => value.label === russianCategory
+      ([, value]) => value.label === russianCategory
     );
     return entry ? entry[0] : russianCategory;
-  };
-
-  const categories = ["Все", "Природа", "Архитектура", "Студии"];
-  const categoryIcons = {
-    Природа: <Mountain size={16} />,
-    Архитектура: <Building size={16} />,
-    Студии: <Camera size={16} />,
-    Все: <MapPin size={16} />,
   };
 
   const filteredLocations = locations.filter((location) => {
@@ -87,7 +94,7 @@ export default function LocationsClient({ locations }: { locations: any[] }) {
     return matchesSearch && matchesCategory;
   });
 
-  const handleLocationClick = (location: any) => {
+  const handleLocationClick = (location: Location) => {
     setSelectedLocation(location);
     setMapCenter([location.latitude, location.longitude]);
   };

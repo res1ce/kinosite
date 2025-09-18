@@ -2,7 +2,6 @@
 "use client";
 import { useMemo, useState } from "react";
 import Toolbar from "@/components/Toolbar";
-import Panel from "@/components/Panel";
 import FileUploader from "@/components/FileUploader";
 import DeleteButton from "@/components/DeleteButton";
 

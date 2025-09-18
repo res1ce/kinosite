@@ -1,8 +1,23 @@
 'use client';
 
 import Link from "next/link";
-import { CalendarDays, Clock, ArrowRight, Search, Filter } from "lucide-react";
+import { CalendarDays, Clock, ArrowRight, Search} from "lucide-react";
 import { useState, useEffect } from "react";
+
+interface Event {
+  id: string;
+  title: string;
+  slug: string;
+  shortDescription: string;
+  content: string;
+  coverImageUrl: string | null;
+  galleryUrls: JSON; // или Json если импортируете из Prisma
+  date: string; // или Date, зависит от того, как приходят данные
+  location: string | null;
+  isPublished: boolean;
+  createdAt: string; // или Date
+  updatedAt: string; // или Date
+}
 
 function useScrollAnimation() {
   const [visibleItems, setVisibleItems] = useState(new Set());
@@ -28,7 +43,7 @@ function useScrollAnimation() {
   return visibleItems;
 }
 
-export default function NewsClient({ events }: { events: any[] }) {
+export default function NewsClient({ events }: { events: Event[] }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('Все');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -40,8 +55,7 @@ export default function NewsClient({ events }: { events: any[] }) {
     const matchesSearch =
       item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.shortDescription.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === 'Все' || item.category === selectedCategory;
-    return matchesSearch && matchesCategory;
+    return matchesSearch;
   });
 
   return (

@@ -1,7 +1,7 @@
 "use client";
 
 import ContactModal from "@/components/ContactModal";
-import { Users, Target, Award, Star, Heart, MapPin, Calendar, Trophy, Sparkles } from "lucide-react";
+import { Users, Heart, MapPin, Calendar, Trophy, Sparkles } from "lucide-react";
 import { useState, useEffect } from "react";
 
 interface TeamMember {
@@ -44,7 +44,6 @@ export default function AboutPage() {
   const [aboutContent, setAboutContent] = useState<string>('');
   const [siteContent, setSiteContent] = useState<SiteContent | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -72,7 +71,6 @@ export default function AboutPage() {
         }
 
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Произошла ошибка');
         console.error('Error fetching data:', err);
       } finally {
         setLoading(false);

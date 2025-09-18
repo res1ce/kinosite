@@ -2,9 +2,25 @@
 'use client';
 
 import Link from "next/link";
-import { CalendarDays, MapPin, Ticket, Landmark } from "lucide-react";
+import { CalendarDays, MapPin, Landmark } from "lucide-react";
 import { useEffect, useState } from "react";
 import ContactModal from "@/components/ContactModal";
+
+interface SiteContent {
+  heroText?: string;
+  feature1Number?: string;
+  feature1Label?: string;
+  feature2Number?: string;
+  feature2Label?: string;
+  feature3Number?: string;
+  feature3Label?: string;
+  contactPhone?: string;
+  contactEmail?: string;
+}
+
+interface VisibilityState {
+  [key: string]: boolean;
+}
 
 // Hook for scroll animations
 function useScrollAnimation() {
@@ -40,7 +56,7 @@ function useScrollAnimation() {
   return { scrollY, isVisible };
 }
 
-export default function Home({ site }: { site: any }) {
+export default function Home({ site }: { site: SiteContent | null }) {
   const { scrollY, isVisible } = useScrollAnimation();
 
   const heroText = site?.heroText || "Организуем съёмки, подбираем локации и сопровождаем проекты в регионе.";
@@ -210,7 +226,7 @@ export default function Home({ site }: { site: any }) {
       `}</style>
       
       <main className="min-h-screen font-sans overflow-hidden">
-        <Hero heroText={heroText} scrollY={scrollY} isVisible={isVisible} />
+        <Hero heroText={heroText} scrollY={scrollY} />
         <Features items={features} isVisible={isVisible} />
         <Services isVisible={isVisible} />
         <CTA site={site} isVisible={isVisible} />
@@ -219,7 +235,7 @@ export default function Home({ site }: { site: any }) {
   );
 }
 
-function Hero({ heroText, scrollY, isVisible }: { heroText: string; scrollY: number; isVisible: any }) {
+function Hero({ heroText, scrollY}: { heroText: string; scrollY: number;}) {
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Animated Background with Parallax */}
@@ -288,7 +304,7 @@ function Hero({ heroText, scrollY, isVisible }: { heroText: string; scrollY: num
   );
 }
 
-function Features({ items, isVisible }: { items: { number: string; label: string }[]; isVisible: any }) {
+function Features({ items, isVisible }: { items: { number: string; label: string }[]; isVisible: VisibilityState }) {
   return (
     <section className="py-32 relative bg-gradient-to-b from-gray-50 to-white overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-br from-purple-50/50 to-blue-50/50"></div>
@@ -341,7 +357,7 @@ function Features({ items, isVisible }: { items: { number: string; label: string
   );
 }
 
-function Services({ isVisible }: { isVisible: any }) {
+function Services({ isVisible }: { isVisible: VisibilityState }) {
   const services = [
     { 
       title: "Новости", 
@@ -442,7 +458,7 @@ function Services({ isVisible }: { isVisible: any }) {
   );
 }
 
-function CTA({ site, isVisible }: { site: any; isVisible: any }) {
+function CTA({ site, isVisible }: { site: SiteContent | null; isVisible: VisibilityState }) {
   return (
     <section className="relative py-32 overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-br from-purple-900 via-pink-900 to-indigo-900"></div>
@@ -480,7 +496,7 @@ function CTA({ site, isVisible }: { site: any; isVisible: any }) {
           </p>
           
           <div className="animate-rotateIn" style={{ animationDelay: '1s' }}>
-            <ContactModal phone={site.contactPhone} email={site.contactEmail}>
+            <ContactModal phone={site?.contactPhone || "+7 (999) 123-45-67"} email={site?.contactEmail || "info@kino.ru"}>
               <button className="group relative px-12 py-5 bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white font-bold text-lg rounded-3xl shadow-2xl hover:shadow-purple-500/25 transform hover:scale-105 transition-all duration-500 overflow-hidden shimmer-effect hover-glow animate-floating">
                 <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 <span className="relative flex items-center gap-3">
