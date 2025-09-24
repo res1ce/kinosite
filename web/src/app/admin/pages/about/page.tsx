@@ -125,6 +125,8 @@ async function moveTeamMember(formData: FormData) {
   revalidatePath("/admin/about");
 }
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminAboutPage() {
   const aboutPage = await prisma.page.findUnique({ where: { slug: "about" } });
   const teamMembers = await prisma.teamMember.findMany({

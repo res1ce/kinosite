@@ -1,6 +1,8 @@
 import { prisma } from '@/lib/prisma'
 import LocationsClient from './LocationsClient'
 
+export const revalidate = 60;
+
 export default async function LocationsPage() {
   const rawLocations = await prisma.location.findMany({
     orderBy: { createdAt: 'desc' }

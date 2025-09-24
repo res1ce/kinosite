@@ -58,6 +58,8 @@ async function updateSiteContent(formData: FormData) {
   revalidatePath("/admin");
 }
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminSitePage() {
   const site = await prisma.siteContent.findUnique({ where: { slug: "main" } });
 

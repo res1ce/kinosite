@@ -96,7 +96,7 @@ export async function POST(request: Request) {
         isPublished: true
       }
     });
-
+    
     return NextResponse.json(event, { status: 201 });
   } catch (error) {
     console.error('Error creating event:', error);

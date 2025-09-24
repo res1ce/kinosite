@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import NewsClient from "./NewsClient";
 
+export const revalidate = 60;
+
 export default async function NewsPage() {
   const rawEvents = await prisma.event.findMany({
     where: { isPublished: true },
