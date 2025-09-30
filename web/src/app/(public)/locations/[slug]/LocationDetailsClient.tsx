@@ -1,12 +1,10 @@
-// LocationDetailsClient.tsx "Детальная страница локации"
 'use client';
 
-import { MapPin, Camera, Clock, Share, ArrowLeft, Eye, Navigation} from "lucide-react";
+import { MapPin, Camera, Clock, Share, ArrowLeft, Eye, Navigation, ChevronLeft, ChevronRight, X, Grid3x3, Maximize2 } from "lucide-react";
 import { YMaps, Map, Placemark } from "@pbe/react-yandex-maps";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 
-// Интерфейс на основе Prisma модели Location
 interface Location {
   id: string;
   name: string;
@@ -50,19 +48,121 @@ function useScrollAnimation() {
   return visibleItems;
 }
 
+function Lightbox({ 
+  images, 
+  initialIndex, 
+  onClose 
+}: { 
+  images: string[]; 
+  initialIndex: number; 
+  onClose: () => void;
+}) {
+  const [currentIndex, setCurrentIndex] = useState(initialIndex);
+
+  const goNext = useCallback(() => {
+    setCurrentIndex((prev) => (prev + 1) % images.length);
+  }, [images.length]);
+
+  const goPrev = useCallback(() => {
+    setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
+  }, [images.length]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+      if (e.key === 'ArrowRight') goNext();
+      if (e.key === 'ArrowLeft') goPrev();
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose, goNext, goPrev]);
+
+  return (
+    <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center">
+      <button
+        onClick={onClose}
+        className="absolute top-4 right-4 w-10 h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors"
+      >
+        <X size={20} />
+      </button>
+
+      {images.length > 1 && (
+        <>
+          <button
+            onClick={goPrev}
+            className="absolute left-4 w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors"
+          >
+            <ChevronLeft size={24} />
+          </button>
+          <button
+            onClick={goNext}
+            className="absolute right-4 w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors"
+          >
+            <ChevronRight size={24} />
+          </button>
+        </>
+      )}
+
+      <div className="absolute top-4 left-1/2 -translate-x-1/2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-white text-sm">
+        {currentIndex + 1} / {images.length}
+      </div>
+
+      <img
+        src={images[currentIndex]}
+        alt={`Image ${currentIndex + 1}`}
+        className="max-h-[90vh] max-w-[90vw] object-contain"
+      />
+
+      {images.length > 1 && (
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 max-w-[90vw] overflow-x-auto">
+          <div className="flex gap-2 p-2 bg-white/10 backdrop-blur-sm rounded-lg">
+            {images.slice(
+              Math.max(0, currentIndex - 5),
+              Math.min(images.length, currentIndex + 6)
+            ).map((img, idx) => {
+              const realIdx = Math.max(0, currentIndex - 5) + idx;
+              return (
+                <button
+                  key={realIdx}
+                  onClick={() => setCurrentIndex(realIdx)}
+                  className={`w-16 h-16 flex-shrink-0 rounded overflow-hidden border-2 transition-all ${
+                    realIdx === currentIndex
+                      ? 'border-white scale-110'
+                      : 'border-transparent opacity-60 hover:opacity-100'
+                  }`}
+                >
+                  <img
+                    src={img}
+                    alt={`Thumbnail ${realIdx + 1}`}
+                    className="w-full h-full object-cover"
+                  />
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function LocationDetailsClient({ location }: LocationDetailsClientProps) {
-  const [, setActiveImageIndex] = useState(0);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
+  const [showAllImages, setShowAllImages] = useState(false);
   const visibleItems = useScrollAnimation();
 
-  // Генерируем дополнительные данные на основе имеющихся
+  const images = location.galleryUrls || [];
+  const displayImages = showAllImages ? images : images.slice(0, 12);
+
   const generatedData = {
-    rating: 4.5 + Math.random() * 0.4, // 4.5-4.9
-    reviewsCount: Math.floor(Math.random() * 200) + 50, // 50-250
-    viewsCount: Math.floor(Math.random() * 3000) + 1000, // 1000-4000
-    coverImage: location.galleryUrls?.[0] || '/placeholder-location.jpg'
+    rating: 4.5 + Math.random() * 0.4,
+    reviewsCount: Math.floor(Math.random() * 200) + 50,
+    viewsCount: Math.floor(Math.random() * 3000) + 1000,
+    coverImage: images[0] || '/placeholder-location.jpg'
   };
 
-  // Категория на русском
   const getCategoryName = (category: string) => {
     switch (category) {
       case 'ARCHITECTURE': return 'Архитектура';
@@ -72,25 +172,11 @@ export default function LocationDetailsClient({ location }: LocationDetailsClien
     }
   };
 
-  // Статичные данные для демонстрации (можно вынести в отдельную конфигурацию)
   const staticData = {
-    features: [
-      'Живописные виды', 'Удобный доступ', 'Хорошее освещение', 'Тишина и покой',
-      'Безопасность', 'Парковка', 'Электричество', 'Вода поблизости'
-    ],
-    facilities: [
-      'Парковка для техники', 'Места для размещения', 'Доступ на автомобиле', 'Мобильная связь'
-    ],
     bestFor: [
       'Художественные фильмы', 'Документальное кино', 'Рекламные ролики',
       'Музыкальные клипы', 'Фотосессии', 'Телевизионные передачи'
     ],
-    seasonality: {
-      spring: { available: true, conditions: 'Хорошие', note: 'Цветение природы' },
-      summer: { available: true, conditions: 'Отличные', note: 'Лучший период' },
-      autumn: { available: true, conditions: 'Хорошие', note: 'Золотая осень' },
-      winter: { available: true, conditions: 'Особые', note: 'Зимние пейзажи' }
-    },
     contact: {
       phone: '+7 (999) 123-45-67',
       email: 'locations@kino.ru',
@@ -110,6 +196,11 @@ export default function LocationDetailsClient({ location }: LocationDetailsClien
     }
   };
 
+  const openLightbox = (index: number) => {
+    setLightboxIndex(index);
+    setLightboxOpen(true);
+  };
+
   return (
     <>
       <style jsx global>{`
@@ -124,56 +215,6 @@ export default function LocationDetailsClient({ location }: LocationDetailsClien
           .parallax-hero {
             background-attachment: scroll;
           }
-        }
-
-        .prose {
-          max-width: none;
-          color: rgb(55, 65, 81);
-        }
-        
-        .prose h2 {
-          font-size: 1.875rem;
-          font-weight: 700;
-          margin: 2rem 0 1rem 0;
-          background: linear-gradient(135deg, #3b82f6, #06b6d4);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-        }
-        
-        .prose h3 {
-          font-size: 1.5rem;
-          font-weight: 600;
-          margin: 1.5rem 0 0.75rem 0;
-          color: rgb(55, 65, 81);
-        }
-        
-        .prose p {
-          margin: 1rem 0;
-          line-height: 1.75;
-          color: rgb(75, 85, 99);
-        }
-        
-        .prose ul {
-          margin: 1rem 0;
-          padding-left: 1.5rem;
-        }
-        
-        .prose li {
-          margin: 0.5rem 0;
-          color: rgb(75, 85, 99);
-        }
-
-        .image-gallery {
-          display: grid;
-          grid-template-columns: 2fr 1fr 1fr;
-          grid-template-rows: 1fr 1fr;
-          gap: 1rem;
-          height: 500px;
-        }
-
-        .image-gallery > div:first-child {
-          grid-row: span 2;
         }
 
         .animate-on-scroll {
@@ -234,22 +275,27 @@ export default function LocationDetailsClient({ location }: LocationDetailsClien
         }
       `}</style>
 
+      {lightboxOpen && (
+        <Lightbox
+          images={images}
+          initialIndex={lightboxIndex}
+          onClose={() => setLightboxOpen(false)}
+        />
+      )}
+
       <main>
-        {/* Enhanced Hero Section */}
         <section 
           className="relative h-[80vh] min-h-[600px] parallax-hero overflow-hidden"
           style={{ 
             backgroundImage: `url(${generatedData.coverImage})`,
-            backgroundColor: '#1f2937' // fallback
+            backgroundColor: '#1f2937'
           }}
         >
           <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/40 to-black/70"></div>
           
-          {/* Floating elements */}
           <div className="absolute top-20 right-20 w-40 h-40 bg-blue-500/20 rounded-full blur-3xl animate-floating"></div>
           <div className="absolute bottom-20 left-20 w-48 h-48 bg-purple-500/20 rounded-full blur-3xl animate-floating" style={{ animationDelay: '2s' }}></div>
 
-          {/* Navigation */}
           <div className="absolute top-8 left-8 right-8 z-20 flex justify-between items-center">
             <Link 
               href="/locations" 
@@ -270,10 +316,8 @@ export default function LocationDetailsClient({ location }: LocationDetailsClien
             </div>
           </div>
 
-          {/* Content */}
           <div className="relative z-10 container mx-auto px-6 h-full flex items-end pb-16">
             <div className="max-w-5xl w-full">
-              {/* Stats */}
               <div className="flex flex-wrap items-center gap-6 mb-8 animate-fadeUp">
                 <div className="glass-card px-4 py-2 rounded-xl">
                   <div className="flex items-center gap-2 text-white/90 text-sm">
@@ -303,68 +347,91 @@ export default function LocationDetailsClient({ location }: LocationDetailsClien
           </div>
         </section>
 
-        {/* Image Gallery */}
-        {location.galleryUrls && location.galleryUrls.length > 0 && (
+        {images.length > 0 && (
           <section className="container mx-auto px-6 py-16">
             <div 
               className={`animate-on-scroll ${visibleItems.has('gallery-section') ? 'visible' : ''}`}
               id="gallery-section"
               data-animate
             >
-              <h2 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-12 text-center">
-                Галерея локации
-              </h2>
+              <div className="flex items-center justify-between mb-8">
+                <h2 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                  Галерея локации
+                </h2>
+                <div className="flex items-center gap-3">
+                  <div className="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-full text-sm font-medium">
+                    <Grid3x3 className="inline w-4 h-4 mr-2" />
+                    {images.length} фото
+                  </div>
+                </div>
+              </div>
               
-              <div className="image-gallery rounded-3xl overflow-hidden shadow-2xl">
-                {location.galleryUrls.slice(0, 5).map((url, index) => (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                {displayImages.map((url, index) => (
                   <div 
                     key={index}
-                    className="group relative overflow-hidden cursor-pointer bg-cover bg-center transition-transform duration-700 hover:scale-105"
+                    className="group relative aspect-square overflow-hidden cursor-pointer bg-cover bg-center rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-2xl"
                     style={{ backgroundImage: `url(${url})` }}
-                    onClick={() => setActiveImageIndex(index)}
+                    onClick={() => openLightbox(index)}
                   >
-                    <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors duration-300"></div>
-                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
-                        <Eye className="text-white" size={20} />
+                    <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors duration-300">
+                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
+                          <Maximize2 className="text-white" size={20} />
+                        </div>
+                      </div>
+                      <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/60 backdrop-blur-sm rounded text-white text-xs font-medium">
+                        {index + 1}
                       </div>
                     </div>
                   </div>
                 ))}
               </div>
+
+              {images.length > 12 && (
+                <div className="mt-8 text-center">
+                  <button
+                    onClick={() => setShowAllImages(!showAllImages)}
+                    className="group inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
+                  >
+                    {showAllImages ? (
+                      <>
+                        <ChevronLeft size={20} />
+                        Показать меньше
+                      </>
+                    ) : (
+                      <>
+                        Показать все {images.length} фото
+                        <ChevronRight size={20} />
+                      </>
+                    )}
+                  </button>
+                </div>
+              )}
             </div>
           </section>
         )}
 
-        {/* Details Section */}
         <section className="container mx-auto px-6 py-16">
           <div className="grid lg:grid-cols-3 gap-12">
-            {/* Main Content */}
             <div className="lg:col-span-2 space-y-12">
-              {/* Description */}
               {location.description && (
                 <div 
                   className={`animate-on-scroll ${visibleItems.has('description-section') ? 'visible' : ''}`}
                   id="description-section"
                   data-animate
                 >
-                  {location.description && (
-                    <>
-                    <h2 className="text-3xl font-bold mb-8 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                      О локации
-                    </h2>
-                    <p className="text-xl text-black leading-relaxed max-w-3xl mb-8 animate-fadeUp" style={{ animationDelay: '0.6s' }}>
-                      {location.description}
-                    </p>
-                    </>
-                  )}
+                  <h2 className="text-3xl font-bold mb-8 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                    О локации
+                  </h2>
+                  <p className="text-xl text-gray-700 dark:text-gray-300 leading-relaxed">
+                    {location.description}
+                  </p>
                 </div>
               )}
             </div>
 
-            {/* Sidebar */}
             <div className="space-y-8">
-              {/* Best For */}
               <div 
                 className={`animate-on-scroll ${visibleItems.has('bestfor-card') ? 'visible' : ''}`}
                 id="bestfor-card"
@@ -388,7 +455,6 @@ export default function LocationDetailsClient({ location }: LocationDetailsClien
           </div>
         </section>
 
-        {/* Map Section */}
         <section 
           className={`container mx-auto px-6 py-16 animate-on-scroll ${visibleItems.has('map-section') ? 'visible' : ''}`}
           id="map-section"
