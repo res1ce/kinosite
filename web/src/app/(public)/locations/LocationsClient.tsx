@@ -3,7 +3,7 @@
 import { YMaps, Map, Placemark } from "@pbe/react-yandex-maps";
 import { MapPin, Search, Camera, Mountain, Building } from "lucide-react";
 import Link from "next/link";
-import { JSX, useEffect, useState } from "react";
+import { JSX, useEffect, useState, useRef } from "react";
 
 interface Location {
   id: string;
@@ -22,29 +22,38 @@ interface Location {
   rating?: number;
 }
 
-// Анимации (useScrollAnimation)
+// ИСПРАВЛЕННЫЙ хук анимации
 function useScrollAnimation() {
   const [visibleItems, setVisibleItems] = useState(new Set());
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setVisibleItems((prev) => new Set([...prev, entry.target.id]));
-          }
-        });
-      },
-      { threshold: 0.1, rootMargin: "50px" }
-    );
+    // Даем время на монтирование компонента
+    setIsMounted(true);
+    
+    // Небольшая задержка перед инициализацией observer
+    const initTimeout = setTimeout(() => {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              setVisibleItems((prev) => new Set([...prev, entry.target.id]));
+            }
+          });
+        },
+        { threshold: 0.05, rootMargin: "100px" } // Увеличен rootMargin
+      );
 
-    const elements = document.querySelectorAll("[data-animate]");
-    elements.forEach((el) => observer.observe(el));
+      const elements = document.querySelectorAll("[data-animate]");
+      elements.forEach((el) => observer.observe(el));
 
-    return () => observer.disconnect();
+      return () => observer.disconnect();
+    }, 100);
+
+    return () => clearTimeout(initTimeout);
   }, []);
 
-  return visibleItems;
+  return { visibleItems, isMounted };
 }
 
 export default function LocationsClient({ locations }: { locations: Location[] }) {
@@ -52,22 +61,20 @@ export default function LocationsClient({ locations }: { locations: Location[] }
   const [selectedCategory] = useState("Все");
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
   const [mapCenter, setMapCenter] = useState<[number, number]>([52.034, 113.499]);
+  const listContainerRef = useRef<HTMLDivElement>(null);
 
-  const visibleItems = useScrollAnimation();
+  const { visibleItems, isMounted } = useScrollAnimation();
 
-  // Маппинг английских категорий на русские
   const categoryMap: Record<string, { label: string; icon: JSX.Element }> = {
     ARCHITECTURE: { label: "Архитектура", icon: <Building size={16} /> },
     NATURE: { label: "Природа", icon: <Mountain size={16} /> },
     STUDIO: { label: "Студии", icon: <Camera size={16} /> },
   };
 
-  // Функция для получения русского названия категории
   const getCategoryLabel = (englishCategory: string): string => {
     return categoryMap[englishCategory]?.label || englishCategory;
   };
 
-  // Функция для получения английского названия по русскому
   const getEnglishCategory = (russianCategory: string): string => {
     if (russianCategory === "Все") return "Все";
     
@@ -82,7 +89,6 @@ export default function LocationsClient({ locations }: { locations: Location[] }
       location.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       location.description?.toLowerCase().includes(searchTerm.toLowerCase());
     
-    // Исправленная логика фильтрации по категориям
     let matchesCategory = false;
     if (selectedCategory === "Все") {
       matchesCategory = true;
@@ -98,6 +104,24 @@ export default function LocationsClient({ locations }: { locations: Location[] }
     setSelectedLocation(location);
     setMapCenter([location.latitude, location.longitude]);
   };
+
+  // Принудительная проверка видимости при монтировании
+  useEffect(() => {
+    if (isMounted && listContainerRef.current) {
+      const timer = setTimeout(() => {
+        const elements = listContainerRef.current?.querySelectorAll("[data-animate]");
+        elements?.forEach((el) => {
+          const rect = el.getBoundingClientRect();
+          const isVisible = rect.top < window.innerHeight && rect.bottom > 0;
+          if (isVisible) {
+            el.classList.add('visible');
+          }
+        });
+      }, 200);
+
+      return () => clearTimeout(timer);
+    }
+  }, [isMounted, filteredLocations]);
 
   return (
     <>
@@ -147,7 +171,6 @@ export default function LocationsClient({ locations }: { locations: Location[] }
 
         .animate-fadeUp {
           animation: fadeUp 0.6s ease-out forwards;
-          opacity: 0;
         }
 
         .animate-slideInDown {
@@ -169,8 +192,8 @@ export default function LocationsClient({ locations }: { locations: Location[] }
         }
 
         .animate-on-scroll.visible {
-          opacity: 1;
-          transform: translateY(0);
+          opacity: 1 !important;
+          transform: translateY(0) !important;
         }
 
         .shimmer-effect {
@@ -237,7 +260,6 @@ export default function LocationsClient({ locations }: { locations: Location[] }
           <div className="absolute inset-0 bg-gradient-to-br from-blue-900 via-purple-900 to-cyan-900"></div>
           <div className="absolute inset-0 bg-gradient-to-tr from-green-600/20 via-transparent to-blue-600/20"></div>
           
-          {/* Floating background elements */}
           <div className="absolute top-20 left-20 w-64 h-64 bg-blue-500/20 rounded-full blur-3xl animate-floating"></div>
           <div className="absolute bottom-20 right-20 w-80 h-80 bg-purple-500/20 rounded-full blur-3xl animate-floating" style={{ animationDelay: '2s' }}></div>
           <div className="absolute top-1/2 left-1/3 w-48 h-48 bg-cyan-500/15 rounded-full blur-2xl animate-floating" style={{ animationDelay: '4s' }}></div>
@@ -260,7 +282,6 @@ export default function LocationsClient({ locations }: { locations: Location[] }
                 Откройте для себя потрясающие места для съемок в Забайкальском крае
               </p>
 
-              {/* Search and Controls */}
               <div className="flex flex-col lg:flex-row gap-4 max-w-3xl mx-auto animate-fadeUp" style={{ animationDelay: '0.4s' }}>
                 <div className="relative flex-1">
                   <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white/60" size={20} />
@@ -317,12 +338,12 @@ export default function LocationsClient({ locations }: { locations: Location[] }
                             <div class="p-3 max-w-xs">
                               <div class="font-bold text-lg mb-2">${location.name}</div>
                               ${location.coverImage ? `<img src="${location.coverImage}" class="w-full h-24 object-cover rounded-lg mb-3" alt="${location.name}" />` : ''}
-                              <div class="text-sm text-gray-600 mb-2">${location.description}</div>
+                              <div class="text-sm text-gray-600 mb-2">${location.description || ''}</div>
                               ${location.address ? `<div class="text-xs text-gray-500 mb-2">${location.address}</div>` : ''}
                               <div class="flex items-center justify-between">
                                 <div class="flex items-center gap-1">
                                   <span class="text-yellow-500">★</span>
-                                  <span class="text-sm font-semibold">${location.rating}</span>
+                                  <span class="text-sm font-semibold">${location.rating || 'N/A'}</span>
                                 </div>
                                 <span class="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded-full">${getCategoryLabel(location.category)}</span>
                               </div>
@@ -341,84 +362,85 @@ export default function LocationsClient({ locations }: { locations: Location[] }
               </div>
             </div>
 
-              {/* Locations List */}
-              <div 
-                className="space-y-4 animate-fadeUp"
-                id="locations-list"
-                data-animate
-                style={{ animationDelay: '0.2s' }}
-              >
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                    Список локаций
-                  </h2>
-                  <div className="text-sm text-gray-500">
-                    {filteredLocations.length} из {locations.length}
-                  </div>
+            {/* Locations List */}
+            <div 
+              ref={listContainerRef}
+              className="space-y-4 animate-fadeUp"
+              id="locations-list"
+              data-animate
+              style={{ animationDelay: '0.2s' }}
+            >
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                  Список локаций
+                </h2>
+                <div className="text-sm text-gray-500">
+                  {filteredLocations.length} из {locations.length}
                 </div>
+              </div>
 
-                <div className="max-h-[600px] overflow-y-auto custom-scrollbar space-y-4">
-                  {filteredLocations.map((location, i) => (
-                    <Link
-                      href={`/locations/${location.slug}`}
-                      key={location.id}
-                      id={`location-${i}`}
-                      data-animate
-                      className={`location-card group animate-on-scroll cursor-pointer block ${visibleItems.has(`location-${i}`) ? 'visible' : ''}`}
-                      style={{ animationDelay: `${i * 0.1}s` }}
-                    >
-                      <div className={`relative p-6 rounded-3xl border transition-all duration-500 overflow-hidden ${
-                        selectedLocation?.id === location.id 
-                          ? 'bg-gradient-to-br from-blue-50 to-purple-50 border-blue-300 shadow-lg' 
-                          : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-md hover:shadow-xl'
-                      }`}>
-                        {/* Background Image */}
-                        {location.coverImage && (
-                          <div 
-                            className="absolute top-0 right-0 w-24 h-24 rounded-bl-3xl bg-cover bg-center opacity-20 group-hover:opacity-30 transition-opacity duration-300"
-                            style={{ backgroundImage: `url(${location.coverImage})` }}
-                          />
-                        )}
+              <div className="max-h-[600px] overflow-y-auto custom-scrollbar space-y-4">
+                {filteredLocations.map((location, i) => (
+                  <Link
+                    href={`/locations/${location.slug}`}
+                    key={location.id}
+                    id={`location-${i}`}
+                    data-animate
+                    className={`location-card group animate-on-scroll cursor-pointer block ${visibleItems.has(`location-${i}`) || !isMounted ? 'visible' : ''}`}
+                    style={{ animationDelay: `${i * 0.05}s` }}
+                  >
+                    <div className={`relative p-6 rounded-3xl border transition-all duration-500 overflow-hidden ${
+                      selectedLocation?.id === location.id 
+                        ? 'bg-gradient-to-br from-blue-50 to-purple-50 border-blue-300 shadow-lg' 
+                        : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-md hover:shadow-xl'
+                    }`}>
+                      {location.coverImage && (
+                        <div 
+                          className="absolute top-0 right-0 w-24 h-24 rounded-bl-3xl bg-cover bg-center opacity-20 group-hover:opacity-30 transition-opacity duration-300"
+                          style={{ backgroundImage: `url(${location.coverImage})` }}
+                        />
+                      )}
 
-                        {/* Content */}
-                        <div className="relative z-10">
-                          <div className="flex items-start justify-between mb-3">
-                            <div className="flex items-center gap-3">
-                              <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform duration-300">
-                                {categoryMap[location.category]?.icon || <MapPin size={16} />}
-                              </div>
-                              <div>
-                                <h3 className="font-bold text-lg text-gray-900 dark:text-white group-hover:text-blue-600 transition-colors">
-                                  {location.name}
-                                </h3>
-                                <div className="flex items-center gap-2">
-                                  <span className="text-xs px-2 py-1 bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 rounded-full">
-                                    {getCategoryLabel(location.category)}
-                                  </span>
-                                </div>
+                      <div className="relative z-10">
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="flex items-center gap-3 min-w-0 flex-1">
+                            {/* ИСПРАВЛЕНО: добавлен flex-shrink-0 для иконки */}
+                            <div className="w-12 h-12 flex-shrink-0 bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform duration-300">
+                              {categoryMap[location.category]?.icon || <MapPin size={16} />}
+                            </div>
+                            
+                            {/* ИСПРАВЛЕНО: добавлен min-w-0 для контейнера текста */}
+                            <div className="min-w-0 flex-1">
+                              <h3 className="font-bold text-lg text-gray-900 dark:text-white group-hover:text-blue-600 transition-colors break-words">
+                                {location.name}
+                              </h3>
+                              <div className="flex items-center gap-2 mt-1">
+                                <span className="text-xs px-2 py-1 bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 rounded-full whitespace-nowrap">
+                                  {getCategoryLabel(location.category)}
+                                </span>
                               </div>
                             </div>
                           </div>
-
-                          <p className="text-sm text-gray-600 dark:text-gray-300 mb-4 line-clamp-2 leading-relaxed">
-                            {location.description}
-                          </p>
-
-                          {location.address && (
-                            <div className="flex items-center gap-2 text-xs text-gray-500 mb-4">
-                              <MapPin size={12} />
-                              {location.address}
-                            </div>
-                          )}
                         </div>
 
-                        {/* Shimmer Effect */}
-                        <div className="shimmer-effect"></div>
+                        <p className="text-sm text-gray-600 dark:text-gray-300 mb-4 line-clamp-2 leading-relaxed">
+                          {location.description}
+                        </p>
+
+                        {location.address && (
+                          <div className="flex items-center gap-2 text-xs text-gray-500 mb-4">
+                            <MapPin size={12} className="flex-shrink-0" />
+                            <span className="break-words">{location.address}</span>
+                          </div>
+                        )}
                       </div>
-                    </Link>
-                  ))}
-                </div>
+                      
+                      <div className="shimmer-effect"></div>
+                    </div>
+                  </Link>
+                ))}
               </div>
+            </div>
           </div>
         </section>
       </main>
