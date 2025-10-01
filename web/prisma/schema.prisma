@@ -100,6 +100,9 @@ model SiteContent {
   contactEmail      String   @default("info@kino.ru")       // новый (назначение письма)
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
+  regionTitle       String?
+  regionDescription String?
+  regionVideoUrl    String?
 }
 
 model TeamMember {

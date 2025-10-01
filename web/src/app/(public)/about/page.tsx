@@ -36,6 +36,9 @@ interface SiteContent {
   footerContacts: string;
   contactPhone: string;
   contactEmail: string;
+  regionTitle?: string;
+  regionDescription?: string;
+  regionVideoUrl?: string;
 }
 
 export default function AboutPage() {
@@ -192,7 +195,7 @@ export default function AboutPage() {
 
       {/* Team Section */}
       {teamMembers.length > 0 && (
-        <section className="container mx-auto px-6 py-20">
+        <section id="team" className="container mx-auto px-6 py-20">
           <div className="text-center mb-16 animate-fadeUp">
             <h2 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent mb-6">
               Наша команда

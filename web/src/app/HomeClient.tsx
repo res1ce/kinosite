@@ -2,7 +2,7 @@
 'use client';
 
 import Link from "next/link";
-import { CalendarDays, MapPin, Landmark } from "lucide-react";
+import { CalendarDays, MapPin, Landmark, Users } from "lucide-react";
 import { useEffect, useState } from "react";
 import ContactModal from "@/components/ContactModal";
 
@@ -16,6 +16,9 @@ interface SiteContent {
   feature3Label?: string;
   contactPhone?: string;
   contactEmail?: string;
+  regionTitle?: string;
+  regionDescription?: string;
+  regionVideoUrl?: string;
 }
 
 interface VisibilityState {
@@ -228,6 +231,14 @@ export default function Home({ site }: { site: SiteContent | null }) {
       <main className="min-h-screen font-sans overflow-hidden">
         <Hero heroText={heroText} scrollY={scrollY} />
         <Features items={features} isVisible={isVisible} />
+        {site?.regionVideoUrl && (
+          <RegionVideo 
+            title={site.regionTitle} 
+            description={site.regionDescription} 
+            videoUrl={site.regionVideoUrl} 
+            isVisible={isVisible} 
+          />
+        )}
         <Services isVisible={isVisible} />
         <CTA site={site} isVisible={isVisible} />
       </main>
@@ -357,6 +368,63 @@ function Features({ items, isVisible }: { items: { number: string; label: string
   );
 }
 
+function RegionVideo({ 
+  title, 
+  description, 
+  videoUrl, 
+  isVisible 
+}: { 
+  title?: string; 
+  description?: string; 
+  videoUrl: string; 
+  isVisible: VisibilityState;
+}) {
+  return (
+    <section className="py-32 relative bg-gradient-to-b from-white to-gray-50 overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-br from-indigo-50/50 to-purple-50/50"></div>
+      
+      <div className="absolute top-20 right-20 w-64 h-64 bg-indigo-200/20 rounded-full blur-3xl animate-pulse"></div>
+      <div className="absolute bottom-20 left-20 w-80 h-80 bg-purple-200/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+      
+      <div className="relative container mx-auto px-6">
+        <div 
+          id="region-header"
+          data-animate
+          className={`text-center mb-16 animate-on-scroll ${isVisible['region-header'] ? 'visible' : ''}`}
+        >
+          <h2 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-6 shimmer-effect">
+            {title || "Забайкальский край"}
+          </h2>
+          <div className="w-24 h-1 bg-gradient-to-r from-indigo-500 to-purple-500 mx-auto rounded-full mb-8"></div>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            {description || "Откройте для себя уникальную природу и культуру региона"}
+          </p>
+        </div>
+        
+        <div 
+          id="region-video"
+          data-animate
+          className={`max-w-5xl mx-auto animate-on-scroll ${isVisible['region-video'] ? 'visible' : ''}`}
+          style={{ animationDelay: '0.2s' }}
+        >
+          <div className="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-white group hover:shadow-3xl transition-all duration-500">
+            <div className="aspect-video bg-gray-900">
+              <iframe
+                src={videoUrl}
+                className="w-full h-full"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                title={title || "Видео о регионе"}
+              />
+            </div>
+            <div className="absolute inset-0 border-2 border-purple-500/20 rounded-3xl pointer-events-none group-hover:border-purple-500/40 transition-colors"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function Services({ isVisible }: { isVisible: VisibilityState }) {
   const services = [
     { 
@@ -374,6 +442,22 @@ function Services({ isVisible }: { isVisible: VisibilityState }) {
       href: "/locations",
       gradient: "from-emerald-500 to-teal-500",
       hoverGradient: "group-hover:from-teal-500 group-hover:to-emerald-500"
+    },
+    { 
+      title: "О нас", 
+      description: "Наша миссия и достижения", 
+      icon: <Landmark size={28} />, 
+      href: "/about",
+      gradient: "from-purple-500 to-pink-500",
+      hoverGradient: "group-hover:from-pink-500 group-hover:to-purple-500"
+    },
+    { 
+      title: "Наша команда", 
+      description: "Профессионалы киноиндустрии", 
+      icon: <Users size={28} />, 
+      href: "/about#team",
+      gradient: "from-violet-500 to-indigo-500",
+      hoverGradient: "group-hover:from-indigo-500 group-hover:to-violet-500"
     },
     // { 
     //   title: "Услуги", 

@@ -21,6 +21,10 @@ async function updateSiteContent(formData: FormData) {
   const contactPhone = String(formData.get("contactPhone") || "").trim();
   const contactEmail = String(formData.get("contactEmail") || "").trim();
 
+  const regionTitle = String(formData.get("regionTitle") || "").trim();
+  const regionDescription = String(formData.get("regionDescription") || "").trim();
+  const regionVideoUrl = String(formData.get("regionVideoUrl") || "").trim();
+
   // Простая валидация — если пусто, подставим пустые строки
   await prisma.siteContent.upsert({
     where: { slug: "main" },
@@ -37,6 +41,9 @@ async function updateSiteContent(formData: FormData) {
       footerContacts: footerContacts || "Чита, Забайкальский край\ninfo@kino.ru",
       contactPhone: contactPhone || "+7 (999) 123-45-67",
       contactEmail: contactEmail || "info@kino.ru",
+      regionTitle: regionTitle || "Забайкальский край",
+      regionDescription: regionDescription || "Уникальный регион России с богатой природой и историей",
+      regionVideoUrl: regionVideoUrl || "",
     },
     update: {
       heroText,
@@ -50,6 +57,9 @@ async function updateSiteContent(formData: FormData) {
       footerContacts,
       contactPhone,
       contactEmail,
+      regionTitle,
+      regionDescription,
+      regionVideoUrl,
     },
   });
 
@@ -106,7 +116,7 @@ export default async function AdminSitePage() {
               <textarea
                 name="heroText"
                 rows={4}
-                defaultValue={site?.heroText}
+                defaultValue={site?.heroText || ""}
                 placeholder="Введите основной текст для hero секции..."
                 className="w-full rounded-xl border-2 border-gray-200 dark:border-gray-600 px-4 py-3 bg-white dark:bg-gray-900/50 focus:outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-500/20 transition-all duration-200 resize-none hover:border-gray-300 dark:hover:border-gray-500"
               />
@@ -180,7 +190,7 @@ export default async function AdminSitePage() {
                 </label>
                 <input
                   name="footerDescription"
-                  defaultValue={site?.footerDescription}
+                  defaultValue={site?.footerDescription || ""}
                   placeholder="Краткое описание вашей деятельности"
                   className="w-full rounded-xl border-2 border-gray-200 dark:border-gray-600 px-4 py-3 bg-white dark:bg-gray-900/50 focus:outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-500/20 transition-all duration-200 hover:border-gray-300 dark:hover:border-gray-500"
                 />
@@ -228,7 +238,7 @@ export default async function AdminSitePage() {
                   </div>
                   <input
                     name="contactPhone"
-                    defaultValue={site?.contactPhone}
+                    defaultValue={site?.contactPhone || ""}
                     placeholder="+7 (999) 123-45-67"
                     className="w-full pl-12 pr-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-900/50 focus:outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-500/20 transition-all duration-200 hover:border-gray-300 dark:hover:border-gray-500"
                   />
@@ -254,6 +264,67 @@ export default async function AdminSitePage() {
                     className="w-full pl-12 pr-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-900/50 focus:outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-500/20 transition-all duration-200 hover:border-gray-300 dark:hover:border-gray-500"
                   />
                 </div>
+              </div>
+            </div>
+          </div>
+          
+          {/* Region Video Section */}
+          <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-8 hover:shadow-2xl transition-all duration-300">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center">
+                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <h2 className="text-xl font-bold text-gray-800 dark:text-white">О регионе (видео)</h2>
+              <div className="h-px flex-1 bg-gradient-to-r from-gray-300 to-transparent dark:from-gray-600"></div>
+            </div>
+
+            <div className="space-y-6">
+              <div className="space-y-3">
+                <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-indigo-500"></span>
+                  Заголовок секции
+                </label>
+                <input
+                  name="regionTitle"
+                  defaultValue={site?.regionTitle || ""}
+                  placeholder="Забайкальский край"
+                  className="w-full rounded-xl border-2 border-gray-200 dark:border-gray-600 px-4 py-3 bg-white dark:bg-gray-900/50 focus:outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-500/20 transition-all duration-200 hover:border-gray-300 dark:hover:border-gray-500"
+                />
+              </div>
+
+              <div className="space-y-3">
+                <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-indigo-500"></span>
+                  Описание региона
+                </label>
+                <textarea
+                  name="regionDescription"
+                  rows={5}
+                  defaultValue={site?.regionDescription || ""}
+                  placeholder="Описание Забайкальского края, его особенности и достопримечательности..."
+                  className="w-full rounded-xl border-2 border-gray-200 dark:border-gray-600 px-4 py-3 bg-white dark:bg-gray-900/50 focus:outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-500/20 transition-all duration-200 resize-none hover:border-gray-300 dark:hover:border-gray-500"
+                />
+              </div>
+
+              <div className="space-y-3">
+                <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-indigo-500"></span>
+                  URL видео (Rutube embed)
+                </label>
+                <input
+                  name="regionVideoUrl"
+                  defaultValue={site?.regionVideoUrl || ""}
+                  placeholder="https://rutube.ru/play/embed/..."
+                  className="w-full rounded-xl border-2 border-gray-200 dark:border-gray-600 px-4 py-3 bg-white dark:bg-gray-900/50 focus:outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-500/20 transition-all duration-200 hover:border-gray-300 dark:hover:border-gray-500"
+                />
+                <p className="text-xs text-gray-500 flex items-center gap-2">
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Поддерживаются: Rutube, YouTube, VK Video
+                </p>
               </div>
             </div>
           </div>
