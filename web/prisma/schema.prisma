@@ -62,6 +62,9 @@ model PriceItem {
   id          String   @id @default(cuid())
   name        String
   description String?
+  features    String?  // JSON array строк: ["Подбор локаций", "Разрешения"]
+  iconType    String?  @default("star") // target, star, users, checkCircle, award, sparkles
+  order       Int      @default(0) // для сортировки
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }

@@ -2,7 +2,7 @@
 'use client';
 
 import Link from "next/link";
-import { CalendarDays, MapPin, Landmark, Users } from "lucide-react";
+import { CalendarDays, MapPin, Landmark, Users, Ticket } from "lucide-react";
 import { useEffect, useState } from "react";
 import ContactModal from "@/components/ContactModal";
 
@@ -500,6 +500,22 @@ function Services({ isVisible }: { isVisible: VisibilityState }) {
       hoverGradient: "group-hover:from-teal-500 group-hover:to-emerald-500"
     },
     { 
+      title: "Услуги", 
+      description: "Поддержка съёмок и консультации", 
+      icon: <Ticket size={28} />, 
+      href: "/services",
+      gradient: "from-purple-500 to-pink-500",
+      hoverGradient: "group-hover:from-pink-500 group-hover:to-purple-500"
+    },
+    { 
+      title: "Документы", 
+      description: "Положения и бланки заявок", 
+      icon: <Landmark size={28} />, 
+      href: "/documents",
+      gradient: "from-amber-500 to-orange-500",
+      hoverGradient: "group-hover:from-orange-500 group-hover:to-amber-500"
+    },
+    { 
       title: "О нас", 
       description: "Наша миссия и достижения", 
       icon: <Landmark size={28} />, 
@@ -514,22 +530,6 @@ function Services({ isVisible }: { isVisible: VisibilityState }) {
       href: "/about#team",
       gradient: "from-violet-500 to-indigo-500",
       hoverGradient: "group-hover:from-indigo-500 group-hover:to-violet-500"
-    },
-    // { 
-    //   title: "Услуги", 
-    //   description: "Поддержка съёмок и консультации", 
-    //   icon: <Ticket size={28} />, 
-    //   href: "/services",
-    //   gradient: "from-purple-500 to-pink-500",
-    //   hoverGradient: "group-hover:from-pink-500 group-hover:to-purple-500"
-    // },
-    { 
-      title: "Документы", 
-      description: "Положения и бланки заявок", 
-      icon: <Landmark size={28} />, 
-      href: "/documents",
-      gradient: "from-amber-500 to-orange-500",
-      hoverGradient: "group-hover:from-orange-500 group-hover:to-amber-500"
     },
   ];
 
