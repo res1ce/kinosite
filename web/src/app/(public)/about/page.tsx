@@ -140,7 +140,7 @@ export default function AboutPage() {
           <div className="text-center max-w-4xl mx-auto">
             <div className="inline-flex items-center px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-white/90 text-sm font-medium mb-8 animate-fadeUp">
               <div className="w-2 h-2 bg-purple-400 rounded-full mr-2 animate-pulse"></div>
-              15 лет в киноиндустрии
+              Официальная кинокомиссия Забайкальского края
             </div>
 
             <h1 className="text-6xl md:text-8xl font-black text-white mb-6 leading-tight animate-fadeUp" style={{ animationDelay: '0.1s' }}>

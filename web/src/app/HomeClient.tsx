@@ -317,7 +317,7 @@ function Hero({ heroText, scrollY}: { heroText: string; scrollY: number;}) {
 
 function Features({ items, isVisible }: { items: { number: string; label: string }[]; isVisible: VisibilityState }) {
   return (
-    <section className="py-32 relative bg-gradient-to-b from-gray-50 to-white overflow-hidden">
+    <section className="py-32 pb-48 relative bg-gradient-to-b from-gray-50 to-white overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-br from-purple-50/50 to-blue-50/50"></div>
       
       {/* Background decorations */}
@@ -379,12 +379,69 @@ function RegionVideo({
   videoUrl: string; 
   isVisible: VisibilityState;
 }) {
-  return (
-    <section className="py-32 relative bg-gradient-to-b from-white to-gray-50 overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-br from-indigo-50/50 to-purple-50/50"></div>
+  // Функция для преобразования обычных URL в embed
+  const getEmbedUrl = (url: string): string => {
+    try {
+      // Rutube
+      if (url.includes('rutube.ru')) {
+        // Если уже embed URL
+        if (url.includes('/play/embed/')) return url;
+        
+        // Преобразуем обычный URL в embed
+        const match = url.match(/\/video\/([a-zA-Z0-9]+)/);
+        if (match) {
+          return `https://rutube.ru/play/embed/${match[1]}`;
+        }
+      }
       
-      <div className="absolute top-20 right-20 w-64 h-64 bg-indigo-200/20 rounded-full blur-3xl animate-pulse"></div>
-      <div className="absolute bottom-20 left-20 w-80 h-80 bg-purple-200/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+      // VK Video
+      if (url.includes('vk.com/video')) {
+        // Если уже embed URL
+        if (url.includes('video_ext.php')) return url;
+        
+        // Преобразуем обычный URL в embed
+        const match = url.match(/video(-?\d+)_(\d+)/);
+        if (match) {
+          return `https://vk.com/video_ext.php?oid=${match[1]}&id=${match[2]}`;
+        }
+      }
+      
+      // YouTube
+      if (url.includes('youtube.com') || url.includes('youtu.be')) {
+        // Если уже embed URL
+        if (url.includes('/embed/')) return url;
+        
+        // Преобразуем обычный URL в embed
+        let videoId = '';
+        if (url.includes('youtu.be/')) {
+          videoId = url.split('youtu.be/')[1].split('?')[0];
+        } else if (url.includes('youtube.com/watch')) {
+          const urlParams = new URLSearchParams(url.split('?')[1]);
+          videoId = urlParams.get('v') || '';
+        }
+        
+        if (videoId) {
+          return `https://www.youtube.com/embed/${videoId}`;
+        }
+      }
+      
+      // Если URL уже правильный или неизвестный формат
+      return url;
+    } catch (error) {
+      console.error('Error parsing video URL:', error);
+      return url;
+    }
+  };
+
+  const embedUrl = getEmbedUrl(videoUrl);
+
+  return (
+    <section className="py-32 relative bg-gradient-to-b from-slate-900 via-indigo-950 to-slate-900 overflow-hidden">
+      {/* Темный фон вместо светлого */}
+      <div className="absolute inset-0">
+        <div className="absolute top-20 right-20 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-20 left-20 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+      </div>
       
       <div className="relative container mx-auto px-6">
         <div 
@@ -392,11 +449,11 @@ function RegionVideo({
           data-animate
           className={`text-center mb-16 animate-on-scroll ${isVisible['region-header'] ? 'visible' : ''}`}
         >
-          <h2 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-6 shimmer-effect">
+          <h2 className="text-5xl md:text-6xl font-bold text-white mb-6">
             {title || "Забайкальский край"}
           </h2>
-          <div className="w-24 h-1 bg-gradient-to-r from-indigo-500 to-purple-500 mx-auto rounded-full mb-8"></div>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+          <div className="w-24 h-1 bg-gradient-to-r from-indigo-400 to-purple-400 mx-auto rounded-full mb-8"></div>
+          <p className="text-xl text-white/70 max-w-3xl mx-auto leading-relaxed">
             {description || "Откройте для себя уникальную природу и культуру региона"}
           </p>
         </div>
@@ -407,17 +464,16 @@ function RegionVideo({
           className={`max-w-5xl mx-auto animate-on-scroll ${isVisible['region-video'] ? 'visible' : ''}`}
           style={{ animationDelay: '0.2s' }}
         >
-          <div className="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-white group hover:shadow-3xl transition-all duration-500">
-            <div className="aspect-video bg-gray-900">
+          <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-white/10 group hover:shadow-3xl transition-all duration-500">
+            <div className="aspect-video bg-black">
               <iframe
-                src={videoUrl}
+                src={embedUrl}
                 className="w-full h-full"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
                 allowFullScreen
                 title={title || "Видео о регионе"}
               />
             </div>
-            <div className="absolute inset-0 border-2 border-purple-500/20 rounded-3xl pointer-events-none group-hover:border-purple-500/40 transition-colors"></div>
           </div>
         </div>
       </div>
