@@ -241,11 +241,10 @@ export default function AboutPage() {
                     {member.name}
                   </h3>
                   <div className="text-purple-600 font-medium mb-3">{member.position}</div>
-                  <p className={`text-gray-600 text-sm leading-relaxed transition-all duration-300 ${
-                    selectedMember === member.id ? 'opacity-100' : 'line-clamp-2'
-                  }`}>
-                    {member.description}
-                  </p>
+                  <div 
+                    className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed prose prose-sm max-w-none dark:prose-invert"
+                    dangerouslySetInnerHTML={{ __html: member.description }}
+                  />
                 </div>
               </div>
             ))}
