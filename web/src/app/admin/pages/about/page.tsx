@@ -21,11 +21,10 @@ async function addTeamMember(formData: FormData) {
   "use server";
   const name = String(formData.get("name") || "").trim();
   const position = String(formData.get("position") || "").trim();
-  const experience = String(formData.get("experience") || "").trim();
   const photo = String(formData.get("photo") || "").trim();
   const description = String(formData.get("description") || "").trim();
 
-  if (!name || !position || !experience || !description) return;
+  if (!name || !position || !description) return;
 
   // Получаем максимальный order для правильной сортировки
   const lastMember = await prisma.teamMember.findFirst({
@@ -37,7 +36,6 @@ async function addTeamMember(formData: FormData) {
     data: {
       name,
       position,
-      experience,
       photo,
       description,
       order: newOrder
@@ -52,15 +50,14 @@ async function updateTeamMember(formData: FormData) {
   const id = String(formData.get("id") || "");
   const name = String(formData.get("name") || "").trim();
   const position = String(formData.get("position") || "").trim();
-  const experience = String(formData.get("experience") || "").trim();
   const photo = String(formData.get("photo") || "").trim();
   const description = String(formData.get("description") || "").trim();
 
-  if (!id || !name || !position || !experience || !description) return;
+  if (!id || !name || !position || !description) return;
 
   await prisma.teamMember.update({
     where: { id },
-    data: { name, position, experience, photo, description },
+    data: { name, position, photo, description },
   });
   
   revalidatePath("/admin/about");
@@ -282,19 +279,6 @@ export default async function AdminAboutPage() {
                     name="position"
                     required
                     placeholder="Директор кинокомиссии"
-                    className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-900/50 focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/20 transition-all duration-200"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Опыт работы *
-                  </label>
-                  <input
-                    type="text"
-                    name="experience"
-                    required
-                    placeholder="15 лет"
                     className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-900/50 focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/20 transition-all duration-200"
                   />
                 </div>

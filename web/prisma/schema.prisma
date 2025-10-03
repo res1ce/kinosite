@@ -112,7 +112,6 @@ model TeamMember {
   id          String   @id @default(cuid())
   name        String
   position    String
-  experience  String
   photo       String
   description String   @db.Text
   order       Int      @default(0)
