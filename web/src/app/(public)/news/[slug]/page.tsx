@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useState } from "react";
-import { CalendarDays, MapPin, Clock, Share, ArrowLeft, Heart, ArrowRight } from "lucide-react";
+import { useEffect, useState, useCallback } from "react";
+import { CalendarDays, MapPin, Clock, Share, ArrowLeft, Heart, ArrowRight, X, ChevronLeft, ChevronRight, Maximize2, Grid3x3 } from "lucide-react";
 import Link from "next/link";
 
 interface Event {
@@ -19,12 +19,114 @@ interface Event {
   updatedAt: Date;
 }
 
+function Lightbox({ 
+  images, 
+  initialIndex, 
+  onClose 
+}: { 
+  images: string[]; 
+  initialIndex: number; 
+  onClose: () => void;
+}) {
+  const [currentIndex, setCurrentIndex] = useState(initialIndex);
+
+  const goNext = useCallback(() => {
+    setCurrentIndex((prev) => (prev + 1) % images.length);
+  }, [images.length]);
+
+  const goPrev = useCallback(() => {
+    setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
+  }, [images.length]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+      if (e.key === 'ArrowRight') goNext();
+      if (e.key === 'ArrowLeft') goPrev();
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose, goNext, goPrev]);
+
+  return (
+    <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center">
+      <button
+        onClick={onClose}
+        className="absolute top-4 right-4 w-10 h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors"
+      >
+        <X size={20} />
+      </button>
+
+      {images.length > 1 && (
+        <>
+          <button
+            onClick={goPrev}
+            className="absolute left-4 w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors"
+          >
+            <ChevronLeft size={24} />
+          </button>
+          <button
+            onClick={goNext}
+            className="absolute right-4 w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors"
+          >
+            <ChevronRight size={24} />
+          </button>
+        </>
+      )}
+
+      <div className="absolute top-4 left-1/2 -translate-x-1/2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-white text-sm">
+        {currentIndex + 1} / {images.length}
+      </div>
+
+      <img
+        src={images[currentIndex]}
+        alt={`Image ${currentIndex + 1}`}
+        className="max-h-[90vh] max-w-[90vw] object-contain"
+      />
+
+      {images.length > 1 && (
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 max-w-[90vw] overflow-x-auto">
+          <div className="flex gap-2 p-2 bg-white/10 backdrop-blur-sm rounded-lg">
+            {images.slice(
+              Math.max(0, currentIndex - 5),
+              Math.min(images.length, currentIndex + 6)
+            ).map((img, idx) => {
+              const realIdx = Math.max(0, currentIndex - 5) + idx;
+              return (
+                <button
+                  key={realIdx}
+                  onClick={() => setCurrentIndex(realIdx)}
+                  className={`w-16 h-16 flex-shrink-0 rounded overflow-hidden border-2 transition-all ${
+                    realIdx === currentIndex
+                      ? 'border-white scale-110'
+                      : 'border-transparent opacity-60 hover:opacity-100'
+                  }`}
+                >
+                  <img
+                    src={img}
+                    alt={`Thumbnail ${realIdx + 1}`}
+                    className="w-full h-full object-cover"
+                  />
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function NewsDetails({ params }: { params: Promise<{ slug: string }> }) {
   const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isLiked, setIsLiked] = useState(false);
   const [slug, setSlug] = useState<string>('');
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
+  const [showAllImages, setShowAllImages] = useState(false);
 
   useEffect(() => {
     // Получаем slug из params
@@ -347,27 +449,74 @@ export default function NewsDetails({ params }: { params: Promise<{ slug: string
             />
 
             {/* Gallery */}
-            {event.galleryUrls && event.galleryUrls.length > 0 && (
-              <div className="mt-16 animate-fadeUp" style={{ animationDelay: '0.2s' }}>
-                <h2 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 dark:from-purple-400 dark:to-pink-400 bg-clip-text text-transparent mb-8">
-                  Галерея событий
-                </h2>
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                  {event.galleryUrls.map((url, index) => (
-                    <div 
-                      key={index} 
-                      className="group aspect-square rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transform hover:scale-105 transition-all duration-500 animate-fadeUp"
-                      style={{ animationDelay: `${index * 0.1}s` }}
-                    >
-                      <div 
-                        className="w-full h-full bg-cover bg-center transition-transform duration-700 group-hover:scale-110" 
-                        style={{ backgroundImage: `url(${url})` }}
-                      />
+            {event.galleryUrls && event.galleryUrls.length > 0 && (() => {
+              const images = event.galleryUrls;
+              const displayImages = showAllImages ? images : images.slice(0, 12);
+
+              const openLightbox = (index: number) => {
+                setLightboxIndex(index);
+                setLightboxOpen(true);
+              };
+
+              return (
+                <div className="mt-16 animate-fadeUp" style={{ animationDelay: '0.2s' }}>
+                  <div className="flex items-center justify-between mb-8">
+                    <h2 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 dark:from-purple-400 dark:to-pink-400 bg-clip-text text-transparent">
+                      Галерея событий
+                    </h2>
+                    <div className="flex items-center gap-3">
+                      <div className="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-full text-sm font-medium">
+                        <Grid3x3 className="inline w-4 h-4 mr-2" />
+                        {images.length} фото
+                      </div>
                     </div>
-                  ))}
+                  </div>
+                  
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                    {displayImages.map((url, index) => (
+                      <div 
+                        key={index}
+                        className="group relative aspect-square overflow-hidden cursor-pointer bg-cover bg-center rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-2xl"
+                        style={{ backgroundImage: `url(${url})` }}
+                        onClick={() => openLightbox(index)}
+                      >
+                        <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors duration-300">
+                          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
+                              <Maximize2 className="text-white" size={20} />
+                            </div>
+                          </div>
+                          <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/60 backdrop-blur-sm rounded text-white text-xs font-medium">
+                            {index + 1}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {images.length > 12 && (
+                    <div className="mt-8 text-center">
+                      <button
+                        onClick={() => setShowAllImages(!showAllImages)}
+                        className="group inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
+                      >
+                        {showAllImages ? (
+                          <>
+                            <ChevronLeft size={20} />
+                            Показать меньше
+                          </>
+                        ) : (
+                          <>
+                            Показать все {images.length} фото
+                            <ChevronRight size={20} />
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  )}
                 </div>
-              </div>
-            )}
+              );
+            })()}
 
             {/* Event Info */}
             <div className="mt-16 p-8 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-3xl border border-purple-100 dark:border-purple-800/30 animate-fadeUp" style={{ animationDelay: '0.4s' }}>
@@ -437,6 +586,15 @@ export default function NewsDetails({ params }: { params: Promise<{ slug: string
           </div>
         </section>
       </main>
+
+      {/* Lightbox */}
+      {lightboxOpen && event?.galleryUrls && event.galleryUrls.length > 0 && (
+        <Lightbox
+          images={event.galleryUrls}
+          initialIndex={lightboxIndex}
+          onClose={() => setLightboxOpen(false)}
+        />
+      )}
     </>
   );
 }

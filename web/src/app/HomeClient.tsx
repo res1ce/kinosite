@@ -277,7 +277,7 @@ function Hero({ heroText, scrollY}: { heroText: string; scrollY: number;}) {
             Официальная кинокoмиссия Забайкальского края
           </div>
           
-          <h1 className="text-6xl md:text-8xl font-black tracking-tight leading-none">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black tracking-tight leading-tight sm:leading-none">
             <span className="block text-white animate-fadeInLeft">Забайкальская</span>
             <span className="block bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent animate-fadeInRight" style={{ animationDelay: '0.2s' }}>
               кино<span className="text-white">комиссия</span>
@@ -633,12 +633,12 @@ function CTA({ site, isVisible }: { site: SiteContent | null; isVisible: Visibil
             Открыты для сотрудничества
           </div>
           
-          <h2 className="text-5xl md:text-7xl font-black text-white mb-8 leading-tight animate-scaleIn" style={{ animationDelay: '0.2s' }}>
-            Присоединяйтесь к 
+          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black text-white mb-8 leading-tight animate-scaleIn" style={{ animationDelay: '0.2s' }}>
+            <span className="block">Присоединяйтесь к</span>
             <span className="block bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent animate-fadeInLeft" style={{ animationDelay: '0.4s' }}>
               киноиндустрии
             </span>
-            <span className="block text-4xl md:text-5xl font-light text-white/80 mt-2 animate-fadeInRight" style={{ animationDelay: '0.6s' }}>
+            <span className="block text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-light text-white/80 mt-2 animate-fadeInRight" style={{ animationDelay: '0.6s' }}>
               Забайкалья
             </span>
           </h2>

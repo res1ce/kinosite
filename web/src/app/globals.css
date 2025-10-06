@@ -94,7 +94,8 @@ html[data-theme="dark"] {
 .accessibility-mode .absolute.inset-0[class*="bg-"],
 .accessibility-mode [class*="absolute"][class*="inset-0"][class*="bg-gradient"],
 .accessibility-mode [class*="absolute"][class*="inset-0"][class*="from-"],
-.accessibility-mode [class*="absolute"][class*="inset-0"][class*="to-"] {
+.accessibility-mode [class*="absolute"][class*="inset-0"][class*="to-"],
+.accessibility-mode [class*="absolute"][class*="inset-0"][class*="opacity-"] {
   display: none !important;
 }
 
