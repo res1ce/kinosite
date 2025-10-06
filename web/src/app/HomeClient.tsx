@@ -317,12 +317,12 @@ function Hero({ heroText, scrollY}: { heroText: string; scrollY: number;}) {
 
 function Features({ items, isVisible }: { items: { number: string; label: string }[]; isVisible: VisibilityState }) {
   return (
-    <section className="py-32 pb-48 relative bg-gradient-to-b from-gray-50 to-white overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-br from-purple-50/50 to-blue-50/50"></div>
+    <section className="py-32 pb-48 relative bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-950 overflow-hidden transition-colors duration-300">
+      <div className="absolute inset-0 bg-gradient-to-br from-purple-50/50 to-blue-50/50 dark:from-purple-900/20 dark:to-blue-900/20"></div>
       
       {/* Background decorations */}
-      <div className="absolute top-20 right-20 w-64 h-64 bg-purple-200/20 rounded-full blur-3xl animate-pulse"></div>
-      <div className="absolute bottom-20 left-20 w-80 h-80 bg-blue-200/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+      <div className="absolute top-20 right-20 w-64 h-64 bg-purple-200/20 dark:bg-purple-500/10 rounded-full blur-3xl animate-pulse"></div>
+      <div className="absolute bottom-20 left-20 w-80 h-80 bg-blue-200/20 dark:bg-blue-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
       
       <div className="relative container mx-auto px-6">
         <div 
@@ -330,10 +330,10 @@ function Features({ items, isVisible }: { items: { number: string; label: string
           data-animate
           className={`text-center mb-20 animate-on-scroll ${isVisible['features-header'] ? 'visible' : ''}`}
         >
-          <h2 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent mb-6 shimmer-effect">
+          <h2 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-gray-100 dark:to-gray-400 bg-clip-text text-transparent mb-6">
             Наши достижения
           </h2>
-          <div className="w-24 h-1 bg-gradient-to-r from-purple-500 to-pink-500 mx-auto rounded-full transform scale-0 animate-scaleIn" style={{ animationDelay: '0.3s' }}></div>
+          <div className="w-24 h-1 bg-gradient-to-r from-purple-500 to-pink-500 dark:from-purple-400 dark:to-pink-400 mx-auto rounded-full transform scale-0 animate-scaleIn" style={{ animationDelay: '0.3s' }}></div>
         </div>
         
         <div className="grid md:grid-cols-3 gap-8">
@@ -342,21 +342,21 @@ function Features({ items, isVisible }: { items: { number: string; label: string
               key={item.label}
               id={`feature-${i}`}
               data-animate
-              className={`group relative p-10 rounded-3xl bg-white shadow-xl hover:shadow-2xl border border-gray-100 transform hover:scale-105 transition-all duration-500 animate-on-scroll shimmer-effect hover-glow ${isVisible[`feature-${i}`] ? 'visible' : ''}`}
+              className={`group relative p-10 rounded-3xl bg-white dark:bg-gray-800 shadow-xl hover:shadow-2xl dark:shadow-purple-500/10 border border-gray-100 dark:border-gray-700 transform hover:scale-105 transition-all duration-500 animate-on-scroll shimmer-effect hover-glow ${isVisible[`feature-${i}`] ? 'visible' : ''}`}
               style={{ animationDelay: `${i * 0.2}s` }}
             >
-              <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-purple-500/5 to-pink-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-purple-500/5 to-pink-500/5 dark:from-purple-500/10 dark:to-pink-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               
               <div className="relative text-center">
-                <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl mb-6 shadow-lg animate-rotateIn group-hover:animate-floating">
+                <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 dark:from-purple-600 dark:to-pink-600 rounded-2xl mb-6 shadow-lg animate-rotateIn group-hover:animate-floating">
                   <span className="text-white font-bold text-lg">★</span>
                 </div>
                 
-                <div className="text-6xl md:text-7xl font-black bg-gradient-to-br from-purple-600 to-pink-600 bg-clip-text text-transparent mb-4 animate-scaleIn" style={{ animationDelay: `${i * 0.1 + 0.3}s` }}>
+                <div className="text-6xl md:text-7xl font-black bg-gradient-to-br from-purple-600 to-pink-600 dark:from-purple-400 dark:to-pink-400 bg-clip-text text-transparent mb-4 animate-scaleIn" style={{ animationDelay: `${i * 0.1 + 0.3}s` }}>
                   {item.number}
                 </div>
                 
-                <div className="text-lg font-semibold text-gray-700 leading-snug animate-fadeInUp" style={{ animationDelay: `${i * 0.1 + 0.5}s` }}>
+                <div className="text-lg font-semibold text-gray-700 dark:text-gray-200 leading-snug animate-fadeInUp" style={{ animationDelay: `${i * 0.1 + 0.5}s` }}>
                   {item.label}
                 </div>
               </div>

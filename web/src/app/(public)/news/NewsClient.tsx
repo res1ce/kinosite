@@ -1,4 +1,3 @@
-//NewsClient.tsx
 'use client';
 
 import Link from "next/link";
@@ -12,12 +11,12 @@ interface Event {
   shortDescription: string;
   content: string;
   coverImageUrl: string | null;
-  galleryUrls: JSON; // или Json если импортируете из Prisma
-  date: string; // или Date, зависит от того, как приходят данные
+  galleryUrls: JSON;
+  date: string;
   location: string | null;
   isPublished: boolean;
-  createdAt: string; // или Date
-  updatedAt: string; // или Date
+  createdAt: string;
+  updatedAt: string;
 }
 
 function useScrollAnimation() {
@@ -79,6 +78,12 @@ export default function NewsClient({ events }: { events: Event[] }) {
           border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
+        .dark .glass-effect,
+        html[data-theme="dark"] .glass-effect {
+          background: rgba(0, 0, 0, 0.2);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
         .news-card {
           transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
@@ -92,45 +97,46 @@ export default function NewsClient({ events }: { events: Event[] }) {
         }
       `}</style>
 
-      <main className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-purple-50/30 dark:from-gray-900 dark:via-gray-800 dark:to-purple-900/20">
+      <main className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-purple-50/30 dark:from-gray-950 dark:via-gray-900 dark:to-purple-950/30 transition-colors duration-300">
         {/* Hero Section */}
         <section className="relative py-32 overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-purple-900 via-pink-900 to-indigo-900"></div>
-          <div className="absolute inset-0 bg-gradient-to-tr from-blue-600/20 via-transparent to-purple-600/20"></div>
+          {/* Background gradients */}
+          <div className="absolute inset-0 bg-gradient-to-br from-purple-900 via-pink-900 to-indigo-900 dark:from-purple-950 dark:via-pink-950 dark:to-indigo-950"></div>
+          <div className="absolute inset-0 bg-gradient-to-tr from-blue-600/20 via-transparent to-purple-600/20 dark:from-blue-500/30 dark:via-transparent dark:to-purple-500/30"></div>
           
           {/* Floating background elements */}
-          <div className="absolute top-20 left-20 w-64 h-64 bg-purple-500/20 rounded-full blur-3xl animate-floating"></div>
-          <div className="absolute bottom-20 right-20 w-80 h-80 bg-pink-500/20 rounded-full blur-3xl animate-floating" style={{ animationDelay: '2s' }}></div>
-          <div className="absolute top-1/2 left-1/3 w-48 h-48 bg-blue-500/15 rounded-full blur-2xl animate-floating" style={{ animationDelay: '4s' }}></div>
+          <div className="absolute top-20 left-20 w-64 h-64 bg-purple-500/20 dark:bg-purple-400/30 rounded-full blur-3xl animate-floating"></div>
+          <div className="absolute bottom-20 right-20 w-80 h-80 bg-pink-500/20 dark:bg-pink-400/30 rounded-full blur-3xl animate-floating" style={{ animationDelay: '2s' }}></div>
+          <div className="absolute top-1/2 left-1/3 w-48 h-48 bg-blue-500/15 dark:bg-blue-400/25 rounded-full blur-2xl animate-floating" style={{ animationDelay: '4s' }}></div>
 
           <div className="relative z-10 container mx-auto px-6">
             <div className="text-center max-w-4xl mx-auto">
-              <div className="inline-flex items-center px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-white/90 text-sm font-medium mb-8 animate-slideInDown">
-                <div className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></div>
+              <div className="inline-flex items-center px-4 py-2 bg-white/10 dark:bg-white/5 backdrop-blur-sm rounded-full text-white/90 text-sm font-medium mb-8 animate-slideInDown border border-white/10">
+                <div className="w-2 h-2 bg-green-400 dark:bg-green-300 rounded-full mr-2 animate-pulse"></div>
                 Новости кинокомиссии
               </div>
 
               <h1 className="text-6xl md:text-8xl font-black text-white mb-6 leading-tight animate-fadeUp">
                 События и 
-                <span className="block bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                <span className="block bg-gradient-to-r from-purple-400 via-pink-400 to-purple-300 bg-clip-text text-transparent">
                   новости
                 </span>
               </h1>
 
-              <p className="text-xl text-white/80 mb-12 leading-relaxed max-w-2xl mx-auto animate-fadeUp" style={{ animationDelay: '0.2s' }}>
+              <p className="text-xl text-white/80 dark:text-white/70 mb-12 leading-relaxed max-w-2xl mx-auto animate-fadeUp" style={{ animationDelay: '0.2s' }}>
                 Следите за актуальными событиями, анонсами и отчётами кинокомиссии Забайкальского края
               </p>
 
               {/* Search and Filter */}
               <div className="flex flex-col sm:flex-row gap-4 max-w-2xl mx-auto animate-fadeUp" style={{ animationDelay: '0.4s' }}>
                 <div className="relative flex-1">
-                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white/60" size={20} />
+                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white/60 dark:text-white/50" size={20} />
                   <input
                     type="text"
                     placeholder="Поиск новостей..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-12 pr-4 py-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl text-white placeholder-white/60 focus:outline-none focus:border-purple-400 transition-all duration-300"
+                    className="w-full pl-12 pr-4 py-4 bg-white/10 dark:bg-white/5 backdrop-blur-sm border border-white/20 dark:border-white/10 rounded-2xl text-white placeholder-white/60 dark:placeholder-white/50 focus:outline-none focus:border-purple-400 dark:focus:border-purple-300 transition-all duration-300"
                   />
                 </div>
                 
@@ -144,8 +150,8 @@ export default function NewsClient({ events }: { events: Event[] }) {
                             setSelectedCategory(category);
                             setIsFilterOpen(false);
                           }}
-                          className={`block w-full text-left px-6 py-3 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${
-                            selectedCategory === category ? 'bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300' : ''
+                          className={`block w-full text-left px-6 py-3 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${
+                            selectedCategory === category ? 'bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300 font-semibold' : ''
                           }`}
                         >
                           {category}
@@ -172,25 +178,33 @@ export default function NewsClient({ events }: { events: Event[] }) {
                   style={{ animationDelay: `${i * 0.1}s` }}
                 >
                   <Link href={`/news/${item.slug}`} className="block">
-                    <div className="relative overflow-hidden rounded-3xl bg-white dark:bg-gray-800 shadow-xl hover:shadow-2xl border border-gray-100 dark:border-gray-700">
+                    <div className="relative overflow-hidden rounded-3xl bg-white dark:bg-gray-800 shadow-xl hover:shadow-2xl dark:shadow-purple-500/10 dark:hover:shadow-purple-500/20 border border-gray-100 dark:border-gray-700 transition-all duration-500">
                       {/* Image */}
-                      <div className="relative h-64 overflow-hidden">
-                        <div
-                          className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
-                          style={{ backgroundImage: `url(${item.coverImageUrl})` }}
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                      <div className="relative h-64 overflow-hidden bg-gray-200 dark:bg-gray-700">
+                        {item.coverImageUrl ? (
+                          <>
+                            <div
+                              className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
+                              style={{ backgroundImage: `url(${item.coverImageUrl})` }}
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                          </>
+                        ) : (
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <CalendarDays className="w-20 h-20 text-gray-300 dark:text-gray-600" />
+                          </div>
+                        )}
 
                         {/* Date Badge */}
                         <div className="absolute top-4 right-4">
-                          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-black/30 backdrop-blur-sm rounded-full">
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-black/30 dark:bg-black/50 backdrop-blur-sm rounded-full border border-white/10">
                             <CalendarDays size={12} />
                             {new Date(item.date).toLocaleDateString("ru-RU")}
                           </span>
                         </div>
 
                         {/* Hover overlay */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-purple-600/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        <div className="absolute inset-0 bg-gradient-to-t from-purple-600/20 dark:from-purple-500/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                       </div>
 
                       {/* Content */}
@@ -222,7 +236,7 @@ export default function NewsClient({ events }: { events: Event[] }) {
             </div>
           ) : (
             <div className="text-center py-20 animate-fadeUp">
-              <div className="w-24 h-24 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-6 animate-floating">
+              <div className="w-24 h-24 bg-gradient-to-r from-purple-500 to-pink-500 dark:from-purple-600 dark:to-pink-600 rounded-full flex items-center justify-center mx-auto mb-6 animate-floating shadow-lg dark:shadow-purple-500/20">
                 <Search className="text-white" size={32} />
               </div>
               <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
@@ -236,7 +250,7 @@ export default function NewsClient({ events }: { events: Event[] }) {
                   setSearchTerm('');
                   setSelectedCategory('Все');
                 }}
-                className="px-8 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-2xl hover:shadow-lg transform hover:scale-105 transition-all duration-300"
+                className="px-8 py-3 bg-gradient-to-r from-purple-600 to-pink-600 dark:from-purple-500 dark:to-pink-500 text-white font-semibold rounded-2xl hover:shadow-lg dark:hover:shadow-purple-500/30 transform hover:scale-105 transition-all duration-300"
               >
                 Сбросить фильтры
               </button>

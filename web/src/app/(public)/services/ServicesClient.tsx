@@ -73,7 +73,7 @@ export default function ServicesClient({
         }
       `}</style>
 
-      <main className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-green-50/30">
+      <main className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-green-50/30 dark:from-gray-900 dark:via-gray-800 dark:to-green-900/20 transition-colors duration-300">
         {/* Hero Section */}
         <section className="relative py-32 overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-green-900 via-teal-900 to-blue-900"></div>
@@ -108,25 +108,25 @@ export default function ServicesClient({
         {/* Services Grid */}
         <section className="container mx-auto px-6 py-20">
           <div className="text-center mb-16 animate-fadeUp">
-            <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-green-600 to-teal-600 bg-clip-text text-transparent mb-6">
+            <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-green-600 to-teal-600 dark:from-green-400 dark:to-teal-400 bg-clip-text text-transparent mb-6">
               Что мы предлагаем
             </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
               Полный спектр услуг для успешной реализации вашего проекта
             </p>
           </div>
 
           {services.length === 0 ? (
             <div className="text-center py-20">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gray-100 flex items-center justify-center">
-                <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+                <svg className="w-8 h-8 text-gray-400 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v6a2 2 0 002 2h2m0-8h6a2 2 0 012 2v6a2 2 0 01-2 2h-6m0-8v8" />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold text-gray-500 mb-2">
+              <h3 className="text-xl font-semibold text-gray-500 dark:text-gray-400 mb-2">
                 Услуги пока не добавлены
               </h3>
-              <p className="text-gray-400">
+              <p className="text-gray-400 dark:text-gray-500">
                 Администратор скоро добавит информацию об услугах
               </p>
             </div>
@@ -135,24 +135,24 @@ export default function ServicesClient({
               {services.map((service, i) => (
                 <div 
                   key={service.id}
-                  className="service-card group relative p-8 bg-white rounded-3xl shadow-xl border border-gray-100 hover:shadow-2xl overflow-hidden animate-fadeUp"
+                  className="service-card group relative p-8 bg-white dark:bg-gray-800 rounded-3xl shadow-xl dark:shadow-green-500/10 border border-gray-100 dark:border-gray-700 hover:shadow-2xl dark:hover:shadow-green-500/20 overflow-hidden animate-fadeUp transition-all duration-300"
                   style={{ animationDelay: `${i * 0.1}s` }}
                 >
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-green-500/10 to-teal-500/10 rounded-full -translate-y-16 translate-x-16"></div>
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-green-500/10 to-teal-500/10 dark:from-green-500/20 dark:to-teal-500/20 rounded-full -translate-y-16 translate-x-16"></div>
                   
                   <div className="relative z-10">
                     {/* Icon */}
-                    <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-teal-500 rounded-2xl flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform duration-300 animate-floating mb-6">
+                    <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-teal-500 dark:from-green-600 dark:to-teal-600 rounded-2xl flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform duration-300 animate-floating mb-6">
                       {getIcon(service.iconType)}
                     </div>
 
                     {/* Content */}
-                    <h3 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-green-600 transition-colors">
+                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4 group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors">
                       {service.name}
                     </h3>
 
                     {service.description && (
-                      <p className="text-gray-600 mb-6 leading-relaxed">
+                      <p className="text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">
                         {service.description}
                       </p>
                     )}
@@ -162,8 +162,8 @@ export default function ServicesClient({
                       <div className="space-y-3">
                         {service.features.map((feature, idx) => (
                           <div key={idx} className="flex items-center gap-3">
-                            <CheckCircle2 size={18} className="text-green-500 flex-shrink-0" />
-                            <span className="text-sm text-gray-700">{feature}</span>
+                            <CheckCircle2 size={18} className="text-green-500 dark:text-green-400 flex-shrink-0" />
+                            <span className="text-sm text-gray-700 dark:text-gray-200">{feature}</span>
                           </div>
                         ))}
                       </div>
@@ -177,15 +177,15 @@ export default function ServicesClient({
 
         {/* Contact Section */}
         <section className="relative py-20 overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-green-900/10 to-teal-900/10"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-green-900/10 to-teal-900/10 dark:from-green-900/20 dark:to-teal-900/20"></div>
           
           <div className="relative container mx-auto px-6">
             <div className="max-w-4xl mx-auto text-center">
-              <h2 className="text-4xl font-bold mb-8 bg-gradient-to-r from-green-600 to-teal-600 bg-clip-text text-transparent animate-fadeUp">
+              <h2 className="text-4xl font-bold mb-8 bg-gradient-to-r from-green-600 to-teal-600 dark:from-green-400 dark:to-teal-400 bg-clip-text text-transparent animate-fadeUp">
                 Готовы начать проект?
               </h2>
               
-              <p className="text-xl text-gray-600 mb-12 animate-fadeUp" style={{ animationDelay: '0.1s' }}>
+              <p className="text-xl text-gray-600 dark:text-gray-300 mb-12 animate-fadeUp" style={{ animationDelay: '0.1s' }}>
                 Свяжитесь с нами для обсуждения деталей и получения персонального предложения
               </p>
               

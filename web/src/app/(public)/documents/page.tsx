@@ -73,13 +73,13 @@ export default function DocumentsPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-amber-50/30">
+      <main className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-amber-50/30 dark:from-gray-900 dark:via-gray-800 dark:to-amber-900/20">
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-center">
             <div className="w-16 h-16 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-4 animate-spin">
               <FileText className="text-white" size={24} />
             </div>
-            <p className="text-lg text-gray-600">Загрузка документов...</p>
+            <p className="text-lg text-gray-600 dark:text-gray-300">Загрузка документов...</p>
           </div>
         </div>
       </main>
@@ -88,14 +88,14 @@ export default function DocumentsPage() {
 
   if (error) {
     return (
-      <main className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-amber-50/30">
+      <main className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-amber-50/30 dark:from-gray-900 dark:via-gray-800 dark:to-amber-900/20">
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-center">
             <div className="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
               <FileText className="text-white" size={24} />
             </div>
-            <h2 className="text-xl font-bold text-gray-900 mb-2">Ошибка загрузки</h2>
-            <p className="text-gray-600 mb-4">{error}</p>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Ошибка загрузки</h2>
+            <p className="text-gray-600 dark:text-gray-300 mb-4">{error}</p>
             <button
               onClick={() => window.location.reload()}
               className="px-6 py-3 bg-gradient-to-r from-amber-600 to-orange-600 text-white font-semibold rounded-xl hover:shadow-lg transition-all duration-300"
@@ -109,7 +109,7 @@ export default function DocumentsPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-amber-50/30">
+    <main className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-amber-50/30 dark:from-gray-900 dark:via-gray-800 dark:to-amber-900/20 transition-colors duration-300">
       {/* Hero Section */}
       <section className="relative py-32 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-amber-900 via-orange-900 to-red-900"></div>
@@ -162,12 +162,12 @@ export default function DocumentsPage() {
           {filteredDocuments.map((doc, i) => (
             <div 
               key={doc.id}
-              className="group relative p-6 bg-white rounded-2xl shadow-lg hover:shadow-2xl border border-gray-100 transition-all duration-500 overflow-hidden animate-fadeUp"
+              className="group relative p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-lg dark:shadow-amber-500/10 hover:shadow-2xl dark:hover:shadow-amber-500/20 border border-gray-100 dark:border-gray-700 transition-all duration-500 overflow-hidden animate-fadeUp"
               style={{ animationDelay: `${i * 0.1}s` }}
             > 
               <div className="flex items-start gap-6">
                 {/* Icon */}
-                <div className="flex-shrink-0 w-16 h-16 bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform duration-300">
+                <div className="flex-shrink-0 w-16 h-16 bg-gradient-to-r from-amber-500 to-orange-500 dark:from-amber-600 dark:to-orange-600 rounded-2xl flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform duration-300">
                   <FileText size={24} />
                 </div>
 
@@ -175,17 +175,17 @@ export default function DocumentsPage() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex-1">
-                      <h3 className="text-xl font-bold text-gray-900 group-hover:text-amber-600 transition-colors mb-2">
+                      <h3 className="text-xl font-bold text-gray-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors mb-2">
                         {doc.title}
                       </h3>
-                      <p className="text-gray-600 leading-relaxed mb-4">
+                      <p className="text-gray-600 dark:text-gray-300 leading-relaxed mb-4">
                         {doc.description}
                       </p>
                     </div>
                   </div>
 
                   {/* Meta info */}
-                  <div className="flex flex-wrap items-center gap-6 text-sm text-gray-500 mb-4">
+                  <div className="flex flex-wrap items-center gap-6 text-sm text-gray-500 dark:text-gray-400 mb-4">
                     <div className="flex items-center gap-2">
                       <Calendar size={14} />
                       <span>Обновлено {doc.updatedAt.toLocaleDateString('ru-RU')}</span>
@@ -208,7 +208,7 @@ export default function DocumentsPage() {
                       href={doc.fileUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-2 px-6 py-3 bg-gray-100 text-gray-700 font-semibold rounded-xl hover:bg-gray-200 transition-all duration-300"
+                      className="flex items-center gap-2 px-6 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 font-semibold rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-300"
                     >
                       <FileText size={16} />
                       <span>Просмотр</span>
@@ -223,13 +223,13 @@ export default function DocumentsPage() {
 
           {filteredDocuments.length === 0 && !loading && (
             <div className="text-center py-16 animate-fadeUp">
-              <div className="w-24 h-24 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-6 animate-floating">
+              <div className="w-24 h-24 bg-gradient-to-r from-amber-500 to-orange-500 dark:from-amber-600 dark:to-orange-600 rounded-full flex items-center justify-center mx-auto mb-6 animate-floating">
                 <Search className="text-white" size={32} />
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
                 {documents.length === 0 ? 'Документы отсутствуют' : 'Документы не найдены'}
               </h3>
-              <p className="text-gray-600 max-w-md mx-auto mb-8">
+              <p className="text-gray-600 dark:text-gray-300 max-w-md mx-auto mb-8">
                 {documents.length === 0 
                   ? 'В системе пока нет загруженных документов'
                   : 'Попробуйте изменить параметры поиска или выбрать другую категорию'

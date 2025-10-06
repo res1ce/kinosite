@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
+import ThemeToggle from "@/components/ThemeToggle";
 
 export default function AdminLayoutClient({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -60,9 +61,12 @@ export default function AdminLayoutClient({ children }: { children: React.ReactN
               </Link>
             ))}
             
+            {/* Theme Toggle Button */}
+            <ThemeToggle variant="admin" />
+            
             <button
               onClick={handleLogout}
-              className="group relative px-4 py-2 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-200 ml-2"
+              className="group relative px-4 py-2 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-200"
             >
               <div className="flex items-center gap-2">
                 <svg className="w-4 h-4 opacity-60 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -96,6 +100,9 @@ export default function AdminLayoutClient({ children }: { children: React.ReactN
                 <span>{item.title}</span>
               </Link>
             ))}
+            
+            {/* Mobile Theme Toggle */}
+            <ThemeToggle variant="admin" showLabel />
             
             <button
               onClick={handleLogout}

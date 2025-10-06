@@ -1,10 +1,10 @@
-// app/layout.tsx
 'use client';
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { Menu, X, Phone, Mail, Check } from "lucide-react";
+import ThemeToggle from "@/components/ThemeToggle";
 
 interface SiteContent {
   id: string;
@@ -22,7 +22,6 @@ interface SiteContent {
   contactEmail: string;
 }
 
-// Default fallback data
 const defaultSite = {
   contactPhone: "+7 (999) 123-45-67",
   contactEmail: "info@kino.ru",
@@ -30,7 +29,6 @@ const defaultSite = {
   footerContacts: "Чита, Забайкальский край\ninfo@kino.ru"
 };
 
-// Fixed ContactModal component with proper portal positioning
 function ContactModal({ 
   phone, 
   email, 
@@ -91,16 +89,13 @@ function ContactModal({
         zIndex: 99999
       }}
     >
-      {/* Background overlay */}
       <div
         className="absolute inset-0 bg-black/60 backdrop-blur-sm"
         onClick={() => setIsOpen(false)}
       />
 
-      {/* Modal content */}
       <div className="relative z-10 w-full max-w-md mx-auto">
         <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl p-8 animate-scaleIn border border-gray-200 dark:border-gray-700">
-          {/* Close button */}
           <button
             onClick={() => setIsOpen(false)}
             className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200"
@@ -108,7 +103,6 @@ function ContactModal({
             <X size={20} />
           </button>
 
-          {/* Title */}
           <div className="text-center mb-8">
             <div className="w-16 h-16 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center mx-auto mb-4">
               <Phone className="text-white" size={24} />
@@ -121,7 +115,6 @@ function ContactModal({
             </p>
           </div>
 
-          {/* Contact buttons */}
           <div className="space-y-4">
             <button
               onClick={() => copyToClipboard(phone, 'phone')}
@@ -156,7 +149,6 @@ function ContactModal({
             </button>
           </div>
 
-          {/* Additional info */}
           <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700 text-center">
             <p className="text-sm text-gray-500 dark:text-gray-400">
               Работаем ежедневно с 9:00 до 18:00
@@ -218,7 +210,6 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
     { title: "О нас", href: "/about" },
   ];
 
-  // Use site content if available, otherwise use defaults
   const site = siteContent || defaultSite;
   const footerDescription = site.footerDescription || defaultSite.footerDescription;
   const footerContacts = site.footerContacts || defaultSite.footerContacts;
@@ -349,17 +340,26 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
           -webkit-box-orient: vertical;
           overflow: hidden;
         }
+
+        .dark,
+        html[data-theme="dark"] {
+          color-scheme: dark;
+        }
+
+        .dark body,
+        html[data-theme="dark"] body {
+          background: #0b0b0b;
+          color: #e7e7e7;
+        }
       `}</style>
 
-      <div className="min-h-screen flex flex-col">
-        {/* Enhanced Header */}
+      <div className="min-h-screen flex flex-col bg-white dark:bg-gray-900 transition-colors duration-300">
         <header className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 ${
           scrolled 
-            ? 'backdrop-blur-md bg-white/80 dark:bg-gray-900/80 shadow-2xl border-b border-white/20' 
+            ? 'backdrop-blur-md bg-white/80 dark:bg-gray-900/80 shadow-2xl border-b border-gray-200/20 dark:border-white/20' 
             : 'backdrop-blur-sm bg-white/70 dark:bg-black/40 shadow-sm'
         }`}>
           <div className="container mx-auto px-6 flex items-center justify-between h-20">
-            {/* Enhanced Logo */}
             <Link
               href="/"
               className="group relative font-bold text-2xl bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent hover:scale-105 transition-all duration-300 animate-slideInDown"
@@ -370,13 +370,12 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
               Кинокомиссия
             </Link>
 
-            {/* Desktop Navigation */}
             <nav className="hidden lg:flex items-center gap-8">
               {nav.map((item, i) => (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="group relative px-4 py-2 font-semibold text-gray-700 dark:text-gray-200 transition-all duration-300 hover:text-purple-600 animate-slideInDown"
+                  className="group relative px-4 py-2 font-semibold text-gray-700 dark:text-gray-200 transition-all duration-300 hover:text-purple-600 dark:hover:text-purple-400 animate-slideInDown"
                   style={{ animationDelay: `${i * 0.1 + 0.2}s` }}
                 >
                   {item.title}
@@ -386,8 +385,10 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
               ))}
             </nav>
 
-            {/* Desktop CTA */}
-            <div className="hidden lg:block animate-slideInDown" style={{ animationDelay: '0.8s' }}>
+            <div className="hidden lg:flex items-center gap-4 animate-slideInDown" style={{ animationDelay: '0.8s' }}>
+              {/* Theme Toggle Button */}
+              <ThemeToggle variant="desktop" />
+
               <ContactModal 
                 phone={contactPhone} 
                 email={contactEmail}
@@ -401,25 +402,28 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
               </ContactModal>
             </div>
 
-            {/* Mobile Menu Button */}
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="lg:hidden p-2 rounded-xl bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/20 hover:bg-purple-500/20 transition-all duration-300"
-            >
-              {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
+            <div className="flex items-center gap-2 lg:hidden">
+              {/* Mobile Theme Toggle */}
+              <ThemeToggle variant="mobile" />
+
+              <button
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                className="p-2 rounded-xl bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/20 hover:bg-purple-500/20 transition-all duration-300"
+              >
+                {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+              </button>
+            </div>
           </div>
 
-          {/* Mobile Menu */}
           {isMenuOpen && (
-            <div className="lg:hidden absolute top-full left-0 w-full backdrop-blur-md bg-white/95 dark:bg-gray-900/95 border-t border-white/20 animate-slideInDown">
+            <div className="lg:hidden absolute top-full left-0 w-full backdrop-blur-md bg-white/95 dark:bg-gray-900/95 border-t border-gray-200/20 dark:border-white/20 animate-slideInDown">
               <nav className="container mx-auto px-6 py-6 space-y-4">
                 {nav.map((item, i) => (
                   <Link
                     key={item.href}
                     href={item.href}
                     onClick={() => setIsMenuOpen(false)}
-                    className="block p-4 font-semibold text-gray-700 dark:text-gray-200 hover:text-purple-600 bg-gradient-to-r from-purple-500/5 to-pink-500/5 rounded-xl border border-purple-500/10 hover:border-purple-500/30 transition-all duration-300 animate-fadeUp"
+                    className="block p-4 font-semibold text-gray-700 dark:text-gray-200 hover:text-purple-600 dark:hover:text-purple-400 bg-gradient-to-r from-purple-500/5 to-pink-500/5 rounded-xl border border-purple-500/10 hover:border-purple-500/30 transition-all duration-300 animate-fadeUp"
                     style={{ animationDelay: `${i * 0.1}s` }}
                   >
                     {item.title}
@@ -443,15 +447,12 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
           )}
         </header>
 
-        {/* Content with top padding */}
         <div className="flex-1 pt-20">{children}</div>
 
-        {/* Enhanced Footer */}
         <footer className="relative mt-20 overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-purple-900 via-pink-900 to-indigo-900"></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-purple-900 via-pink-900 to-indigo-900 dark:from-purple-950 dark:via-pink-950 dark:to-indigo-950"></div>
           <div className="absolute inset-0 bg-gradient-to-tr from-blue-600/20 via-transparent to-purple-600/20"></div>
           
-          {/* Floating background elements */}
           <div className="absolute top-10 left-10 w-32 h-32 bg-pink-500/20 rounded-full blur-2xl animate-floating"></div>
           <div className="absolute bottom-10 right-10 w-40 h-40 bg-blue-500/20 rounded-full blur-3xl animate-floating" style={{ animationDelay: '2s' }}></div>
           
@@ -463,7 +464,6 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
               </div>
             ) : (
               <div className="grid md:grid-cols-3 gap-12 mb-12">
-                {/* Company Info */}
                 <div className="space-y-4 animate-fadeUp">
                   <h3 className="text-2xl font-bold text-white mb-4">Кинокомиссия</h3>
                   <p className="text-white/80 leading-relaxed">{footerDescription}</p>
@@ -477,7 +477,6 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
                   </div>
                 </div>
 
-                {/* Navigation */}
                 <div className="space-y-4 animate-fadeUp" style={{ animationDelay: '0.2s' }}>
                   <h3 className="text-xl font-bold text-white mb-4">Навигация</h3>
                   <ul className="space-y-3">
@@ -496,7 +495,6 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
                   </ul>
                 </div>
 
-                {/* Contacts */}
                 <div className="space-y-4 animate-fadeUp" style={{ animationDelay: '0.4s' }}>
                   <h3 className="text-xl font-bold text-white mb-4">Контакты</h3>
                   <div className="space-y-3">
@@ -511,7 +509,6 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
               </div>
             )}
 
-            {/* Bottom */}
             <div className="pt-8 border-t border-white/20 text-center animate-fadeUp" style={{ animationDelay: '0.6s' }}>
               <div className="flex flex-col md:flex-row justify-between items-center gap-4">
                 <p className="text-white/70 text-sm">

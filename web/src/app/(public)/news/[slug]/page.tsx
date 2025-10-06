@@ -90,13 +90,13 @@ export default function NewsDetails({ params }: { params: Promise<{ slug: string
   // Loading state
   if (loading) {
     return (
-      <main className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-purple-50/30">
+      <main className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-purple-50/30 dark:from-gray-900 dark:via-gray-800 dark:to-purple-900/20">
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-center">
             <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-4 animate-spin">
               <CalendarDays className="text-white" size={24} />
             </div>
-            <p className="text-lg text-gray-600">Загрузка события...</p>
+            <p className="text-lg text-gray-600 dark:text-gray-300">Загрузка события...</p>
           </div>
         </div>
       </main>
@@ -106,14 +106,14 @@ export default function NewsDetails({ params }: { params: Promise<{ slug: string
   // Error state
   if (error || !event) {
     return (
-      <main className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-purple-50/30">
+      <main className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-purple-50/30 dark:from-gray-900 dark:via-gray-800 dark:to-purple-900/20">
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-center">
             <div className="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
               <ArrowLeft className="text-white" size={24} />
             </div>
-            <h2 className="text-xl font-bold text-gray-900 mb-2">Событие не найдено</h2>
-            <p className="text-gray-600 mb-4">{error || 'Запрашиваемое событие не существует'}</p>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Событие не найдено</h2>
+            <p className="text-gray-600 dark:text-gray-300 mb-4">{error || 'Запрашиваемое событие не существует'}</p>
             <Link
               href="/news"
               className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-xl hover:shadow-lg transition-all duration-300"
@@ -135,6 +135,11 @@ export default function NewsDetails({ params }: { params: Promise<{ slug: string
           color: rgb(55, 65, 81);
         }
         
+        .dark .prose,
+        html[data-theme="dark"] .prose {
+          color: rgb(209, 213, 219);
+        }
+        
         .prose h2 {
           font-size: 1.875rem;
           font-weight: 700;
@@ -152,10 +157,20 @@ export default function NewsDetails({ params }: { params: Promise<{ slug: string
           color: rgb(55, 65, 81);
         }
         
+        .dark .prose h3,
+        html[data-theme="dark"] .prose h3 {
+          color: rgb(229, 231, 235);
+        }
+        
         .prose p {
           margin: 1rem 0;
           line-height: 1.75;
           color: rgb(75, 85, 99);
+        }
+        
+        .dark .prose p,
+        html[data-theme="dark"] .prose p {
+          color: rgb(156, 163, 175);
         }
         
         .prose ul {
@@ -166,6 +181,11 @@ export default function NewsDetails({ params }: { params: Promise<{ slug: string
         .prose li {
           margin: 0.5rem 0;
           color: rgb(75, 85, 99);
+        }
+        
+        .dark .prose li,
+        html[data-theme="dark"] .prose li {
+          color: rgb(156, 163, 175);
         }
 
         .parallax-hero {
@@ -319,7 +339,7 @@ export default function NewsDetails({ params }: { params: Promise<{ slug: string
         </section>
 
         {/* Content Section */}
-        <section className="container mx-auto px-6 py-16">
+        <section className="container mx-auto px-6 py-16 bg-white dark:bg-gray-900 transition-colors duration-300">
           <div className="max-w-4xl mx-auto">
             <article 
               className="prose prose-lg animate-fadeUp"
@@ -329,7 +349,7 @@ export default function NewsDetails({ params }: { params: Promise<{ slug: string
             {/* Gallery */}
             {event.galleryUrls && event.galleryUrls.length > 0 && (
               <div className="mt-16 animate-fadeUp" style={{ animationDelay: '0.2s' }}>
-                <h2 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-8">
+                <h2 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 dark:from-purple-400 dark:to-pink-400 bg-clip-text text-transparent mb-8">
                   Галерея событий
                 </h2>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -350,8 +370,8 @@ export default function NewsDetails({ params }: { params: Promise<{ slug: string
             )}
 
             {/* Event Info */}
-            <div className="mt-16 p-8 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-3xl animate-fadeUp" style={{ animationDelay: '0.4s' }}>
-              <h3 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-6">
+            <div className="mt-16 p-8 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-3xl border border-purple-100 dark:border-purple-800/30 animate-fadeUp" style={{ animationDelay: '0.4s' }}>
+              <h3 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 dark:from-purple-400 dark:to-pink-400 bg-clip-text text-transparent mb-6">
                 Детали события
               </h3>
               <div className="grid md:grid-cols-2 gap-6">
@@ -399,9 +419,9 @@ export default function NewsDetails({ params }: { params: Promise<{ slug: string
         </section>
 
         {/* Related Articles */}
-        <section className="bg-gradient-to-r from-gray-50 to-purple-50/20 dark:from-gray-900 dark:to-purple-900/10 py-20">
+        <section className="bg-gradient-to-r from-gray-50 to-purple-50/20 dark:from-gray-900 dark:to-purple-900/10 py-20 transition-colors duration-300">
           <div className="container mx-auto px-6">
-            <h2 className="text-4xl font-bold text-center mb-12 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent animate-fadeUp">
+            <h2 className="text-4xl font-bold text-center mb-12 bg-gradient-to-r from-purple-600 to-pink-600 dark:from-purple-400 dark:to-pink-400 bg-clip-text text-transparent animate-fadeUp">
               Другие события
             </h2>
             

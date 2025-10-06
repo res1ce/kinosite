@@ -64,7 +64,7 @@ export default function AboutPage({
   ] : defaultStats;
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-purple-50/30">
+    <main className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-purple-50/30 dark:from-gray-900 dark:via-gray-800 dark:to-purple-900/20 transition-colors duration-300">
       {/* Hero Section */}
       <section className="relative py-32 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-purple-900 via-indigo-900 to-blue-900"></div>
@@ -93,12 +93,12 @@ export default function AboutPage({
 
             <div className="grid md:grid-cols-3 gap-6 mb-12">
               {stats.map((stat, i) => (
-                <div key={stat.label} className="bg-white/10 backdrop-blur-sm rounded-2xl p-6">
-                  <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-xl mx-auto mb-3 animate-floating">
+                <div key={stat.label} className="bg-white/10 dark:bg-white/5 backdrop-blur-sm rounded-2xl p-6">
+                  <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-r from-purple-500 to-indigo-500 dark:from-purple-600 dark:to-indigo-600 rounded-xl mx-auto mb-3 animate-floating">
                     <div className="text-white">{stat.icon}</div>
                   </div>
                   <div className="text-2xl font-bold text-white mb-1">{stat.number}</div>
-                  <div className="text-white/70 text-sm">{stat.label}</div>
+                  <div className="text-white/70 dark:text-white/60 text-sm">{stat.label}</div>
                 </div>
               ))}
             </div>
@@ -111,17 +111,17 @@ export default function AboutPage({
         <section className="container mx-auto px-6 py-20">
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent mb-6">
+              <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 dark:from-purple-400 dark:to-indigo-400 bg-clip-text text-transparent mb-6">
                 Наши задачи и цели
               </h2>
-              <p className="text-xl text-gray-600">
+              <p className="text-xl text-gray-600 dark:text-gray-300">
                 Узнайте больше о том, как мы развиваем кинематограф в регионе
               </p>
             </div>
 
-            <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-12">
+            <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl dark:shadow-purple-500/10 p-8 md:p-12">
               <article
-                className="prose prose-lg max-w-none text-gray-800 leading-relaxed"
+                className="prose prose-lg dark:prose-invert max-w-none text-gray-800 dark:text-gray-200 leading-relaxed"
                 dangerouslySetInnerHTML={{ __html: aboutContent.content }}
               />
             </div>
@@ -130,16 +130,16 @@ export default function AboutPage({
       )}
 
       {/* Divider */}
-      <div className="relative py-16 bg-gradient-to-b from-white to-gray-50">
+      <div className="relative py-16 bg-gradient-to-b from-white to-gray-50 dark:from-gray-800 dark:to-gray-900">
         <div className="container mx-auto px-6">
           <div className="flex items-center justify-center gap-4">
-            <div className="h-px flex-1 bg-gradient-to-r from-transparent to-purple-300"></div>
+            <div className="h-px flex-1 bg-gradient-to-r from-transparent to-purple-300 dark:to-purple-600"></div>
             <div className="flex gap-2">
-              <div className="w-2 h-2 rounded-full bg-purple-400 animate-pulse"></div>
-              <div className="w-2 h-2 rounded-full bg-indigo-400 animate-pulse" style={{ animationDelay: '0.2s' }}></div>
-              <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+              <div className="w-2 h-2 rounded-full bg-purple-400 dark:bg-purple-500 animate-pulse"></div>
+              <div className="w-2 h-2 rounded-full bg-indigo-400 dark:bg-indigo-500 animate-pulse" style={{ animationDelay: '0.2s' }}></div>
+              <div className="w-2 h-2 rounded-full bg-blue-400 dark:bg-blue-500 animate-pulse" style={{ animationDelay: '0.4s' }}></div>
             </div>
-            <div className="h-px flex-1 bg-gradient-to-l from-transparent to-purple-300"></div>
+            <div className="h-px flex-1 bg-gradient-to-l from-transparent to-purple-300 dark:to-purple-600"></div>
           </div>
         </div>
       </div>
@@ -149,10 +149,10 @@ export default function AboutPage({
     {teamMembers.length > 0 && (
     <section id="team" className="container mx-auto px-6 py-20 scroll-mt-20">
         <div className="text-center mb-16">
-        <h2 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent mb-6">
+        <h2 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 dark:from-purple-400 dark:to-indigo-400 bg-clip-text text-transparent mb-6">
             Наша команда
         </h2>
-        <p className="text-xl text-gray-600">
+        <p className="text-xl text-gray-600 dark:text-gray-300">
             Профессионалы, которые делают проекты реальностью
         </p>
         </div>
@@ -168,10 +168,10 @@ export default function AboutPage({
             return (
             <div 
                 key={member.id}
-                className="group bg-white rounded-3xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-500"
+                className="group bg-white dark:bg-gray-800 rounded-3xl shadow-xl dark:shadow-purple-500/10 overflow-hidden hover:shadow-2xl dark:hover:shadow-purple-500/20 transition-all duration-500"
             >
                 {/* Photo Section - Fixed aspect ratio with proper object fit */}
-                <div className="relative aspect-[4/5] overflow-hidden bg-gradient-to-br from-purple-100 to-indigo-100">
+                <div className="relative aspect-[4/5] overflow-hidden bg-gradient-to-br from-purple-100 to-indigo-100 dark:from-purple-900/30 dark:to-indigo-900/30">
                 {member.photo ? (
                     <img 
                     src={member.photo}
@@ -180,7 +180,7 @@ export default function AboutPage({
                     />
                 ) : (
                     <div className="absolute inset-0 flex items-center justify-center">
-                    <Users className="w-24 h-24 text-purple-300" />
+                    <Users className="w-24 h-24 text-purple-300 dark:text-purple-600" />
                     </div>
                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
@@ -188,15 +188,15 @@ export default function AboutPage({
                 
                 {/* Content Section */}
                 <div className="p-6">
-                <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-purple-600 transition-colors">
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
                     {member.name}
                 </h3>
-                <div className="text-purple-600 font-medium mb-4 text-sm">{member.position}</div>
+                <div className="text-purple-600 dark:text-purple-400 font-medium mb-4 text-sm">{member.position}</div>
                 
                 {/* Expandable Description */}
                 <div className={`overflow-hidden transition-all duration-500 ${isExpanded ? 'max-h-[2000px]' : 'max-h-24'}`}>
                     <div 
-                    className={`prose prose-sm max-w-none text-gray-600 leading-relaxed ${!isExpanded ? 'line-clamp-3' : ''}`}
+                    className={`prose prose-sm dark:prose-invert max-w-none text-gray-600 dark:text-gray-300 leading-relaxed ${!isExpanded ? 'line-clamp-3' : ''}`}
                     dangerouslySetInnerHTML={{ __html: member.description }}
                     />
                 </div>
@@ -204,7 +204,7 @@ export default function AboutPage({
                 {/* Toggle Button */}
                 <button
                     onClick={() => toggleMember(member.id)}
-                    className="mt-4 flex items-center gap-2 text-purple-600 hover:text-purple-700 font-medium transition-colors group/btn text-sm"
+                    className="mt-4 flex items-center gap-2 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 font-medium transition-colors group/btn text-sm"
                 >
                     <span>{isExpanded ? 'Свернуть' : 'Читать далее'}</span>
                     {isExpanded ? (
