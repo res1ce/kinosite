@@ -49,6 +49,72 @@ export default function NewsClient({ events }: { events: Event[] }) {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const visibleItems = useScrollAnimation();
 
+  // Fix image visibility in accessibility mode
+  useEffect(() => {
+    const applyAccessibilityStyles = () => {
+      const isAccessibilityMode = document.documentElement.classList.contains('accessibility-mode');
+
+      if (isAccessibilityMode) {
+        const newsCards = document.querySelectorAll('.news-card, article[data-animate]');
+
+        newsCards.forEach((card) => {
+          if (card instanceof HTMLElement) {
+            // Отключаем анимации для карточки
+            card.style.setProperty('opacity', '1', 'important');
+            card.style.setProperty('animation', 'none', 'important');
+            card.style.setProperty('transform', 'none', 'important');
+
+            // Находим контейнер изображения
+            const imageContainer = card.querySelector('.relative.h-64.overflow-hidden');
+            
+            if (imageContainer instanceof HTMLElement) {
+              // Находим div с background-image (само изображение)
+              const imageDiv = imageContainer.querySelector('div[style*="background-image"]');
+              
+              if (imageDiv instanceof HTMLElement) {
+                // Убеждаемся что изображение видимо
+                imageDiv.style.setProperty('opacity', '1', 'important');
+                imageDiv.style.setProperty('visibility', 'visible', 'important');
+                imageDiv.style.setProperty('display', 'block', 'important');
+                imageDiv.style.setProperty('z-index', '1', 'important');
+                imageDiv.style.setProperty('animation', 'none', 'important');
+                imageDiv.style.setProperty('transform', 'none', 'important');
+              }
+
+              // Скрываем все оверлеи
+              const overlays = imageContainer.querySelectorAll('.absolute.inset-0');
+              overlays.forEach((overlay) => {
+                if (overlay instanceof HTMLElement && overlay !== imageDiv) {
+                  overlay.style.setProperty('display', 'none', 'important');
+                }
+              });
+            }
+
+            // Отключаем анимации для всех дочерних элементов
+            const allChildren = card.querySelectorAll('*');
+            allChildren.forEach((child) => {
+              if (child instanceof HTMLElement) {
+                child.style.setProperty('opacity', '1', 'important');
+                child.style.setProperty('animation', 'none', 'important');
+                child.style.setProperty('transform', 'none', 'important');
+              }
+            });
+          }
+        });
+      }
+    };
+
+    applyAccessibilityStyles();
+
+    const observer = new MutationObserver(applyAccessibilityStyles);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class']
+    });
+
+    return () => observer.disconnect();
+  }, [events]);
+
   const categories = ['Все', 'Фестивали', 'Локации', 'Партнерство', 'Премьеры', 'Конкурсы'];
 
   const filteredNews = events.filter(item => {

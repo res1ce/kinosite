@@ -99,6 +99,15 @@ html[data-theme="dark"] {
   display: none !important;
 }
 
+/* Скрываем оверлеи внутри контейнеров с изображениями */
+.accessibility-mode .relative.h-64 > .absolute.inset-0[class*="bg-"],
+.accessibility-mode .relative.overflow-hidden > .absolute.inset-0[class*="bg-"],
+.accessibility-mode .relative > .absolute.inset-0[class*="bg-gradient-to-"],
+.accessibility-mode .relative > .absolute.inset-0[class*="via-transparent"],
+.accessibility-mode .relative > .absolute.inset-0[class*="from-black"] {
+  display: none !important;
+}
+
 /* Убираем только декоративные градиенты (НЕ background-image) */
 .accessibility-mode [class*="bg-gradient"]:not([style*="background-image"]) {
   background-image: none !important;

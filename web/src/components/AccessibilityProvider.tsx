@@ -15,13 +15,11 @@ export function AccessibilityProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     setMounted(true);
-    // Get accessibility mode from localStorage
     const savedMode = localStorage.getItem('accessibilityMode') === 'true';
     setIsAccessibilityMode(savedMode);
     
     if (savedMode) {
       document.documentElement.classList.add('accessibility-mode');
-      console.log('✅ Accessibility mode enabled from localStorage');
     }
   }, []);
 
