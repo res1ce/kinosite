@@ -31,7 +31,7 @@ html[data-theme="dark"] {
   --border: rgba(255,255,255,.14);
 }
 
-/* Версия для слабовидящих */
+/* Версия для слабовидящих - СВЕТЛАЯ */
 .accessibility-mode {
   --background: #ffffff;
   --foreground: #000000;
@@ -46,6 +46,23 @@ html[data-theme="dark"] {
 .accessibility-mode body {
   background: #ffffff !important;
   color: #000000 !important;
+}
+
+/* Версия для слабовидящих - ТЕМНАЯ */
+.accessibility-mode.dark {
+  --background: #000000;
+  --foreground: #ffffff;
+  --brand-primary: #6699ff;
+  --brand-secondary: #99ccff;
+  --brand-accent: #ffaa00;
+  --surface: #1a1a1a;
+  --border: rgba(255,255,255,0.3);
+  background: #000000 !important;
+}
+
+.accessibility-mode.dark body {
+  background: #000000 !important;
+  color: #ffffff !important;
 }
 
 /* Отключаем ВСЕ анимации в режиме для слабовидящих */
@@ -63,14 +80,14 @@ html[data-theme="dark"] {
   opacity: 1 !important;
   visibility: visible !important;
   display: block !important;
-  border: 2px solid #000000 !important;
+  border: 2px solid var(--foreground) !important;
 }
 
 /* Элементы с background-image (изображения) */
 .accessibility-mode [style*="background-image"] {
   opacity: 1 !important;
   visibility: visible !important;
-  border: 2px solid #000000 !important;
+  border: 2px solid var(--foreground) !important;
 }
 
 /* КРИТИЧНО: Убираем overlay слои поверх изображений */
@@ -84,7 +101,7 @@ html[data-theme="dark"] {
 /* Убираем только декоративные градиенты (НЕ background-image) */
 .accessibility-mode [class*="bg-gradient"]:not([style*="background-image"]) {
   background-image: none !important;
-  background: #ffffff !important;
+  background: var(--background) !important;
 }
 
 .accessibility-mode * {
@@ -104,7 +121,7 @@ html[data-theme="dark"] {
 .accessibility-mode h4,
 .accessibility-mode h5,
 .accessibility-mode h6 {
-  color: #000000 !important;
+  color: var(--foreground) !important;
   font-weight: 700 !important;
 }
 
@@ -129,13 +146,13 @@ html[data-theme="dark"] {
 .accessibility-mode div {
   font-size: 1.3rem !important;
   font-weight: 500 !important;
-  color: #000000 !important;
+  color: var(--foreground) !important;
 }
 
 .accessibility-mode a {
   font-size: 1.3rem !important;
   font-weight: 500 !important;
-  color: #0000cc !important;
+  color: var(--brand-primary) !important;
 }
 
 .accessibility-mode button,
@@ -143,15 +160,15 @@ html[data-theme="dark"] {
   font-size: 1.4rem !important;
   font-weight: 600 !important;
   padding: 1rem 2rem !important;
-  border: 3px solid #000000 !important;
-  background: #f5f5f5 !important;
-  color: #000000 !important;
+  border: 3px solid var(--foreground) !important;
+  background: var(--surface) !important;
+  color: var(--foreground) !important;
 }
 
 .accessibility-mode button:hover,
 .accessibility-mode .button:hover {
-  background: #e0e0e0 !important;
-  color: #000000 !important;
+  background: var(--background) !important;
+  color: var(--foreground) !important;
 }
 
 .accessibility-mode img {
@@ -163,22 +180,23 @@ html[data-theme="dark"] {
   text-decoration: underline !important;
   text-decoration-thickness: 2px !important;
   text-underline-offset: 4px !important;
-  color: #0000cc !important;
-  -webkit-text-fill-color: #0000cc !important;
+  color: var(--brand-primary) !important;
+  -webkit-text-fill-color: var(--brand-primary) !important;
 }
 
 .accessibility-mode a:hover {
   text-decoration-thickness: 3px !important;
-  background-color: #ffff00 !important;
-  color: #000000 !important;
+  background-color: var(--brand-accent) !important;
+  color: var(--background) !important;
+  -webkit-text-fill-color: var(--background) !important;
 }
 
 .accessibility-mode .bg-gradient-to-r,
 .accessibility-mode .bg-gradient-to-br,
 .accessibility-mode .bg-gradient-to-bl,
 .accessibility-mode [class*="bg-gradient"] {
-  background: #f5f5f5 !important;
-  border: 3px solid #000000 !important;
+  background: var(--surface) !important;
+  border: 3px solid var(--foreground) !important;
 }
 
 .accessibility-mode [class*="bg-"],
@@ -187,12 +205,12 @@ html[data-theme="dark"] {
 .accessibility-mode header,
 .accessibility-mode footer,
 .accessibility-mode main {
-  background-color: #ffffff !important;
+  background-color: var(--background) !important;
 }
 
 .accessibility-mode [class*="text-white"],
 .accessibility-mode [class*="text-gray"] {
-  color: #000000 !important;
+  color: var(--foreground) !important;
 }
 
 .accessibility-mode [class*="shadow"],
@@ -216,23 +234,23 @@ html[data-theme="dark"] {
 .accessibility-mode [class*="bg-pink"],
 .accessibility-mode [class*="bg-indigo"],
 .accessibility-mode [class*="bg-blue"] {
-  background: #f5f5f5 !important;
-  color: #000000 !important;
+  background: var(--surface) !important;
+  color: var(--foreground) !important;
 }
 
 /* Исправление для Link компонентов в футере */
 .accessibility-mode footer a,
 .accessibility-mode footer a *,
 .accessibility-mode footer a span {
-  color: #0000cc !important;
-  -webkit-text-fill-color: #0000cc !important;
+  color: var(--brand-primary) !important;
+  -webkit-text-fill-color: var(--brand-primary) !important;
 }
 
 /* Исправление для Link компонентов на главной странице ("Что мы предлагаем") */
 .accessibility-mode a.group {
-  background: #ffffff !important;
+  background: var(--background) !important;
   backdrop-filter: none !important;
-  border: 3px solid #000000 !important;
+  border: 3px solid var(--foreground) !important;
 }
 
 .accessibility-mode a.group h3,
@@ -240,28 +258,28 @@ html[data-theme="dark"] {
 .accessibility-mode a.group span,
 .accessibility-mode a.group div.text-white,
 .accessibility-mode a.group [class*="text-white"] {
-  color: #000000 !important;
-  -webkit-text-fill-color: #000000 !important;
+  color: var(--foreground) !important;
+  -webkit-text-fill-color: var(--foreground) !important;
 }
 
 /* Более специфичное правило для всего контента внутри */
 .accessibility-mode a.group .relative > *,
 .accessibility-mode a.group .relative * {
-  color: #000000 !important;
-  -webkit-text-fill-color: #000000 !important;
+  color: var(--foreground) !important;
+  -webkit-text-fill-color: var(--foreground) !important;
 }
 
 /* Еще более специфичное правило для текста */
 .accessibility-mode a.group h3,
 .accessibility-mode a.group p {
-  color: #000000 !important;
-  -webkit-text-fill-color: #000000 !important;
+  color: var(--foreground) !important;
+  -webkit-text-fill-color: var(--foreground) !important;
   opacity: 1 !important;
 }
 
 /* SVG иконки внутри карточек */
 .accessibility-mode a.group svg {
-  color: #000000 !important;
+  color: var(--foreground) !important;
   fill: currentColor !important;
   stroke: currentColor !important;
 }
@@ -273,8 +291,8 @@ html[data-theme="dark"] {
 
 /* Иконка в карточке */
 .accessibility-mode a.group [class*="bg-gradient-to-br"] {
-  background: #f5f5f5 !important;
-  border: 2px solid #000000 !important;
+  background: var(--surface) !important;
+  border: 2px solid var(--foreground) !important;
 }
 
 /* Убедимся что контент внутри карточек виден */
@@ -287,8 +305,8 @@ html[data-theme="dark"] {
 .accessibility-mode .service-card,
 html.accessibility-mode .service-card,
 html.accessibility-mode div.service-card.group {
-  background: #ffffff !important;
-  border: 3px solid #000000 !important;
+  background: var(--background) !important;
+  border: 3px solid var(--foreground) !important;
   box-shadow: none !important;
 }
 
@@ -298,8 +316,8 @@ html.accessibility-mode div.service-card.group {
 .accessibility-mode .service-card .text-gray-600,
 .accessibility-mode .service-card .text-gray-700,
 .accessibility-mode .service-card .text-gray-200 {
-  color: #000000 !important;
-  -webkit-text-fill-color: #000000 !important;
+  color: var(--foreground) !important;
+  -webkit-text-fill-color: var(--foreground) !important;
 }
 
 /* Все текстовые элементы - МАКСИМАЛЬНЫЙ ПРИОРИТЕТ */
@@ -309,8 +327,8 @@ html.accessibility-mode div.service-card.group {
 .accessibility-mode .service-card p.text-gray-600,
 .accessibility-mode .service-card span,
 .accessibility-mode .service-card span.text-sm {
-  color: #000000 !important;
-  -webkit-text-fill-color: #000000 !important;
+  color: var(--foreground) !important;
+  -webkit-text-fill-color: var(--foreground) !important;
   opacity: 1 !important;
   background: transparent !important;
 }
@@ -321,8 +339,8 @@ html.accessibility-mode div.service-card.group {
 .accessibility-mode .service-card .relative span,
 .accessibility-mode .service-card .relative div,
 .accessibility-mode .service-card .relative * {
-  color: #000000 !important;
-  -webkit-text-fill-color: #000000 !important;
+  color: var(--foreground) !important;
+  -webkit-text-fill-color: var(--foreground) !important;
 }
 
 /* СУПЕР АГРЕССИВНОЕ ПРАВИЛО - переопределяет ВСЁ */
@@ -330,31 +348,31 @@ html.accessibility-mode .service-card *,
 .accessibility-mode .service-card *,
 .accessibility-mode div.service-card *,
 body .accessibility-mode .service-card * {
-  color: #000000 !important;
-  -webkit-text-fill-color: #000000 !important;
-  text-fill-color: #000000 !important;
+  color: var(--foreground) !important;
+  -webkit-text-fill-color: var(--foreground) !important;
+  text-fill-color: var(--foreground) !important;
 }
 
 /* Еще один вариант с максимальной специфичностью */
 .accessibility-mode div.service-card.group > div.relative > * {
-  color: #000000 !important;
-  -webkit-text-fill-color: #000000 !important;
+  color: var(--foreground) !important;
+  -webkit-text-fill-color: var(--foreground) !important;
 }
 
 .accessibility-mode div.service-card.group h3,
 .accessibility-mode div.service-card.group p,
 .accessibility-mode div.service-card.group span {
-  color: #000000 !important;
-  -webkit-text-fill-color: #000000 !important;
+  color: var(--foreground) !important;
+  -webkit-text-fill-color: var(--foreground) !important;
 }
 
 /* Самое агрессивное правило с полным путем */
 html.accessibility-mode div.service-card.group.relative > div.relative.z-10 > h3.text-2xl,
 html.accessibility-mode div.service-card.group.relative > div.relative.z-10 > p.text-gray-600,
 html.accessibility-mode div.service-card.group.relative > div.relative.z-10 span.text-sm {
-  color: #000000 !important;
-  -webkit-text-fill-color: #000000 !important;
-  fill: #000000 !important;
+  color: var(--foreground) !important;
+  -webkit-text-fill-color: var(--foreground) !important;
+  fill: var(--foreground) !important;
 }
 
 /* Все div внутри карточки */
@@ -370,20 +388,20 @@ html.accessibility-mode .service-card p,
 html.accessibility-mode .service-card p.text-gray-600,
 html.accessibility-mode .service-card span,
 html.accessibility-mode .service-card span.text-sm {
-  color: #000000 !important;
-  -webkit-text-fill-color: #000000 !important;
+  color: var(--foreground) !important;
+  -webkit-text-fill-color: var(--foreground) !important;
 }
 
 /* SVG иконки в service-card - включая CheckCircle2 */
 .accessibility-mode .service-card svg {
-  color: #000000 !important;
+  color: var(--foreground) !important;
   fill: currentColor !important;
   stroke: currentColor !important;
 }
 
 /* Специально для иконок CheckCircle2 в списке фич */
 .accessibility-mode .service-card [class*="text-green"] svg {
-  color: #000000 !important;
+  color: var(--foreground) !important;
 }
 
 /* Скрываем градиентные оверлеи в service-card */
@@ -394,8 +412,8 @@ html.accessibility-mode .service-card span.text-sm {
 /* Иконка в service-card */
 .accessibility-mode .service-card [class*="bg-gradient-to-r"],
 .accessibility-mode .service-card [class*="bg-gradient-to-br"] {
-  background: #f5f5f5 !important;
-  border: 2px solid #000000 !important;
+  background: var(--surface) !important;
+  border: 2px solid var(--foreground) !important;
 }
 
 /* Убедимся что контент внутри service-card виден */
@@ -409,20 +427,20 @@ html.accessibility-mode .service-card span.text-sm {
 .accessibility-mode [class*="text-transparent"] {
   -webkit-background-clip: initial !important;
   background-clip: initial !important;
-  -webkit-text-fill-color: #000000 !important;
-  color: #000000 !important;
+  -webkit-text-fill-color: var(--foreground) !important;
+  color: var(--foreground) !important;
   background: none !important;
 }
 
 /* Переопределение для всех элементов с text-white и text-gray */
 .accessibility-mode [class*="text-white"],
 .accessibility-mode [class*="text-white/"] {
-  color: #000000 !important;
-  -webkit-text-fill-color: #000000 !important;
+  color: var(--foreground) !important;
+  -webkit-text-fill-color: var(--foreground) !important;
 }
 
 .accessibility-mode [class*="text-gray"] {
-  color: #000000 !important;
+  color: var(--foreground) !important;
 }
 
 body {
