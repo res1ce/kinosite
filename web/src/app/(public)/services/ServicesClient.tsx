@@ -2,6 +2,7 @@
 
 import { CheckCircle2, Target, Star, Users, Award, Sparkles } from "lucide-react";
 import ContactModal from "@/components/ContactModal";
+import { useEffect } from "react";
 
 interface Service {
   id: string;
@@ -36,6 +37,45 @@ export default function ServicesClient({
   services: Service[];
   siteContent: SiteContent | null;
 }) {
+  useEffect(() => {
+    const applyAccessibilityStyles = () => {
+      const isAccessibilityMode = document.documentElement.classList.contains('accessibility-mode');
+      
+      if (isAccessibilityMode) {
+        const serviceCards = document.querySelectorAll('.service-card');
+        
+        serviceCards.forEach((card) => {
+          if (card instanceof HTMLElement) {
+            // Отключаем анимации для карточки
+            card.style.setProperty('opacity', '1', 'important');
+            card.style.setProperty('animation', 'none', 'important');
+            
+            // Отключаем анимации для всех дочерних элементов
+            const allChildren = card.querySelectorAll('*');
+            allChildren.forEach((child) => {
+              if (child instanceof HTMLElement) {
+                child.style.setProperty('opacity', '1', 'important');
+                child.style.setProperty('animation', 'none', 'important');
+              }
+            });
+          }
+        });
+      }
+    };
+    
+    // Применяем сразу
+    applyAccessibilityStyles();
+    
+    // Применяем при изменении класса
+    const observer = new MutationObserver(applyAccessibilityStyles);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class']
+    });
+    
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <>
       <style jsx global>{`
@@ -70,6 +110,14 @@ export default function ServicesClient({
 
         .service-card:hover {
           transform: translateY(-8px) scale(1.02);
+        }
+
+        /* Accessibility mode: отключаем анимации */
+        html.accessibility-mode .service-card,
+        html.accessibility-mode .service-card *,
+        html.accessibility-mode .animate-fadeUp {
+          opacity: 1 !important;
+          animation: none !important;
         }
       `}</style>
 
@@ -136,7 +184,9 @@ export default function ServicesClient({
                 <div 
                   key={service.id}
                   className="service-card group relative p-8 bg-white dark:bg-gray-800 rounded-3xl shadow-xl dark:shadow-green-500/10 border border-gray-100 dark:border-gray-700 hover:shadow-2xl dark:hover:shadow-green-500/20 overflow-hidden animate-fadeUp transition-all duration-300"
-                  style={{ animationDelay: `${i * 0.1}s` }}
+                  style={{ 
+                    animationDelay: `${i * 0.1}s`,
+                  }}
                 >
                   <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-green-500/10 to-teal-500/10 dark:from-green-500/20 dark:to-teal-500/20 rounded-full -translate-y-16 translate-x-16"></div>
                   

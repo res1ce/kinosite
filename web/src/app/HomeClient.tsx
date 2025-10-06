@@ -5,6 +5,8 @@ import Link from "next/link";
 import { CalendarDays, MapPin, Landmark, Users, Ticket } from "lucide-react";
 import { useEffect, useState } from "react";
 import ContactModal from "@/components/ContactModal";
+import ThemeToggle from "@/components/ThemeToggle";
+import AccessibilityToggle from "@/components/AccessibilityToggle";
 
 interface SiteContent {
   heroText?: string;
@@ -301,6 +303,16 @@ function Hero({ heroText, scrollY}: { heroText: string; scrollY: number;}) {
                 Локации региона
               </span>
             </Link>
+          </div>
+          
+          {/* Theme and Accessibility Controls */}
+          <div className="flex flex-col sm:flex-row justify-center items-stretch gap-4 pt-6 max-w-2xl mx-auto animate-fadeInUp" style={{ animationDelay: '0.8s' }}>
+            <div className="flex-1">
+              <AccessibilityToggle variant="hero" showLabel={true} />
+            </div>
+            <div className="flex-1">
+              <ThemeToggle variant="hero" showLabel={true} />
+            </div>
           </div>
         </div>
       </div>

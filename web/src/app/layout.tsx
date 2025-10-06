@@ -3,6 +3,7 @@ import { Inter, Manrope } from "next/font/google";
 import "./globals.css";
 import RevealOnScroll from "@/components/RevealOnScroll";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { AccessibilityProvider } from "@/components/AccessibilityProvider";
 
 const inter = Inter({ variable: "--font-inter", subsets: ["latin", "cyrillic"] });
 const manrope = Manrope({ variable: "--font-manrope", subsets: ["latin", "cyrillic"] });
@@ -38,6 +39,12 @@ export default function RootLayout({
                   } else {
                     document.documentElement.classList.remove('dark');
                   }
+                  
+                  // Accessibility mode
+                  const accessibilityMode = localStorage.getItem('accessibilityMode') === 'true';
+                  if (accessibilityMode) {
+                    document.documentElement.classList.add('accessibility-mode');
+                  }
                 } catch (e) {}
               })();
             `,
@@ -48,8 +55,10 @@ export default function RootLayout({
         className={`${inter.variable} ${manrope.variable} antialiased`}
       >
         <ThemeProvider>
-          {children}
-          <RevealOnScroll />
+          <AccessibilityProvider>
+            {children}
+            <RevealOnScroll />
+          </AccessibilityProvider>
         </ThemeProvider>
       </body>
     </html>

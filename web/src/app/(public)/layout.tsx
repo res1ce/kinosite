@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { Menu, X, Phone, Mail, Check } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
+import AccessibilityToggle from "@/components/AccessibilityToggle";
 
 interface SiteContent {
   id: string;
@@ -386,6 +387,9 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
             </nav>
 
             <div className="hidden lg:flex items-center gap-4 animate-slideInDown" style={{ animationDelay: '0.8s' }}>
+              {/* Accessibility Toggle Button */}
+              <AccessibilityToggle variant="desktop" />
+              
               {/* Theme Toggle Button */}
               <ThemeToggle variant="desktop" />
 
@@ -403,6 +407,9 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
             </div>
 
             <div className="flex items-center gap-2 lg:hidden">
+              {/* Mobile Accessibility Toggle */}
+              <AccessibilityToggle variant="mobile" />
+              
               {/* Mobile Theme Toggle */}
               <ThemeToggle variant="mobile" />
 
