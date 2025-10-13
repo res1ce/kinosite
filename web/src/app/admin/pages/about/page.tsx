@@ -291,25 +291,6 @@ export default async function AdminAboutPage() {
                 </div>
               </div>
               
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Описание * (HTML разрешён)
-                </label>
-                <textarea
-                  name="description"
-                  required
-                  rows={3}
-                  placeholder="<p>Основатель кинокомиссии</p><ul><li>80+ проектов</li></ul>"
-                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-900/50 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all duration-200 resize-none font-mono text-sm"
-                />
-                <div className="flex items-center gap-2 text-xs text-gray-500 mt-2">
-                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  Можно использовать HTML теги: &lt;p&gt;, &lt;strong&gt;, &lt;ul&gt;, &lt;li&gt;
-                </div>
-              </div>
-              
               <button
                 type="submit"
                 className="group relative px-6 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-200"

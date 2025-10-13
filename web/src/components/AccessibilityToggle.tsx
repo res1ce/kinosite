@@ -63,7 +63,7 @@ export default function AccessibilityToggle({ variant = 'desktop', showLabel = f
   return (
     <button
       onClick={toggleAccessibilityMode}
-      className={`${baseClasses} ${variantClasses[variant]}`}
+      className={`${baseClasses} ${variantClasses[variant]} hover:scale-105 transition-all duration-300 shimmer-effect hover-glow`}
       aria-label="Версия для слабовидящих"
       title="Версия для слабовидящих"
     >

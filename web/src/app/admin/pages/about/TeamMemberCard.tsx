@@ -56,10 +56,6 @@ export default function TeamMemberCard({
           <p className="text-emerald-600 dark:text-emerald-400 font-medium mb-1">
             {member.position}
           </p>
-            <div 
-            className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed prose prose-sm max-w-none dark:prose-invert"
-            dangerouslySetInnerHTML={{ __html: member.description }}
-            />
         </div>
 
         {/* Actions */}
@@ -180,19 +176,6 @@ export default function TeamMemberCard({
                   variant="blue" 
                 />
               </div>
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Описание *
-              </label>
-              <textarea
-                name="description"
-                defaultValue={member.description}
-                required
-                rows={3}
-                className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-900/50 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all duration-200 resize-none"
-              />
             </div>
             
             <div className="flex items-center gap-3">

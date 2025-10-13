@@ -72,7 +72,7 @@ export default function ThemeToggle({ variant = 'desktop', showLabel = false }: 
   return (
     <button
       onClick={toggleTheme}
-      className={`${baseClasses} ${variantClasses[variant]}`}
+      className={`${baseClasses} ${variantClasses[variant]} hover:scale-105 transition-all duration-300 shimmer-effect hover-glow`}
       aria-label="Переключить тему"
       title="Переключить тему"
     >

@@ -150,7 +150,7 @@ export default function AboutPage({
     <section id="team" className="container mx-auto px-6 py-20 scroll-mt-20">
         <div className="text-center mb-16">
         <h2 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 dark:from-purple-400 dark:to-indigo-400 bg-clip-text text-transparent mb-6">
-            Наша команда
+            Состав кинокомиссии
         </h2>
         <p className="text-xl text-gray-600 dark:text-gray-300">
             Профессионалы, которые делают проекты реальностью
@@ -192,27 +192,6 @@ export default function AboutPage({
                     {member.name}
                 </h3>
                 <div className="text-purple-600 dark:text-purple-400 font-medium mb-4 text-sm">{member.position}</div>
-                
-                {/* Expandable Description */}
-                <div className={`overflow-hidden transition-all duration-500 ${isExpanded ? 'max-h-[2000px]' : 'max-h-24'}`}>
-                    <div 
-                    className={`prose prose-sm dark:prose-invert max-w-none text-gray-600 dark:text-gray-300 leading-relaxed ${!isExpanded ? 'line-clamp-3' : ''}`}
-                    dangerouslySetInnerHTML={{ __html: member.description }}
-                    />
-                </div>
-                
-                {/* Toggle Button */}
-                <button
-                    onClick={() => toggleMember(member.id)}
-                    className="mt-4 flex items-center gap-2 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 font-medium transition-colors group/btn text-sm"
-                >
-                    <span>{isExpanded ? 'Свернуть' : 'Читать далее'}</span>
-                    {isExpanded ? (
-                    <ChevronUp size={18} className="group-hover/btn:-translate-y-1 transition-transform" />
-                    ) : (
-                    <ChevronDown size={18} className="group-hover/btn:translate-y-1 transition-transform" />
-                    )}
-                </button>
                 </div>
             </div>
             );
