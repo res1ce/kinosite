@@ -11,6 +11,7 @@ export default async function HomePage() {
       regionTitle: rawSite.regionTitle ?? undefined,
       regionDescription: rawSite.regionDescription ?? undefined,
       regionVideoUrl: rawSite.regionVideoUrl ?? undefined,
+      regionVideoFile: rawSite.regionVideoFile ?? undefined,
     } : null;
 
   return <HomeClient site={site} />;

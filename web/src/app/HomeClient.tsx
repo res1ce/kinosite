@@ -21,6 +21,7 @@ interface SiteContent {
   regionTitle?: string;
   regionDescription?: string;
   regionVideoUrl?: string;
+  regionVideoFile?: string;
 }
 
 interface VisibilityState {
@@ -233,11 +234,12 @@ export default function Home({ site }: { site: SiteContent | null }) {
       <main className="min-h-screen font-sans overflow-hidden">
         <Hero heroText={heroText} scrollY={scrollY} />
         <Features items={features} isVisible={isVisible} />
-        {site?.regionVideoUrl && (
+        {(site?.regionVideoFile || site?.regionVideoUrl) && (
           <RegionVideo 
             title={site.regionTitle} 
             description={site.regionDescription} 
             videoUrl={site.regionVideoUrl} 
+            videoFile={site.regionVideoFile}
             isVisible={isVisible} 
           />
         )}
@@ -384,11 +386,13 @@ function RegionVideo({
   title, 
   description, 
   videoUrl, 
+  videoFile,
   isVisible 
 }: { 
   title?: string; 
   description?: string; 
-  videoUrl: string; 
+  videoUrl?: string; 
+  videoFile?: string;
   isVisible: VisibilityState;
 }) {
   // Функция для преобразования обычных URL в embed
@@ -445,7 +449,9 @@ function RegionVideo({
     }
   };
 
-  const embedUrl = getEmbedUrl(videoUrl);
+  // Приоритет: videoFile > videoUrl
+  const isLocalVideo = videoFile && videoFile.trim() !== '';
+  const embedUrl = !isLocalVideo && videoUrl ? getEmbedUrl(videoUrl) : '';
 
   return (
     <section className="py-32 relative bg-gradient-to-b from-slate-900 via-indigo-950 to-slate-900 overflow-hidden">
@@ -478,13 +484,31 @@ function RegionVideo({
         >
           <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-white/10 group hover:shadow-3xl transition-all duration-500">
             <div className="aspect-video bg-black">
-              <iframe
-                src={embedUrl}
-                className="w-full h-full"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
-                allowFullScreen
-                title={title || "Видео о регионе"}
-              />
+              {isLocalVideo ? (
+                // Загруженный видео файл
+                <video
+                  src={videoFile}
+                  className="w-full h-full object-cover"
+                  controls
+                  controlsList="nodownload"
+                  playsInline
+                  preload="metadata"
+                >
+                  <source src={videoFile} type="video/mp4" />
+                  <source src={videoFile} type="video/webm" />
+                  <source src={videoFile} type="video/ogg" />
+                  Ваш браузер не поддерживает тег video.
+                </video>
+              ) : (
+                // Внешнее видео через iframe
+                <iframe
+                  src={embedUrl}
+                  className="w-full h-full"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+                  allowFullScreen
+                  title={title || "Видео о регионе"}
+                />
+              )}
             </div>
           </div>
         </div>

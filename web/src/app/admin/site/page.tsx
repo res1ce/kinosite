@@ -1,6 +1,7 @@
 // app/admin/site/page.tsx
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import VideoUploader from "@/components/VideoUploader";
 
 async function updateSiteContent(formData: FormData) {
   "use server";
@@ -24,6 +25,7 @@ async function updateSiteContent(formData: FormData) {
   const regionTitle = String(formData.get("regionTitle") || "").trim();
   const regionDescription = String(formData.get("regionDescription") || "").trim();
   const regionVideoUrl = String(formData.get("regionVideoUrl") || "").trim();
+  const regionVideoFile = String(formData.get("regionVideoFile") || "").trim();
 
   // Простая валидация — если пусто, подставим пустые строки
   await prisma.siteContent.upsert({
@@ -44,6 +46,7 @@ async function updateSiteContent(formData: FormData) {
       regionTitle: regionTitle || "Забайкальский край",
       regionDescription: regionDescription || "Уникальный регион России с богатой природой и историей",
       regionVideoUrl: regionVideoUrl || "",
+      regionVideoFile: regionVideoFile || "",
     },
     update: {
       heroText,
@@ -60,6 +63,7 @@ async function updateSiteContent(formData: FormData) {
       regionTitle,
       regionDescription,
       regionVideoUrl,
+      regionVideoFile,
     },
   });
 
@@ -308,10 +312,42 @@ export default async function AdminSitePage() {
                 />
               </div>
 
+              {/* Video Upload Option */}
               <div className="space-y-3">
                 <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-indigo-500"></span>
-                  URL видео (Rutube embed)
+                  Загрузить видео файл
+                </label>
+                <VideoUploader 
+                  name="regionVideoFile" 
+                  initialUrl={site?.regionVideoFile || ""} 
+                  variant="indigo"
+                />
+                <p className="text-xs text-gray-500 flex items-center gap-2">
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Загрузите видео файл напрямую с компьютера
+                </p>
+              </div>
+
+              {/* Divider with "OR" */}
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-300 dark:border-gray-600"></div>
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-4 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 font-medium">
+                    ИЛИ
+                  </span>
+                </div>
+              </div>
+
+              {/* Video URL Option */}
+              <div className="space-y-3">
+                <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-indigo-500"></span>
+                  URL видео (внешняя ссылка)
                 </label>
                 <input
                   name="regionVideoUrl"
@@ -325,6 +361,19 @@ export default async function AdminSitePage() {
                   </svg>
                   Примеры: rutube.ru/video/abc123 или vk.com/video-123_456 или youtube.com/watch?v=abc123
                 </p>
+              </div>
+
+              {/* Priority Info */}
+              <div className="bg-indigo-50/50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-xl p-4">
+                <div className="flex items-start gap-3">
+                  <svg className="w-5 h-5 text-indigo-600 dark:text-indigo-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <div className="text-sm text-indigo-700 dark:text-indigo-300">
+                    <p className="font-semibold mb-1">Приоритет отображения:</p>
+                    <p>Если загружен файл, то он будет использован. Иначе будет использована внешняя ссылка (URL).</p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

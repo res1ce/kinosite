@@ -106,6 +106,7 @@ model SiteContent {
   regionTitle       String?
   regionDescription String?
   regionVideoUrl    String?
+  regionVideoFile   String?  // Путь к загруженному видео файлу
 }
 
 model TeamMember {
