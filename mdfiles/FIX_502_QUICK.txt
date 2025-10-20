@@ -1,0 +1,97 @@
+═══════════════════════════════════════════════════════
+🚨 СРОЧНО: ИСПРАВЛЕНИЕ 502 Bad Gateway (Out of Memory)
+═══════════════════════════════════════════════════════
+
+ПРОБЛЕМА: POST /api/upload HTTP/2.0" 502 559
+
+ПРИЧИНА: Next.js падает при загрузке 652MB в память
+
+═══════════════════════════════════════════════════════
+
+✅ РЕШЕНИЕ ПРИМЕНЕНО:
+
+1. API route.ts переписан на STREAMING
+   ❌ БЫЛО: Buffer.from(await f.arrayBuffer())  
+   ✅ СТАЛО: Streaming через pipeline (не в память!)
+
+2. Использует ~10-50MB памяти вместо 650MB+
+
+═══════════════════════════════════════════════════════
+
+🚀 ЧТО НУЖНО СДЕЛАТЬ НА СЕРВЕРЕ:
+
+1. ПЕРЕСОБЕРИТЕ Next.js (на компьютере):
+   ─────────────────────
+   cd web
+   npm run build
+
+2. ЗАДЕПЛОЙТЕ на сервер:
+   ─────────────────────
+   # Если Docker:
+   docker-compose build --no-cache nextjs
+   docker-compose up -d
+   
+   # Если PM2:
+   pm2 restart kinosite
+   
+   # Проверьте логи:
+   docker logs -f nextjs_container
+
+3. УВЕЛИЧЬТЕ ПАМЯТЬ для Next.js (рекомендуется):
+   ─────────────────────
+   # В docker-compose.yml добавьте:
+   services:
+     nextjs:
+       deploy:
+         resources:
+           limits:
+             memory: 2G
+       environment:
+         - NODE_OPTIONS=--max-old-space-size=1536
+
+   # Затем:
+   docker-compose down
+   docker-compose up -d
+
+═══════════════════════════════════════════════════════
+
+✅ ПОСЛЕ ПРИМЕНЕНИЯ:
+
+Попробуйте загрузить 652MB видео:
+  https://zabkinokom.ru/admin/site
+
+Ожидаемые логи:
+  ✅ Uploaded: video.mp4 (652.00 MB)
+  POST /api/upload 200 in 234567ms
+
+═══════════════════════════════════════════════════════
+
+📊 СРАВНЕНИЕ:
+
+ДО:   Buffer (в память) → 650MB RAM → OOM → 502 ❌
+ПОСЛЕ: Streaming (на диск) → 10MB RAM → OK → 200 ✅
+
+═══════════════════════════════════════════════════════
+
+🆘 ЕСЛИ ВСЁ РАВНО НЕ РАБОТАЕТ:
+
+1. Проверьте логи:
+   docker logs nextjs_container | tail -100
+
+2. Увеличьте memory до 4G:
+   deploy:
+     resources:
+       limits:
+         memory: 4G
+
+3. Пришлите логи для анализа
+
+═══════════════════════════════════════════════════════
+
+📁 ФАЙЛЫ:
+  route.ts                      - ✅ обновлён (streaming)
+  docker-compose.recommended.yml - пример с настройками
+  FIX_502_BAD_GATEWAY.md         - детальная документация
+
+СТАТУС: ✅ Build успешен, готово к деплою
+

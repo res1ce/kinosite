@@ -1,0 +1,83 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: postgres_kinocompany
+    restart: always
+    environment:
+      POSTGRES_DB: kinocompany
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 6176
+    volumes:
+      - ./database:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d kinocompany"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  nextjs:
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    container_name: nextjs_app
+    restart: always
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://postgres:6176@postgres:5432/kinocompany
+      NEXTAUTH_SECRET: super_secret_long_string
+      NEXTAUTH_URL: https://zabkinokom.ru
+      NODE_OPTIONS: --max-old-space-size=1536
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+    networks:
+      - app-network
+    volumes:
+      - ./app/public/uploads:/app/public/uploads  # ✅ сохраняем картинки на хосте
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx_proxy
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./ssl:/etc/nginx/ssl
+      - ./app/public/uploads:/usr/share/nginx/html/uploads:ro # ✅ nginx будет видеть файлы
+    depends_on:
+      - nextjs
+    networks:
+      - app-network
+
+  studio:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    command: npx prisma studio --port 5000 --hostname 0.0.0.0
+    environment:
+      DATABASE_URL: postgresql://postgres:6176@postgres:5432/kinocompany
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "5000:5000"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

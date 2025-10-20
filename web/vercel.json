@@ -1,0 +1,10 @@
+{
+  "functions": {
+    "api/upload.ts": {
+      "maxDuration": 600,
+      "memory": 3008
+    }
+  },
+  "regions": ["arn1"]
+}
+

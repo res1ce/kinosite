@@ -1,0 +1,54 @@
+═══════════════════════════════════════════════════════
+🚀 БЫСТРАЯ ИНСТРУКЦИЯ: Обновление Nginx для видео 650MB
+═══════════════════════════════════════════════════════
+
+📁 ЧТО ДЕЛАТЬ:
+
+1. БЭКАП (обязательно!)
+   sudo cp /etc/nginx/nginx.conf /etc/nginx/nginx.conf.backup
+
+2. ЗАМЕНИТЕ nginx.conf на новый (из проекта)
+   - Файл: kinosite/nginx.conf
+   
+3. ПРОВЕРЬТЕ конфиг
+   sudo nginx -t
+   
+   ✅ Должно быть: "syntax is ok"
+   ❌ Если ошибка - восстановите бэкап
+
+4. ПЕРЕЗАГРУЗИТЕ Nginx
+   sudo systemctl reload nginx
+   
+5. ПРОВЕРЬТЕ загрузку видео в админке
+
+═══════════════════════════════════════════════════════
+
+🔑 КЛЮЧЕВЫЕ ИЗМЕНЕНИЯ:
+
+✅ client_max_body_size: 1024M  (было 50M)
+✅ Таймауты: 300 секунд (5 минут)
+✅ Специальная секция для /api/upload
+
+═══════════════════════════════════════════════════════
+
+🆘 ЕСЛИ ЧТО-ТО НЕ ТАК:
+
+Откат:
+  sudo cp /etc/nginx/nginx.conf.backup /etc/nginx/nginx.conf
+  sudo systemctl reload nginx
+
+Логи:
+  sudo tail -f /var/log/nginx/error.log
+
+═══════════════════════════════════════════════════════
+
+📋 ЕСЛИ ИСПОЛЬЗУЕТЕ DOCKER:
+
+1. docker cp nginx.conf nginx_container:/etc/nginx/nginx.conf
+2. docker exec nginx_container nginx -t
+3. docker restart nginx_container
+
+═══════════════════════════════════════════════════════
+
+Детальная инструкция: DEPLOY_NGINX_CONFIG.md
+
