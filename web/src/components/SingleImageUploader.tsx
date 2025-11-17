@@ -34,22 +34,36 @@ const colorSchemes = {
 export default function SingleImageUploader({ 
   name, 
   initialUrl = "",
-  variant = "blue" 
+  variant = "blue",
+  value,
+  onChange: onChangeCallback
 }: { 
   name: string; 
   initialUrl?: string;
   variant?: ColorVariant;
+  value?: string;
+  onChange?: (url: string) => void;
 }) {
   const [isUploading, setIsUploading] = useState(false);
-  const [url, setUrl] = useState<string>(initialUrl);
+  const [url, setUrl] = useState<string>(value ?? initialUrl);
   const colors = colorSchemes[variant];
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
+  // Controlled component: sync with external value prop
   useEffect(() => {
-    setUrl(initialUrl);
-    const hidden = document.querySelector<HTMLInputElement>(`input[name='${name}']`);
-    if (hidden) hidden.value = initialUrl;
-  }, [initialUrl, name]);
+    if (value !== undefined) {
+      setUrl(value);
+    }
+  }, [value]);
+
+  // Uncontrolled component: sync with initialUrl
+  useEffect(() => {
+    if (value === undefined) {
+      setUrl(initialUrl);
+      const hidden = document.querySelector<HTMLInputElement>(`input[name='${name}']`);
+      if (hidden) hidden.value = initialUrl;
+    }
+  }, [initialUrl, name, value]);
 
   const upload = async (file: File) => {
     setIsUploading(true);
@@ -59,9 +73,17 @@ export default function SingleImageUploader({
       const res = await fetch("/api/upload", { method: "POST", body: form });
       const data = await res.json();
       if (data.urls?.[0]) {
-        setUrl(data.urls[0]);
-        const hidden = document.querySelector<HTMLInputElement>(`input[name='${name}']`);
-        if (hidden) hidden.value = data.urls[0];
+        const newUrl = data.urls[0];
+        
+        // If controlled, notify parent
+        if (onChangeCallback) {
+          onChangeCallback(newUrl);
+        } else {
+          // If uncontrolled, update internal state
+          setUrl(newUrl);
+          const hidden = document.querySelector<HTMLInputElement>(`input[name='${name}']`);
+          if (hidden) hidden.value = newUrl;
+        }
       }
     } finally {
       setIsUploading(false);
@@ -76,9 +98,14 @@ export default function SingleImageUploader({
   };
 
   const handleRemove = () => {
-    setUrl("");
-    const hidden = document.querySelector<HTMLInputElement>(`input[name='${name}']`);
-    if (hidden) hidden.value = "";
+    if (onChangeCallback) {
+      onChangeCallback("");
+    } else {
+      setUrl("");
+      const hidden = document.querySelector<HTMLInputElement>(`input[name='${name}']`);
+      if (hidden) hidden.value = "";
+    }
+    
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }

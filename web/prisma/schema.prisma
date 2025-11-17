@@ -121,3 +121,16 @@ model TeamMember {
 
   @@map("team_members")
 }
+
+model StaffMember {
+  id          String   @id @default(cuid())
+  name        String
+  role        String   // Актёр, Режиссёр, Оператор и т.д.
+  photo       String?
+  description String   @db.Text
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("staff_members")
+}

@@ -207,6 +207,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
     { title: "Новости", href: "/news" },
     { title: "Локации", href: "/locations" },
     { title: "Услуги", href: "/services" },
+    { title: "Наша команда", href: "/staff" },
     { title: "Документы", href: "/documents" },
     { title: "О нас", href: "/about" },
   ];

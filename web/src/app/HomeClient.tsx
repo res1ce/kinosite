@@ -560,12 +560,20 @@ function Services({ isVisible }: { isVisible: VisibilityState }) {
       hoverGradient: "group-hover:from-pink-500 group-hover:to-purple-500"
     },
     { 
-      title: "Наша команда", 
-      description: "Профессионалы киноиндустрии", 
+      title: "Состав кинокомиссии", 
+      description: "Команда кинокомиссии", 
       icon: <Users size={28} />, 
       href: "/about#team",
       gradient: "from-violet-500 to-indigo-500",
       hoverGradient: "group-hover:from-indigo-500 group-hover:to-violet-500"
+    },
+    { 
+      title: "Наша команда", 
+      description: "Актёры, режиссёры и профессионалы", 
+      icon: <Users size={28} />, 
+      href: "/staff",
+      gradient: "from-pink-500 to-rose-500",
+      hoverGradient: "group-hover:from-rose-500 group-hover:to-pink-500"
     },
   ];
 
